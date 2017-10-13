@@ -1,0 +1,51 @@
+COMMENTAIRES SUR CE FICHIER:
+
+------------
+
+//En entête de chaque fonction dans le header
+/*************************************************
+*Une Description brève mais clair de la fonction *
+*Une Description brève mais clair de la fonction *
+*Une Description brève mais clair de la fonction *
+*************************************************/ 
+void Nomfct(---);
+
+//Dans le code .c ou .cpp pour décrire la fct:
+/*************************************************
+*Une Description brève mais clair de la fonction *
+*Une Description brève mais clair de la fonction *
+*Une Description brève mais clair de la fonction *
+*************************************************/ 
+void Nomfct(---)
+{
+	//corps de la fct
+}
+
+//Define
+
+#ifndef DEF_CLASS
+#define DEF_CLASS
+
+#include <....>
+
+
+//Création de classe
+///!\
+//******************************************
+// ne pas mettre using namespace std; 
+//utiliser plutot std:: dans les headers. 
+//******************************************
+
+class Class{
+	public:
+	type Methode1(type arg);
+	type Methode2(type arg);
+	...
+
+	private:
+	type m_attribut1; 
+	type m_attribut2;
+	type_classique m_attribut3_PremiéreLettreTypeClassique;
+	//Exemple: char m_monchar_C; int m_monint_I;
+	...
+};
