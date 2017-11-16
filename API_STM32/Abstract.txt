@@ -1,0 +1,33 @@
+The CAN project is a simple demo program for the ST 'STM32F103RB' 
+microcontroller using Keil 'MCBSTM32' Evaluation Board, compliant 
+to Cortex Microcontroller Software Interface Standard (CMSIS v2.0).
+
+Example functionality:                                                   
+ - Clock Settings:
+   - XTAL    =            8.00 MHz
+   - SYSCLK  =           72.00 MHz
+   - HCLK    = SYSCLK  = 72.00 MHz
+
+ - CAN controller speed: 500 kbits
+ - send converted analog value in first byte in CAN message 
+ - display received and transmitted byte values on LCD display
+
+This example shows how to use CAN peripheral and how to 
+simulate analog input in uVision.
+
+You may change the value of analog input with potentiometer
+
+
+The CAN example is available in different targets:
+
+  Simulator:       configured for software Simulator
+
+  STM32F103 Flash: configured for on-chip Flash
+                   (used for production or target debugging)
+
+  STM32F103 RAM:   configured for on-chip RAM
+                   (used for target debugging)
+
+Notes:      
+  - to use this example on real CAN network remove 
+    CAN_testmode line from CanDemo.c file
