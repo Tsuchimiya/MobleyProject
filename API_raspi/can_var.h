@@ -34,5 +34,11 @@ char vitesseMesureGauche_c;
 char ultrasonMesure_c;
 
 
+pthread_mutex_t batterie_mutex;
+pthread_mutex_t vitesseMesureDroite_mutex;
+pthread_mutex_t vitesseMesureGauche_mutex;
+pthread_mutex_t ultrasonMesure_mutex;
+pthread_mutex_t angleVolantMesure_mutex;
+
 
 #endif
