@@ -20,7 +20,7 @@
 #include <linux/can.h>
 #include <linux/can/raw.h>
 
-#include <wiringPi.h>
+//#include <wiringPi.h>
 
 #include "can_var.h"
 
@@ -36,9 +36,9 @@ void InitMessage (struct can_frame *frame, int id, int taille);
  * Initialisation globale des communications
  * INPUTS :
 ************************************************************/
-void Init ()
+void Init ();
 
-/********************** SendMessage ************************
+/********************** EnvoiMessage ************************
  * Envoi d'un message
  * INPUTS : frame : pointeur vers trame CAN à transmettre
  *          data : donnée à transmettre
@@ -46,8 +46,14 @@ void Init ()
  * OUTPUT : nbytes : retour de la fonction write
  *********************************************************/
 
-int SendMessage (struct can_frame *frame, char data, int socket);
+int EnvoiMessage (struct can_frame *frame, char data, int socket);
 
-
+/*********************** CreerFiltre **********************
+Crée un filtre pour autoriser un message en réception
+INPUTS : id : id du message
+         indice : emplacement dans le tableau des filtres
+         tabFiltre : tableau contenant les filtres
+ *********************************************************/
+void CreerFiltre (int id, int indice, struct can_filter *tabFiltre);
 
 #endif

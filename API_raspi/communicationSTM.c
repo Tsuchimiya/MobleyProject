@@ -19,24 +19,57 @@ void InitMessage (struct can_frame *frame, int id, int taille)
   *frame.can_dlc = taille;
 }
 
+/*********************** CreerFiltre **********************
+Crée un filtre pour autoriser un message en réception
+INPUTS : id : id du message
+         indice : emplacement dans le tableau des filtres
+         tabFiltre : tableau contenant les filtres
+ *********************************************************/
+void CreerFiltre (int id, int indice, struct can_filter *tabFiltre)
+{
+  *tabFiltre[indice].can_id   = id;
+  *tabFiltre[indice].can_mask = CAN_SFF_MASK;
+}
+
 /*********************** Init ******************************
  * Initialisation globale des communications
  * INPUTS :
 ************************************************************/
 void Init ()
 {
+  // ********************* Creer messages **************************
+  
   // Création message AngleVolantCommande
-  InitMessage (&AngleVolantCommande, 5, 1);
+  InitMessage (&AngleVolantCommande, ANGLEVOLANTCMD, 1);
 
   // Création message VitesseCommandeGauche
-  InitMessage (VitesseCommandeGauche&, 4, 1);
+  InitMessage (VitesseCommandeGauche&, VITESSECMDGAUCHE, 1);
 
   // Création message VitesseCommandeDroite
-  InitMessage (&VitesseCommandeDroite, 3, 1);
+  InitMessage (&VitesseCommandeDroite, VITESSECMDDROITE, 1);
+
+  // ********************* Creer filtres ***************************
+
+  // Filtre batterie
+  CreerFiltre (BATTERIE, 0, rfilter);
+  
+  //Filtre Anglevolantmesure
+  CreerFiltre (ANGLEVOLANTMESURE, 1, &rfilter);
+  
+  // VitesseMesureDroite
+  CreerFiltre (VITESSEMESUREDROITE, 2, &rfilter);
+  
+  // VitesseMesureGauche
+  CreerFiltre (VITESSEMESUREGAUCHE, 3, &rfilter);
+  
+  // UltrasonMesure
+  CreerFiltre (ULTRASONMESURE, 4, rfilter);
+
+  setsockopt(s, SOL_CAN_RAW, CAN_RAW_FILTER, &rfilter, sizeof(rfilter));
   
 }
 
-/********************** SendMessage ************************
+/********************** EnvoiMessage ************************
  * Envoi d'un message
  * INPUTS : frame : pointeur vers trame CAN à transmettre
  *          data : donnée à transmettre
@@ -44,7 +77,7 @@ void Init ()
  * OUTPUT : nbytes : retour de la fonction write
  *********************************************************/
 
-int SendMessage (struct can_frame *frame, char data, int socket)
+int EnvoiMessage (struct can_frame *frame, char data, int socket)
 {
   *frame.data[0]=data;
   nbytes = write(socket, frame, sizeof(struct can_frame));
@@ -53,6 +86,8 @@ int SendMessage (struct can_frame *frame, char data, int socket)
 
 // Messages à envoyer
 struct can_frame AngleVolantCommande, VitesseCommandeGauche, VitesseCommandeDroite;
+// Filtre de réception
+struct can_filter rfilter[NBVARFILTER];
 
 int main(void)
 {
@@ -85,30 +120,6 @@ int main(void)
 		return -2;
 	}
 
-	// ************** filtres réception ****************************
-	// 5 messages en réception = 5 filtres dans rfilter
-	struct can_filter rfilter[5];
-
-	// Batterie
-	rfilter[0].can_id   = 7;
-	rfilter[0].can_mask = CAN_SFF_MASK;
-
-	// Anglevolantmesure
-	rfilter[1].can_id   = 2;
-	rfilter[1].can_mask = CAN_SFF_MASK;
-
-	// VitesseMesureDroite
-	rfilter[2].can_id   = 0;
-	rfilter[2].can_mask = CAN_SFF_MASK;
-
-	// VitesseMesureGauche
-	rfilter[3].can_id   = 1;
-	rfilter[3].can_mask = CAN_SFF_MASK;
-
-	// UltrasonMesure
-	rfilter[4].can_id   = 6;
-	rfilter[4].can_mask = CAN_SFF_MASK;
-
 	/*
 	 // pour recevoir les erreurs du bus can 
 	  can_err_mask_t err_mask = ( CAN_ERR_TX_TIMEOUT | CAN_ERR_BUSOFF );
@@ -116,10 +127,11 @@ int main(void)
 	  	  &err_mask, sizeof(err_mask));
 	*/
 
-	setsockopt(s, SOL_CAN_RAW, CAN_RAW_FILTER, &rfilter, sizeof(rfilter));
 
-
-	// Creation des messages avec taille et id
+	/***************** Initialisation de la communication ******************
+	 * Creation des messages avec taille et id
+         * Creation des filtres de reception
+	 **********************************************************************/
 	Init;
 
        	// ******************* Envoi des messages *********************************
