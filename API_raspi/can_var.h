@@ -27,11 +27,11 @@
 
 
 
-char angleVolantMesure_c;
-char batterie_c;
-char vitesseMesureDroite_c;
-char vitesseMesureGauche_c;
-char ultrasonMesure_c;
+unsigned char angleVolantMesure_c;
+unsigned char batterie_c;
+unsigned char vitesseMesureDroite_c;
+unsigned char vitesseMesureGauche_c;
+unsigned char ultrasonMesure_c;
 
 
 pthread_mutex_t batterie_mutex;
