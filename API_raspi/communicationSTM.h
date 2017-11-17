@@ -4,8 +4,8 @@
 * Une Description brève mais claire de la fonction *
 ****************************************************/
 
-#ifndef _COMMUNICATIONSTM_H
-#define _COMMUNICATIONSTM_H
+#ifndef COMMUNICATIONSTM
+#define COMMUNICATIONSTM
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -56,4 +56,10 @@ INPUTS : id : id du message
  *********************************************************/
 void CreerFiltre (int id, int indice, struct can_filter *tabFiltre);
 
+/**************************** Tests *****************************
+Teste les envois de messages
+INPUTS : socket : 
+ ****************************************************************/
+void Tests (int socket);
+  
 #endif

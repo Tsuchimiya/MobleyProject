@@ -84,6 +84,20 @@ int EnvoiMessage (struct can_frame *frame, char data, int socket)
   return nbytes;
 }
 
+/**************************** Tests *****************************
+Teste les envois de messages
+INPUTS : socket : 
+ ****************************************************************/
+void Tests (int socket)
+{
+  int nbytes;
+  nbytes=EnvoiMessage ( &AngleVolantCommande, 0x11, s);  
+  nbytes=EnvoiMessage ( &VitesseCommandeGauche, 0x13, s);
+  nbytes=EnvoiMessage ( &VitesseCommandeDroite, 0x19, s);
+		
+  printf("Wrote %d bytes\n", nbytes);
+}
+
 // Messages à envoyer
 struct can_frame AngleVolantCommande, VitesseCommandeGauche, VitesseCommandeDroite;
 // Filtre de réception
@@ -92,7 +106,7 @@ struct can_filter rfilter[NBVARFILTER];
 int main(void)
 {
 	int s;
-	int nbytes;
+	
 	struct sockaddr_can addr;
 
 	struct ifreq ifr;
@@ -134,12 +148,8 @@ int main(void)
 	 **********************************************************************/
 	Init;
 
-       	// ******************* Envoi des messages *********************************
-	nbytes=SendMessage ( &AngleVolantCommande, 0x11, s);
-	nbytes=SendMessage ( &VitesseCommandeGauche, 0x11, s);
-	nbytes=SendMessage ( &VitesseCommandeDroite, 0x11, s);
-		
-	printf("Wrote %d bytes\n", nbytes);
+       	// ******************* Envoi des messages ******************************
+	Tests (s);
 	
 	return 0;
 }
