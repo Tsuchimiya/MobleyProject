@@ -15,7 +15,7 @@
 #include <linux/can/raw.h>
 #include <pthread.h>
 
-#define NBVARFILTER 8
+#define NBVARFILTER 5
 #define ANGLEVOLANTMESURE 2
 #define ANGLEVOLANTCMD 5
 #define VITESSECMDGAUCHE 4
@@ -26,20 +26,15 @@
 #define BATTERIE 7
 
 
+char vitesseCmdDroite;
+char vitesseCmdGauche;
+char angleVolant;
 
-unsigned char angleVolantMesure_c;
-unsigned char batterie_c;
-unsigned char vitesseMesureDroite_c;
-unsigned char vitesseMesureGauche_c;
-unsigned char ultrasonMesure_c;
+int idtab[NBVARFILTER] = {BATTERIE,ANGLEVOLANTMESURE,VITESSEMESUREGAUCHE,VITESSEMESUREDROITE,ULTRASONMESURE};
 
 
-pthread_mutex_t batterie_mutex;
-pthread_mutex_t vitesseMesureDroite_mutex;
-pthread_mutex_t vitesseMesureGauche_mutex;
-pthread_mutex_t ultrasonMesure_mutex;
-pthread_mutex_t angleVolantMesure_mutex;
+void * listenCAN (void * data);
 
-int idTab[NBVARFILTER];
+
 
 #endif

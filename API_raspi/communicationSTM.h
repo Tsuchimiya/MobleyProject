@@ -60,6 +60,6 @@ void CreerFiltre (int id, int indice, struct can_filter *tabFiltre);
 Teste les envois de messages
 INPUTS : socket : 
  ****************************************************************/
-void Tests (int socket);
+void Tests (int *s);
   
 #endif
