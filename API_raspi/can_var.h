@@ -26,14 +26,19 @@
 #define BATTERIE 7
 
 
-char vitesseCmdDroite;
-char vitesseCmdGauche;
-char angleVolant;
+
+char angleVolantMesure_c;
+char batterie_c;
+char vitesseMesureDroite_c;
+char vitesseMesureGauche_c;
+char ultrasonMesure_c;
+
+
 
 int idtab[NBVARFILTER] = {BATTERIE,ANGLEVOLANTMESURE,VITESSEMESUREGAUCHE,VITESSEMESUREDROITE,ULTRASONMESURE};
 
 
-void * listenCAN (void * data);
+
 
 
 
