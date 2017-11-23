@@ -27,12 +27,6 @@ main(void)
 	struct ifreq ifr;
 
 	const char *ifname = "vcan0";
-	// opening socket CAN_RAW//SOCK_RAW or CAN_BCM // SOCK_DGRAM BCM = cyclique
-	
-	if((s = socket(PF_CAN, SOCK_RAW, CAN_RAW)) < 0) {
-		perror("Error while opening socket");
-		return -1;
-	}
 
 	//finding dynamically the can0 interface (to bind to all can interface put 0 into the index)
 	strcpy(ifr.ifr_name, ifname);
@@ -43,29 +37,31 @@ main(void)
 
 	printf("%s at index %d\n", ifname, ifr.ifr_ifindex);
 
-	// bind the socket to a can interface
-	if(bind(s, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
-		perror("Error in socket bind");
-		return -2;
+	// opening socket CAN_RAW//SOCK_RAW or CAN_BCM // SOCK_DGRAM BCM = cyclique
+	
+	if((s = socket(PF_CAN, SOCK_DGRAM, CAN_BCM)) < 0) {
+		perror("Error while opening socket");
+		return -1;
 	}
 
 
-	// defining filters for CAN :
-	struct can_filter rfilter[2];
-	rfilter[0].can_id   = 0x123;
-	// both SFF frames with CAN ID 0x123 and EFF frames with 0xXXXXX123 can pass
-	rfilter[0].can_mask = CAN_SFF_MASK;
-	rfilter[1].can_id   = 0x200;
-	rfilter[1].can_mask = 0x700;
+	if((s = connect(s, (struct sockaddr*)&addr, sizeof(addr))) < 0) {
+		perror("Error while connecting socket");
+		return -1;
+	}
 
-	/*
-	  pour recevoir les erreurs du bus can 
-	  can_err_mask_t err_mask = ( CAN_ERR_TX_TIMEOUT | CAN_ERR_BUSOFF );
-	  setsockopt(s, SOL_CAN_RAW, CAN_RAW_ERR_FILTER,
-	  &err_mask, sizeof(err_mask));
-	*/
 
-	setsockopt(s, SOL_CAN_RAW, CAN_RAW_FILTER, &rfilter, sizeof(rfilter));
+	// defining struct to set up a sequence of 2 CAN frames
+
+	struct{
+	  struct bcm_msg_head msg_head;
+	  struct can_frame frame[2];
+	}msgs;
+	
+	struct msgs M;
+	M.msg_head.nframes=2
+
+
 
 
 	// making a packet and sending it
