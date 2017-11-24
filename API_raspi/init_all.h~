@@ -1,0 +1,7 @@
+#ifndef INIT_ALL
+#define INIT_ALL
+#include "can_var.h"
+#include "listen.h"
+#include <pthread.h>
+
+#endif
