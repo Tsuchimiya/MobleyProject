@@ -1,3 +1,32 @@
+-----------------------------
+Projet Mobley 5SIEC 2017-2018
+-----------------------------
+
+-----------------------------------------------------------------
+Ecrire son IP en dur pour pallier aux pbs de déconnexion éthernet
+-----------------------------------------------------------------
+
+Si l'interface utilisée est eth1 :
+Modifier /etc/network/interfaces en sudo
+
+```
+sudo gedit /etc/network/interfaces
+
+```
+
+```
+auto eth1
+iface eth1 inet static
+	address 192.168.1.3
+	netmask 255.255.255.0
+	gateway 192.168.1.255
+```
+
+Ne pas oublier de l'enlever pour une autre utilisation
+---
+SDK
+---
+
 Pour avoir le SDK sur son PC (linux) et ainsi compiler avec les librairies de la raspi :
 
 1. Executer le fichier poky-glibc-x86_64-gei-image-sato-cortexa7hf-neon-vfpv4-toolchain-2.3.2.sh
@@ -26,5 +55,7 @@ user@pc:~/projet5SIEC/API_raspi$ $CC main.c
 
 Toutes les variables (pour compiler avec le g++ ou le gpp de la carte, pour débugger avec le gdb...) sont dans le fichier /opt/poky/2.3.2/environment-setup-cortexa7hf-neon-vfpv4-poky-linux-gnueabi.
 
-4. Demandez le moi par clé USB le SDK fait 450 Mo
--------------------------------------------------
+Télécharger le SDK
+------------------
+
+...
