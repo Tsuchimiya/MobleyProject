@@ -6,24 +6,7 @@
 
 
 /* Includes ------------------------------------------------------------------*/
-#include <stdint.h>
-
-#include "system_time.h"
-
-
-#include "position_sensors.h"
-#include "speed_sensors.h"
-
-#include "motors.h"
-#include "front_motor.h"
-#include "rear_motors.h"
-
-#include "us_sensors.h"
-#include "direction.h"
-#include "can.h"
-
-#include "data_interface.h"
-#include "mirroring.h"
+#include "manager.h"
 
 
 /* Private typedef -----------------------------------------------------------*/
@@ -86,6 +69,26 @@ void Manager_Init(void) {
 		CAN_QuickInit();
     System_Time_QuickInit();
 }
+/*************************
+Fonction privée
+**************************/
+void Tournervolant(int degree_I)
+{	
+	degree_I = degree_I + 145;
+	
+	if(Direction_get() >= degree_I+5)
+	{
+		FrontMotor_turn(RIGHT);
+	}
+	else if(Direction_get() <= degree_I-5)
+	{
+		FrontMotor_turn(LEFT);
+	}
+	else
+	{
+		FrontMotor_turn(NONE);
+	}
+}
 
 /**
  * @brief   Callback associated to the nucleo functionnalities manager whose aim is to set the adequate command and update the sensors' data
@@ -93,7 +96,7 @@ void Manager_Init(void) {
 */
 void Manager_Callback(void) {
     Manager_remainingTimeInCommandPeriod --;
-    
+    pDataITF_PI->enable_motors_control = ENABLE; //Modif SumSum
     if (Manager_remainingTimeInCommandPeriod == 0) {
     // ACTUATORS    
         // Rear motors
@@ -108,11 +111,11 @@ void Manager_Callback(void) {
         }
     
         // Front motors
-        if (pDataITF_PI->motor_dir == LEFT || pDataITF_PI->motor_dir == RIGHT){
-          FrontMotor_turn (pDataITF_PI->motor_dir);
+        if (pDataITF_PI->motor_dir >= -20. && pDataITF_PI->motor_dir <= 20. ){
+            Tournervolant(pDataITF_PI->motor_dir);
         }
-        else if (pDataITF_PI->motor_dir != LEFT && pDataITF_PI->motor_dir != RIGHT) {
-            FrontMotor_turn(NONE);// do nothing
+        else{
+            Tournervolant(0);// do nothing
         }
         
     // SENSORS   

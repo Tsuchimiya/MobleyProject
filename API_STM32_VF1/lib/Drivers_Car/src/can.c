@@ -227,13 +227,13 @@ void CAN_Rx_Callback(uint8_t size, int id, char * data) {
 				paquet.byteMessage[i] = data[i];
 		}
 		if(id == ID_MOTOR_PROP) {
-				pDataITF_PI->motor_prop = paquet.intMessage[0];
+				pDataITF_PI->motor_prop = paquet.byteMessage[0];
 		}
 		else if (id == ID_MOTOR_DIR) {
 			pDataITF_PI->motor_dir = paquet.byteMessage[0];
-			
 		}
+		/*
 		else if(id == ID_MOTOR_ENABLE){
 				pDataITF_PI->enable_motors_control = paquet.byteMessage[0];
-		}
+		}*///ENABLE ne marche pas..
 }
