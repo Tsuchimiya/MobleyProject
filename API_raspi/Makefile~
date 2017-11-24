@@ -1,8 +1,0 @@
-all : main
-
-
-
-main:
-	gcc init_all.c listen.c -o can_recv -lpthread 
-clean:
-	rm -rf *.o
