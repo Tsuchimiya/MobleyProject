@@ -7,6 +7,6 @@
 ".\flash\main.o"
 ".\flash\user.o"
 --library_type=microlib --strict --scatter ".\Flash\CanDemo.sct"
---summary_stderr --info summarysizes --map --xref --callgraph --symbols
+--summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
 --info sizes --info totals --info unused --info veneers
 --list ".\Flash\CanDemo.map" -o .\Flash\CanDemo.axf
