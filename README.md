@@ -1,6 +1,4 @@
------------------------------
-Projet Mobley 5SIEC 2017-2018
------------------------------
+# Projet Mobley 5SIEC 2017-2018
 
 -----------------------------------------------------------------
 Ecrire son IP en dur pour pallier aux pbs de déconnexion éthernet
