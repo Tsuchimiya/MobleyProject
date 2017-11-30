@@ -105,26 +105,21 @@ void Tests (int *s)
   sleep(1);
 
   nbytes=EnvoiMessage ( &AngleVolantCommande, (char)-20, sock);
-  printf("[Test] envoi angle volant: tourner droite %d\n",nbytes);
+  printf("[Test] envoi angle volant: tourner %d\n",nbytes);
   sleep(1);
 
   nbytes=EnvoiMessage ( &VitesseCommandeGauche, (char)25, sock);
-  printf("[Test] envoi cmd vitesse: avancer %d\n",nbytes);
-  sleep(2);
-
-  nbytes=EnvoiMessage ( &AngleVolantCommande, (char)0, sock);
-  printf("[Test] envoi angle volant: redresser %d\n",nbytes);
+  sleep(3);
+  nbytes=EnvoiMessage ( &VitesseCommandeGauche, (char)0, sock);
   sleep(1);
 
-  nbytes=EnvoiMessage ( &AngleVolantCommande, (char)20, sock);
-  printf("[Test] envoi angle volant: tourner gauche %d\n",nbytes);
-  sleep(2);
-
   nbytes=EnvoiMessage ( &AngleVolantCommande, (char)0, sock);
-  printf("[Test] envoi angle volant: redresser %d\n",nbytes);
-  sleep(2);
+ sleep(1);
+  nbytes=EnvoiMessage ( &AngleVolantCommande, (char)20, sock);
+  sleep(1);
+  nbytes=EnvoiMessage ( &AngleVolantCommande, (char)0, sock);
 
-  nbytes=EnvoiMessage ( &VitesseCommandeGauche, (char)0, sock);
-  printf("[Test] envoi cmd vitesse: arrêter %d\n",nbytes);
-
+  
+  
+ 
 }
