@@ -72,7 +72,7 @@ main(void)
     perror("[Init_all] pthread failure with listen");
   }
  printf("[Init_all] starting test\n");
- sleep(5);
+ sleep(3);
  Tests(&s);
 
   pthread_join(test,NULL);
