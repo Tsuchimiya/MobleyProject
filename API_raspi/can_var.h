@@ -15,23 +15,23 @@
 #include <linux/can/raw.h>
 #include <pthread.h>
 
-#define NBVARFILTER 8
-#define ANGLEVOLANTMESURE 2
-#define ANGLEVOLANTCMD 5
-#define VITESSECMDGAUCHE 4
-#define VITESSECMDDROITE 3
-#define VITESSEMESUREGAUCHE 1
-#define VITESSEMESUREDROITE 0
+#define NBVARFILTER 6
+#define ANGLEVOLANTMESURE 5
+#define ANGLEVOLANTCMD 1
+#define VITESSECMDGAUCHE 3
+#define VITESSECMDDROITE 12
+#define VITESSEMESUREGAUCHE 10
+#define VITESSEMESUREDROITE 4
 #define ULTRASONMESURE 6
 #define BATTERIE 7
 
 
 
-unsigned char angleVolantMesure_c;
-unsigned char batterie_c;
-unsigned char vitesseMesureDroite_c;
-unsigned char vitesseMesureGauche_c;
-unsigned char ultrasonMesure_c;
+char angleVolantMesure_c;
+char batterie_c;
+char vitesseMesureDroite_c;
+char vitesseMesureGauche_c;
+char ultrasonMesure_c;
 
 
 pthread_mutex_t batterie_mutex;

@@ -66,7 +66,7 @@ void * treatMsg(struct can_frame canFrame){
     pthread_mutex_unlock(&ultrasonMesure_mutex);
     break;
   default:
-    printf("%s Erreur variable reçue inconnue numéro = %d",TH_NAME,canFrame.can_id);
+    printf("%s Erreur variable reçue inconnue numéro = %d\n",TH_NAME,canFrame.can_id);
 
 
 

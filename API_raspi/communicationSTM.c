@@ -53,6 +53,8 @@ void Init ()
   // Création message VitesseCommandeDroite
   InitMessage (&VitesseCommandeDroite, VITESSECMDDROITE, 1);
 
+
+
 }
 
 /********************** EnvoiMessage ************************
@@ -72,6 +74,7 @@ int EnvoiMessage (struct can_frame *frame, char data, int socket)
 }
 
 
+
 /**************************** Tests *****************************
 Teste les envois de messages
 INPUTS : socket : 
@@ -84,16 +87,19 @@ void Tests (int *s)
   init_socket(&sock);
   Init();
   
- 
+
+  nbytes=EnvoiMessage ( &VitesseCommandeGauche, (char)25, sock);
+  printf("[Test] envoi cmd vitesse : avancer  %d\n",nbytes);
+  sleep(1);
+  nbytes=EnvoiMessage ( &VitesseCommandeGauche, (char)0, sock);
+  printf("[Test] envoi cmd vitesse : arrêt %d\n",nbytes);
+  sleep(1);
+  nbytes=EnvoiMessage ( &VitesseCommandeGauche, (char)-25, sock);
+  printf("[Test] envoi cmd vitesse : reculer %d\n",nbytes);
+  sleep(1);
+  nbytes=EnvoiMessage ( &AngleVolantCommande, (char)20, sock);
+  printf("[Test] envoi angle volant: tourner %d\n",nbytes);
+  sleep(1);
   
-  nbytes=EnvoiMessage ( &AngleVolantCommande, 0x11, sock);
-  printf("[Test] envoi angle cmd volant %d\n",nbytes);
-  sleep(1);
-  nbytes=EnvoiMessage ( &VitesseCommandeGauche, 0x13, sock);
-  printf("[Test] envoi vitesse cmd gauche %d\n",nbytes);
-  sleep(1);
-  nbytes=EnvoiMessage ( &VitesseCommandeDroite, 0x19, sock);
-  printf("[Test] envoi  vitesse cmd droite %d\n",nbytes);
-	
  
 }

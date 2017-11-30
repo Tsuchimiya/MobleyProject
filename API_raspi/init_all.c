@@ -7,8 +7,8 @@ int init_filter(int *sock){
   idTab[3]=ULTRASONMESURE;
   idTab[4]=BATTERIE;
   idTab[5]=VITESSECMDDROITE;
-  idTab[6]=VITESSECMDGAUCHE;
-  idTab[7]= ANGLEVOLANTCMD;
+  //idTab[6]=VITESSECMDGAUCHE;
+  //idTab[7]= ANGLEVOLANTCMD;
   int i = 0;
   // defining filters for CAN :
   struct can_filter rfilter[NBVARFILTER];
@@ -29,7 +29,7 @@ void init_socket(int *s){
 	struct can_frame frame;
 	struct ifreq ifr;
 
-	const char *ifname = "vcan0";
+	const char *ifname = "can0";
 	// opening socket CAN_RAW//SOCK_RAW or CAN_BCM // SOCK_DGRAM BCM = cyclique
 	printf("[init_all] starting socket\n");
 	if((*s = socket(PF_CAN, SOCK_RAW, CAN_RAW)) < 0) {
