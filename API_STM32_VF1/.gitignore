@@ -1,0 +1,27 @@
+# Object files
+*.o
+
+# Compilation files
+*.crf
+*.d
+*.dep
+*.iex
+*.lst
+*.lnp
+*.map
+
+# Keil
+*.bak
+*.ini
+*.axf
+Release
+
+*.html
+*.htm
+*.uvgui.*
+*.uvguix.*
+*.uvopt
+*.uvoptx
+*.saved_uv4
+*.scvd
+*.doc
