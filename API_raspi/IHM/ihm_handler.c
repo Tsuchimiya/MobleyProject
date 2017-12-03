@@ -1,5 +1,19 @@
 #include "ihm_handler.h"
-// Lance une fenetre 
+// Lance une fenetre
+
+void majBatterie(int value){
+  if (DEBUG) {
+    printf("[ihm_handler] maj batterie a %d %%\n", value);
+  }
+  char valueCasted [24];
+  sprintf(valueCasted,"%d %%",value);
+
+  gtk_progress_bar_set_text (GTK_PROGRESS(batterie), valueCasted);
+  gtk_progress_bar_set_fraction(GTK_PROGRESS(batterie),(gdouble)(value/100.0));
+  
+}
+
+
 void * launchWindow (void * p_data){
   gtk_main();
 }
@@ -27,7 +41,8 @@ void initWindow(){
 
   // widgets de la fenetre 
   GtkWidget *window;
-  GtkWidget *button;
+  GtkWidget *table;
+  GtkWidget *logo;
 
   int argc = 0;
   char *argv[]={"main"};
@@ -44,14 +59,21 @@ void initWindow(){
   g_signal_connect (window, "delete-event", G_CALLBACK (delete_event), NULL);
   g_signal_connect (window, "destroy", G_CALLBACK (destroy), NULL);
 
+  // Creation de la table allant contenir tous les widgets
+  table = gtk_table_new (2, 3, TRUE);
+  gtk_container_add (GTK_CONTAINER (window), table);
+
   // Creation du label batterie, parametrage
-  batterie = gtk_label_new("-- %");
-  gtk_container_add (GTK_CONTAINER (window), batterie);
+  batterie = gtk_progress_bar_new();
+  GdkColor col;
+  majBatterie(100);
+  gtk_table_attach_defaults (GTK_TABLE (table), batterie,2,3,0,1);
 
 
   
   // affichage de tous les widgets (TODO recursif)
   gtk_widget_show (batterie);
+  gtk_widget_show(table);
   gtk_widget_show (window);
 
 
@@ -62,12 +84,3 @@ void initWindow(){
 }
 
 
-void majBatterie(int value){
-  if (DEBUG) {
-    printf("[ihm_handler] maj batterie a %d \n", value);
-  }
-  char valueCasted [24];
-  sprintf(valueCasted,"%d",value);
-
-  gtk_label_set_text(GTK_LABEL(batterie), valueCasted);
-}
