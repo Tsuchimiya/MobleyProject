@@ -71,6 +71,11 @@ main(void)
   if(pthread_create(&test,NULL,listenCAN,&s) <0 ){
     perror("[Init_all] pthread failure with listen");
   }
+
+  printf("[Init_all] opening window\n");
+  initWindow();
+
+  
  printf("[Init_all] starting test\n");
  sleep(3);
  Tests(&s);

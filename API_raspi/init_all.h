@@ -1,9 +1,10 @@
 #ifndef INIT_ALL
 #define INIT_ALL
-#include "can_var.h"
-#include "listen.h"
+#include "com_CAN/can_var.h"
+#include "com_CAN/listen.h"
+#include "IHM/ihm_handler.h"
 #include <pthread.h>
-#include "communicationSTM.h"
+#include "com_CAN/communicationSTM.h"
 
 /***********************  init_socket   *******************
  * Initialise et configure un socket conformément aux variables
