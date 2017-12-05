@@ -1,4 +1,7 @@
 #include "ihm_handler.h"
+
+
+
 // Lance une fenetre
 
 void majBatterie(int value){
@@ -8,8 +11,8 @@ void majBatterie(int value){
   char valueCasted [24];
   sprintf(valueCasted,"%d %%",value);
 
-  gtk_progress_bar_set_text (GTK_PROGRESS(batterie), valueCasted);
-  gtk_progress_bar_set_fraction(GTK_PROGRESS(batterie),(gdouble)(value/100.0));
+  gtk_progress_bar_set_text (GTK_PROGRESS_BAR(batterie), valueCasted);
+  gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(batterie),(gdouble)(value/100.0));
   
 }
 
@@ -43,6 +46,7 @@ void initWindow(){
   GtkWidget *window;
   GtkWidget *table;
   GtkWidget *logo;
+  GtkWidget *map;
 
   int argc = 0;
   char *argv[]={"main"};
@@ -60,18 +64,28 @@ void initWindow(){
   g_signal_connect (window, "destroy", G_CALLBACK (destroy), NULL);
 
   // Creation de la table allant contenir tous les widgets
-  table = gtk_table_new (2, 3, TRUE);
+  table = gtk_grid_new ();
   gtk_container_add (GTK_CONTAINER (window), table);
+  gtk_grid_insert_column( GTK_GRID (table), 0);
+  gtk_grid_insert_column( GTK_GRID (table), 1);
+  gtk_grid_insert_column( GTK_GRID (table), 2);
 
   // Creation du label batterie, parametrage
   batterie = gtk_progress_bar_new();
+  gtk_progress_bar_set_show_text (GTK_PROGRESS_BAR(batterie),TRUE);
   GdkColor col;
   majBatterie(100);
-  gtk_table_attach_defaults (GTK_TABLE (table), batterie,2,3,0,1);
+ 
+  gtk_grid_attach (GTK_GRID (table), batterie,2,0,100,20);
 
+  // Création de la map
+  // map = osm_gps_map_new ();
+
+  // gtk_grid_atach(GTK_GRID (table), map, 1,0,200,200);
 
   
   // affichage de tous les widgets (TODO recursif)
+  //gtk_widget_show (map);
   gtk_widget_show (batterie);
   gtk_widget_show(table);
   gtk_widget_show (window);

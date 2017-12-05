@@ -1,5 +1,6 @@
-PACKAGE = `pkg-config --cflags --libs gtk+-2.0`
-LIBS = `pkg-config --libs gtk+-2.0`
+PACKAGE = `pkg-config --cflags --libs gtk+-3.0`
+LIBS = `pkg-config --libs gtk+-3.0`
+
 
 all : main
 
