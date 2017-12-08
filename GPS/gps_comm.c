@@ -18,8 +18,20 @@ void computeCourse(gps_data_t* data, gps_data_t* before)
 
   if (dx==0 && dy==0) {
     course=0;
-  } else if(dx>=0 ???? {
-    course=atan2(dx/dy);
+  } else if(dx==0 && dy>0) {
+    course=0;
+  } else if(dx>0 && dy!=0) {
+    course=atan2(dx,dy)*toDeg;
+  } else if(dx>0 && dy==0) { //atan2(dx,0) returns error
+    course=90.0;
+  } else if(dx==0 && dy<0) {
+    course=180.0;
+  } else if(dx<0 && dy!=0) {
+    course=360.0+atan2(dx,dy)*toDeg;
+  } else if(dx<0 && dy==0) {
+    course=270.0;
+  } else {
+    printf("[GPS] course out of range\n");
   }
 
   data->fix.track=course;
@@ -42,6 +54,7 @@ void main()
 
   while(1)
   {
+    before=data;
     if (gps_waiting(&data, timeout))
     {
       if (gps_read(&data)==-1)
@@ -54,7 +67,6 @@ void main()
         && !isnan(data.fix.longitude))
         {
           nbMeasures++;
-          before=data;
           if(nbMeasures>1)
           {
             computeCourse(&data, &before);
