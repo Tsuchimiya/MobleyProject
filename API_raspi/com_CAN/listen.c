@@ -38,6 +38,22 @@ void * treatMsg(struct can_frame canFrame){
     // affichage sur l'ihm
     int value = (int)canFrame.data[0];
     if(value >=0 && value < 100){
+
+      if (value <= 54){
+	if (value <= 51){
+
+	  if (DEBUG)
+	    printf("%s PLUS DE BATTERIE \n",TH_NAME);
+	  
+	  alert(BATTERIE_CRITIC);
+	}else{
+	  if (DEBUG)
+	    printf("%s BATTERIE FAIBLE \n",TH_NAME);
+	  
+	  alert(BATTERIE_FAIBLE);
+	}
+      }
+      value = (value - 50) *2;
       majBatterie(value);
     }
     else{
