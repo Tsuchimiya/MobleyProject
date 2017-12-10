@@ -1,5 +1,6 @@
 #include "init_all.h"
-
+// 51 % voiture s'arrete
+// avvertissement à 54 %
 int init_filter(int *sock){
   idTab[0]=ANGLEVOLANTMESURE;
   idTab[1]=VITESSEMESUREGAUCHE;
@@ -19,6 +20,19 @@ int init_filter(int *sock){
   }
 
    return setsockopt(*sock, SOL_CAN_RAW, CAN_RAW_FILTER, &rfilter, sizeof(rfilter));
+
+}
+
+
+void test_maj(){
+  double lt = 2.0;
+  double lg  = 50.0;
+  while(1){
+    majCoords(lt,lg);
+    lt=lt + 0.00000001;
+    lg++;
+    usleep(250000);
+  }
 
 }
 
@@ -62,6 +76,7 @@ int
 main(void)
 {
   pthread_t test;
+  pthread_t gps;
 
 
   int s;
@@ -69,17 +84,26 @@ main(void)
   printf("[Init_all] starting listenCAN\n");
 
   if(pthread_create(&test,NULL,listenCAN,&s) <0 ){
-    perror("[Init_all] pthread failure with listen");
+    perror("[Init_all] pthread failure with listen CAN");
   }
 
   printf("[Init_all] opening window\n");
   initWindow();
 
+
+  if(pthread_create(&gps,NULL,listenGPS,NULL) <0 ){
+    perror("[Init_all] pthread failure with listen GPS ");
+  }
+
+  //test_maj();
+
   
  printf("[Init_all] starting test\n");
  sleep(3);
- Tests(&s);
+ //Tests(&s);
 
   pthread_join(test,NULL);
+  pthread_join(gps,NULL);
+
   return 0;
 }

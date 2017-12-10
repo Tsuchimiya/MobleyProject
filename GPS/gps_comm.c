@@ -1,11 +1,8 @@
-#include <gps.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
+#include "gps_comm.h"
 
 #define PI 3.14159265
 
-void computeCourse(gps_data_t* data, gps_data_t* before)
+void computeCourse(struct gps_data_t* data,struct gps_data_t* before)
 {
   double toDeg = 180.0/PI;
   double course;
@@ -37,7 +34,7 @@ void computeCourse(gps_data_t* data, gps_data_t* before)
   data->fix.track=course;
 }
 
-void main()
+void *listenGPS(void * arg)
 {
   int timeout=250000;
   int open;
@@ -71,8 +68,17 @@ void main()
           {
             computeCourse(&data, &before);
           }
+
+	  if (DEBUG){
           printf("latitude: %lf, longitude: %lf, speed: %lf, course: %lf, latt. error: %.2lf, long. error: %.2lf, timestamp: %lf\n",
           data.fix.latitude, data.fix.longitude, data.fix.speed, data.fix.track, data.fix.epy, data.fix.epx, data.fix.time);
+
+	  }
+
+	  majCoords(data.fix.latitude,data.fix.longitude);
+
+
+
         } else {
           printf("no GPS data available\n");
         }
