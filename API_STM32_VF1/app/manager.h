@@ -15,6 +15,7 @@
 #include "motors.h"
 #include "front_motor.h"
 #include "rear_motors.h"
+#include "battery.h"
 
 #include "us_sensors.h"
 #include "direction.h"

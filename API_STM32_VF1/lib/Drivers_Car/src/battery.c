@@ -30,9 +30,13 @@ void Battery_QuickInit(void) {
  * @brief   Returns the charge of the battery
  * @retval  Charge of the battery (in percentage)
 */
+float BatteryValue;
 uint8_t Battery_get(void) {
-    uint16_t BatteryValue = ADC_QuickGet(BATTERY_ADC, BATTERY_RANK);
-    return PERCENTAGE*(BatteryValue - BATTERY_ADC_SCALE)/BATTERY_ADC_SCALE;
+		float Batterie_volt=0.;
+    BatteryValue = ADC_QuickGet(BATTERY_ADC, BATTERY_RANK);
+    //return PERCENTAGE*(BatteryValue - BATTERY_ADC_SCALE)/BATTERY_ADC_SCALE;
+		Batterie_volt=(float)((float)BatteryValue/(4095.));
+		return PERCENTAGE*Batterie_volt;
 }
 
 /* Private functions ---------------------------------------------------------*/

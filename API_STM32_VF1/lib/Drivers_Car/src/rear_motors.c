@@ -169,6 +169,9 @@ float ComputeMotorCommand_L (int16_t speed_cmd, int16_t current, int16_t speed){
         }
     }
     else {
+				coef_in_PI = (MAX_CURRENT - fabs(current_f)) / MAX_CURRENT;
+        in_PI = (int32_t)((float)((int32_t)speed_cmd - (int32_t)speed) * coef_in_PI);
+        dc = PI_Controller_L(in_PI) ; 
         dc = (float)MOTORS_PWM_ZERO;
     }
     
@@ -205,6 +208,9 @@ float ComputeMotorCommand_R (int16_t speed_cmd, int16_t current, int16_t speed){
         }
     }
     else {
+        coef_in_PI = (MAX_CURRENT - fabs(current_f)) / MAX_CURRENT;
+        in_PI = (int32_t)((float)((int32_t)speed_cmd - (int32_t)speed) * coef_in_PI);
+        dc = PI_Controller_R(in_PI) ; 
         dc = (float)MOTORS_PWM_ZERO;
     }
     return dc;

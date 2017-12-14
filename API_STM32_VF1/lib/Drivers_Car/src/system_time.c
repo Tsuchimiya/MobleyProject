@@ -79,6 +79,11 @@ void SysTick_Callback(void) {
 					pDataITF_STM->battery_level =  Battery_get();
 					pDataITF_STM->steering_stop_sensor_L = Direction_get();
 				}
+				else if (cpt_envoie==3)
+				{
+					//Battery
+					CAN_Send_Battery();
+				}
 				else
 					cpt_envoie=0;
 				

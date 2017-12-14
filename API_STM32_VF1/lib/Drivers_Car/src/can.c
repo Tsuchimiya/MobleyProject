@@ -13,6 +13,7 @@
 #include "data_interface.h"
 #include "common_constants.h"
 #include "us_sensors.h"
+#include "battery.h"
 
 
 /* Global Variable*/
@@ -218,6 +219,12 @@ void CAN_Send_Current(void){
 			paquet.intMessage[1] = pDataITF_STM->motor_current_L;
 			paquet.intMessage[2] = pDataITF_STM->motor_current_F;
 			CAN_Send(ID_MOTOR_CURRENT, paquet.stringMessage);
+}
+
+void CAN_Send_Battery (void) {
+	data_paquet paquet;
+	paquet.intMessage[0]=Battery_get();
+	CAN_Send(ID_BATTERY, paquet.stringMessage);
 }
 
 void CAN_Rx_Callback(uint8_t size, int id, char * data) {
