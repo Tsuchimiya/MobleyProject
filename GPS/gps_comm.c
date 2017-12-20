@@ -1,38 +1,7 @@
 #include "gps_comm.h"
 
-#define PI 3.14159265
 
-void computeCourse(struct gps_data_t* data,struct gps_data_t* before)
-{
-  double toDeg = 180.0/PI;
-  double course;
-  double x2=data->fix.longitude;
-  double x1=before->fix.longitude;
-  double y2=data->fix.latitude;
-  double y1=before->fix.latitude;
-  double dx=x2-x1;
-  double dy=y2-y1;
 
-  if (dx==0 && dy==0) {
-    course=0;
-  } else if(dx==0 && dy>0) {
-    course=0;
-  } else if(dx>0 && dy!=0) {
-    course=atan2(dx,dy)*toDeg;
-  } else if(dx>0 && dy==0) { //atan2(dx,0) returns error
-    course=90.0;
-  } else if(dx==0 && dy<0) {
-    course=180.0;
-  } else if(dx<0 && dy!=0) {
-    course=360.0+atan2(dx,dy)*toDeg;
-  } else if(dx<0 && dy==0) {
-    course=270.0;
-  } else {
-    printf("[GPS] course out of range\n");
-  }
-
-  data->fix.track=course;
-}
 
 void *listenGPS(void * arg)
 {
@@ -63,10 +32,13 @@ void *listenGPS(void * arg)
         && !isnan(data.fix.latitude)
         && !isnan(data.fix.longitude))
         {
-          nbMeasures++;
+          nbMeasures++; // peut poser pb et VA déborder à modifier
+	  
           if(nbMeasures>1)
           {
-            computeCourse(&data, &before);
+            
+	      // update des coordonnees
+	  update_coords(data.fix.longitude,data.fix.latitude,before.fix.longitude,before.fix.latitude);
           }
 
 	  if (DEBUG){
@@ -75,8 +47,9 @@ void *listenGPS(void * arg)
 
 	  }
 
+	  // maj des coords sur l'IHM
 	  majCoords(data.fix.latitude,data.fix.longitude);
-
+	
 
 
         } else {
@@ -86,3 +59,4 @@ void *listenGPS(void * arg)
     }
   }
 }
+

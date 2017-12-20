@@ -78,11 +78,17 @@ main(void)
   pthread_t test;
   pthread_t gps;
 
-
+  // initialisation des variables de com can (A FAIRE AVANT LES THREADS)
+  int sockSend;
+  init_socket(&sockSend);
+  Init();
+  setSockSend(sockSend);
+  
   int s;
   init_socket(&s);
   printf("[Init_all] starting listenCAN\n");
 
+  // demarage thread de reception des msg can
   if(pthread_create(&test,NULL,listenCAN,&s) <0 ){
     perror("[Init_all] pthread failure with listen CAN");
   }
@@ -90,6 +96,9 @@ main(void)
   printf("[Init_all] opening window\n");
   initWindow();
 
+
+  
+  // demarage thread gps
 
   if(pthread_create(&gps,NULL,listenGPS,NULL) <0 ){
     perror("[Init_all] pthread failure with listen GPS ");

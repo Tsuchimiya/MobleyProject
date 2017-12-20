@@ -6,6 +6,7 @@
 #include <math.h>
 #include "../API_raspi/IHM/ihm_handler.h"
 #include "../API_raspi/debug.h"
+#include "Trajectoires/segment.h"
 
 
 void *listenGPS(void * arg);
