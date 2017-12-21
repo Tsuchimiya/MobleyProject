@@ -83,6 +83,7 @@ main(void)
   init_socket(&sockSend);
   Init();
   setSockSend(sockSend);
+  goToPoint(1.466152,43.570375);
   
   int s;
   init_socket(&s);

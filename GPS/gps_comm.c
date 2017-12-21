@@ -34,12 +34,14 @@ void *listenGPS(void * arg)
         {
           nbMeasures++; // peut poser pb et VA déborder à modifier
 	  
-          if(nbMeasures>1)
+          if(nbMeasures>3)
           {
             
 	      // update des coordonnees
-	  update_coords(data.fix.longitude,data.fix.latitude,before.fix.longitude,before.fix.latitude);
-          }
+	    update_coords(data.fix.longitude,data.fix.latitude,before.fix.longitude,before.fix.latitude);
+          }else{
+	    sendVitesse(20);
+	  }
 
 	  if (DEBUG){
           printf("latitude: %lf, longitude: %lf, speed: %lf, course: %lf, latt. error: %.2lf, long. error: %.2lf, timestamp: %lf\n",
