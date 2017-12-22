@@ -1,7 +1,7 @@
 #include "gps_comm.h"
 
 
-
+int initGPS = 0;
 
 void *listenGPS(void * arg)
 {
@@ -34,25 +34,24 @@ void *listenGPS(void * arg)
         {
           nbMeasures++; // peut poser pb et VA déborder à modifier
 	  
-          if(nbMeasures>3)
+          if(initGPS>=1)
           {
-            
+            printf("[GPS] update des coords\n");
 	      // update des coordonnees
 	    update_coords(data.fix.longitude,data.fix.latitude,before.fix.longitude,before.fix.latitude);
           }else{
+	    printf("[GPS] init \n");
 	    sendVitesse(20);
 	  }
 
 	  if (DEBUG){
           printf("latitude: %lf, longitude: %lf, speed: %lf, course: %lf, latt. error: %.2lf, long. error: %.2lf, timestamp: %lf\n",
           data.fix.latitude, data.fix.longitude, data.fix.speed, data.fix.track, data.fix.epy, data.fix.epx, data.fix.time);
-
 	  }
-
+	  initGPS = 2;
 	  // maj des coords sur l'IHM
 	  majCoords(data.fix.latitude,data.fix.longitude);
-	
-
+	  
 
         } else {
           printf("no GPS data available\n");

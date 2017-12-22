@@ -1,8 +1,8 @@
 #include "codeRegulPos.h"
 //Variable de commande.
-int Commande_Angle_I[2];
-int Ki_I;
-int Kp_I;
+float Commande_Angle_I[2];
+float Ki_I;
+float Kp_I;
 
 //Initialisation des valeurs pour la régulation.
 void initRegulPos(void)
@@ -16,23 +16,25 @@ void initRegulPos(void)
 void RegulationPos(int angleVersPoint_I)
 {	
 	//Choix d'une régulation selon l'orientation de la voiture.
+	//Droite donc tourne à gauche.
 	if(angleVersPoint_I >= 0 && angleVersPoint_I <= 90)
 	{
-		Commande_Angle_I[0] = angleVersPoint_I * Kp_I;
+		Commande_Angle[0] = -angleVersPoint_I * Kp_I;
 	}
 	else if(angleVersPoint_I > 90 && angleVersPoint_I <= 180)
 	{
 		//Dans le cas d'une erreur trop grande, on sature.
-		Commande_Angle_I[0] = 20;
+		Commande_Angle_I[0] = -20;
 	}
+	//Gauche donc tourne à droite.
 	else if(angleVersPoint_I > 180 && angleVersPoint_I <= 270)
 	{
-		Commande_Angle_I[0] = -angleVersPoint_I * Kp_I;
+		Commande_Angle_I[0] = (angleVersPoint_I-180) * Kp_I;
 	}
 	else if(angleVersPoint_I > 270)
 	{
 		//Dans le cas d'une erreur trop grande, on sature.
-		Commande_Angle_I[0] = -20;
+		Commande_Angle_I[0] = 20;
 	}
 	else
 	{
@@ -41,6 +43,6 @@ void RegulationPos(int angleVersPoint_I)
 	
 	//MAJ de la valeur ancienne, pour le prochain passage.
 	Commande_Angle_I[1] = Commande_Angle_I[0];
-	//Envoi de la commande d'angle.
-	sendAngle(Commande_Angle_I[0]);
+	//Envoit de la commande d'angle.
+	
 }
