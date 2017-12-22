@@ -35,15 +35,22 @@ int computeCourseCoords(double long_before,double lat_before,double longitude, d
   return course;
 }
 
-// On calcule l'angle vers lequel aller
-int computeAngleToGo ( double long_vago, double lat_vago, double long_vago_before, double lat_vago_before){
+struct angles{
+  int angleVago;
+  int angleToGo;
+};
 
+// On calcule l'angle vers lequel aller
+struct angles computeAngleToGo ( double long_vago, double lat_vago, double long_vago_before, double lat_vago_before){
+  struct angles A;
   int angleNordCoords = computeCourseCoords(long_vago,lat_vago, destination.longitude, destination.latitude);
   int angleVago = computeCourseCoords(long_vago_before,lat_vago_before, long_vago,lat_vago);
-
+  ;
   printf("Angle nord coords = %d",angleNordCoords);
   printf("  Angle vago = %d \n",angleVago);
-  return angleNordCoords-angleVago;
+  A.angleToGo = angleNordCoords-angleVago;
+  A.angleVago = angleVago;
+  return A;
 
 }
 
@@ -55,6 +62,7 @@ void goToPoint(double longitude, double latitude){
   nbErrors = 0;
   previousAngle = 0;
   initRegulPos();
+  sendAngle(0);
   
   
 }
@@ -75,6 +83,7 @@ struct coordonnees nextPoint(){
 
 int update_coords(double long_vago,double lat_vago, double long_vago_before,double lat_vago_before){
   int angleToGo;
+  struct angles A;
   switch (init){
     
   case NOT_INIT:
@@ -99,23 +108,31 @@ int update_coords(double long_vago,double lat_vago, double long_vago_before,doub
     }
     else {
       // calcul de l'angle vers lequel aller
-      angleToGo = computeAngleToGo (long_vago,lat_vago,long_vago_before,lat_vago_before);
+      A = computeAngleToGo (long_vago,lat_vago,long_vago_before,lat_vago_before);
+      angleToGo = A.angleToGo;
+   
       printf("[Trajectoire] Angle to GO = %d \n",angleToGo);
       // si l'angle parait correct on regule
-      if (abs(angleToGo - previousAngle) < SEUIL_ANGLE){
+      if (abs(A.angleVago - previousAngle) < SEUIL_ANGLE){
 	printf("[Trajectoire] REGULATION SENT \n");
-	RegulationPos(angleToGo);
-	previousAngle = angleToGo;
+	if(RegulationPos(angleToGo))
+	{
+		A.angleVago = A.angleVago - 180;
+		stateVoiture = VOITURE_STOPPED;
+	}
+	
 
 	// on fait avancer la voiture si elle n'avancait pas deja
 	if (stateVoiture == VOITURE_STOPPED){
 	  sendVitesse(50);
 	}
-	
+	previousAngle = A.angleVago;
       }
+      
 
       // si l'angle est incorrect on ne fait rien , au bout d'un nombre d'erreur consecutives, STOP de la voiture car on est perdus
       else{
+	sendAngle(0);
 	if(nbErrors < SEUIL_ERREUR_CONSEQ){
 	  nbErrors ++;
 	  return 0;
@@ -125,6 +142,7 @@ int update_coords(double long_vago,double lat_vago, double long_vago_before,doub
 	  return ERROR_UPDATE_COORDS;
 	}
       }
+      
     }
     return 0;
     break;

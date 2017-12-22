@@ -17,10 +17,11 @@ void *listenGPS(void * arg)
     exit(-1);
   }
   gps_stream(&data, WATCH_ENABLE | WATCH_JSON, NULL);
-
+  int jump = 0;
   while(1)
   {
-    before=data;
+    if (jump)
+      before=data;
     if (gps_waiting(&data, timeout))
     {
       if (gps_read(&data)==-1)
@@ -32,25 +33,45 @@ void *listenGPS(void * arg)
         && !isnan(data.fix.latitude)
         && !isnan(data.fix.longitude))
         {
-          nbMeasures++; // peut poser pb et VA déborder à modifier
-	  
+         
+	  double l = data.fix.latitude;
+	  double l1 = data.fix.longitude;
           if(initGPS>=1)
           {
             printf("[GPS] update des coords\n");
 	      // update des coordonnees
-	    update_coords(data.fix.longitude,data.fix.latitude,before.fix.longitude,before.fix.latitude);
+	    if (jump){
+	      jump = 0;
+	    }
+	    else{
+	      jump = 1;
+	      update_coords(data.fix.longitude,data.fix.latitude,before.fix.longitude,before.fix.latitude);
+	    }
           }else{
+	    if (jump){
+	      jump = 0;
+	    }
+	    else{
+	      jump = 1;
+	    }
+	    
 	    printf("[GPS] init \n");
-	    sendVitesse(20);
+	    sendVitesse(40);
+		 nbMeasures++; 
+		if (nbMeasures > 10){
+			initGPS = 2;
+			nbMeasures = 0;
+		}
 	  }
 
 	  if (DEBUG){
           printf("latitude: %lf, longitude: %lf, speed: %lf, course: %lf, latt. error: %.2lf, long. error: %.2lf, timestamp: %lf\n",
           data.fix.latitude, data.fix.longitude, data.fix.speed, data.fix.track, data.fix.epy, data.fix.epx, data.fix.time);
 	  }
-	  initGPS = 2;
+	
 	  // maj des coords sur l'IHM
-	  majCoords(data.fix.latitude,data.fix.longitude);
+		
+	//  majCoords(l,l1);
 	  
 
         } else {
