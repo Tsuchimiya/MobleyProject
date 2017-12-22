@@ -51,6 +51,85 @@ void majCoords(double lat, double lon){
 
 }
 
+// Fonction creant la liste de destinations
+void CreerListe (GtkTreeStore *destinations, GtkWidget *liste_dest) {
+  
+  GtkTreeViewColumn *colonne;
+  GtkCellRenderer *renderer;
+
+  // Creation du modele de la liste contenant les destinations
+  destinations = gtk_tree_store_new (1, G_TYPE_STRING);
+
+  // Remplissage de la liste
+  RemplirListe(destinations);
+  printf("liste remplie \n");
+
+  // Creation de la vue
+  liste_dest = gtk_tree_view_new_with_model(GTK_TREE_MODEL(destinations));
+  printf("vue creee\n");
+  g_object_unref (G_OBJECT (destinations));
+
+  // Creation d'un "cell renderer"
+  renderer = gtk_cell_renderer_text_new ();
+  g_object_set (G_OBJECT (renderer),"foreground", "blue", NULL);
+
+  // Creation d'une colonne
+  colonne =  gtk_tree_view_column_new_with_attributes ("Destinations", renderer, "text", DESTINATIONS,NULL);
+
+  // Ajout de la colonne à la vue
+  gtk_tree_view_append_column (GTK_TREE_VIEW (liste_dest), colonne);
+
+}
+
+// Fonction de selection destination
+void ChoixDestination (GtkTreeSelection *choix, gpointer donnee) {
+
+  GtkTreeIter iterateur;
+  GtkTreeModel *model;
+  gchar *dest;
+
+  if (gtk_tree_selection_get_selected (choix, &model, &iterateur)) 
+    {
+      gtk_tree_model_get (model, &iterateur, DESTINATIONS, &dest, -1);
+
+      // Affichage dans le terminal
+      g_print ("[ihm_handler] Vous souhaitez aller au %s\n", dest);
+
+      // Affichage dans un popup
+      GtkDialogFlags flags = GTK_DIALOG_DESTROY_WITH_PARENT;
+      GtkWidget * dialog;
+      dialog = gtk_message_dialog_new (window,flags, GTK_MESSAGE_INFO, GTK_BUTTONS_OK,"Vous souhaitez aller au %s\n", dest);
+      gtk_dialog_run (GTK_DIALOG (dialog));
+      gtk_widget_destroy (dialog);
+
+      g_free (dest);
+      }
+}
+
+// Fonction de remplissage de la liste
+void RemplirListe(GtkTreeStore *destinations) {
+  
+  // Creation de l'iterateur
+  GtkTreeIter iterateur;
+  gtk_tree_store_append (destinations, &iterateur, NULL);
+
+  // Remplissage de la liste
+  gtk_tree_store_set (destinations, &iterateur, DESTINATIONS, "GB",-1);
+  gtk_tree_store_append (destinations, &iterateur, NULL);
+  gtk_tree_store_set (destinations, &iterateur, DESTINATIONS, "GC",-1);
+  gtk_tree_store_append (destinations, &iterateur, NULL);
+  gtk_tree_store_set (destinations, &iterateur, DESTINATIONS, "GEI",-1);
+  gtk_tree_store_append (destinations, &iterateur, NULL);
+  gtk_tree_store_set (destinations, &iterateur, DESTINATIONS, "GMM",-1);
+  gtk_tree_store_append (destinations, &iterateur, NULL);
+  gtk_tree_store_set (destinations, &iterateur, DESTINATIONS, "GM",-1);
+  gtk_tree_store_append (destinations, &iterateur, NULL);
+  gtk_tree_store_set (destinations, &iterateur, DESTINATIONS, "GP",-1);
+  gtk_tree_store_append (destinations, &iterateur, NULL);
+  gtk_tree_store_set (destinations, &iterateur, DESTINATIONS, "GPE",-1);
+  gtk_tree_store_append (destinations, &iterateur, NULL);
+  gtk_tree_store_set (destinations, &iterateur, DESTINATIONS, "RU",-1);  
+}
 
 void * launchWindow (void * p_data){
   gtk_main();
@@ -74,6 +153,7 @@ static void destroy( GtkWidget *widget,
     gtk_main_quit ();
 }
 
+// Fonction initialisant la fenetre
 void initWindow(){
 
 
@@ -82,6 +162,9 @@ void initWindow(){
   GtkWidget *table;
   GtkWidget *logo;
   GtkWidget *map;
+  GtkTreeStore *destinations;
+  GtkWidget *liste_dest;
+
   int argc = 0;
   char *argv[]={"main"};
 
@@ -93,7 +176,7 @@ void initWindow(){
   // Creation de la fenetre de l'IHM et parametrage
   window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
   gtk_window_set_title (GTK_WINDOW (window), "GeoCar");
-  gtk_container_set_border_width (GTK_CONTAINER (window),200);
+  gtk_container_set_border_width (GTK_CONTAINER (window),100);
 
   // Definition du comportement a avoir si on quitte la fenetre
   g_signal_connect (window, "delete-event", G_CALLBACK (delete_event), NULL);
@@ -111,6 +194,7 @@ void initWindow(){
   GtkWidget * gpsTitre;
   GtkWidget * batTitre;
   GtkWidget * statusTitre;
+  GtkWidget * destTitre;
 
   const char *format = "<span underline='double' font_weight='bold' color=\"black\" > %s </span>";
   gpsTitre = gtk_label_new(NULL);
@@ -119,10 +203,14 @@ void initWindow(){
   gtk_label_set_markup(GTK_LABEL(batTitre),g_markup_printf_escaped(format,"Batterie"));
   statusTitre = gtk_label_new(NULL);
   gtk_label_set_markup(GTK_LABEL(statusTitre),g_markup_printf_escaped(format,"Informations voiture"));
+  destTitre = gtk_label_new(NULL);
+  gtk_label_set_markup(GTK_LABEL(destTitre),g_markup_printf_escaped(format,"Où voulez-vous aller ?"));
 
   gtk_grid_attach (GTK_GRID (table), gpsTitre,0,0,2,1);
   gtk_grid_attach (GTK_GRID (table), batTitre,2,0,1,1);
   gtk_grid_attach (GTK_GRID (table), statusTitre,0,4,3,1);
+  gtk_grid_attach (GTK_GRID (table), destTitre,0,5,3,8);
+
 
   /*label#title-label {
   font: 15px Sans
@@ -145,11 +233,58 @@ void initWindow(){
   // Creation des labels coord
   lattitude = gtk_label_new(NULL);
   longitude = gtk_label_new(NULL);
-  majCoords(0.0,0.0);
+  majCoords(43.570600,1.466499);
   
   gtk_grid_attach (GTK_GRID (table), lattitude,0,1,1,1);
   gtk_grid_attach (GTK_GRID (table), longitude,1,1,1,1);
+
+  /************************************************* DESTINATIONS ***********************************************/
+ /*********************************************************************************************************/
+
+// Creation de la liste
+  //CreerListe (destinations, liste_dest);
+  GtkTreeViewColumn *colonne;
+  GtkCellRenderer *renderer;
+
+  // Creation du modele de la liste contenant les destinations
+  destinations = gtk_tree_store_new (1, G_TYPE_STRING);
+
+  // Remplissage de la liste
+  RemplirListe(destinations);
+
+  // Creation de la vue
+  liste_dest = gtk_tree_view_new_with_model(GTK_TREE_MODEL(destinations));
+  g_object_unref (G_OBJECT (destinations));
+
+  // Creation d'un "cell renderer"
+  renderer = gtk_cell_renderer_text_new ();
+  g_object_set (G_OBJECT (renderer),"foreground", "blue", NULL);
+
+  // Creation d'une colonne
+  colonne =  gtk_tree_view_column_new_with_attributes ("Destinations", renderer, "text", DESTINATIONS,NULL);
+
+  // Ajout de la colonne à la vue
+  gtk_tree_view_append_column (GTK_TREE_VIEW (liste_dest), colonne);
+
+  gtk_grid_attach (GTK_GRID (table), liste_dest,0,10,4,4);
+
+  // Bouton valider
+  GtkWidget * Valider_btn;
+  Valider_btn=gtk_button_new_with_label ("Confirmer");
+  gtk_grid_attach (GTK_GRID (table),Valider_btn ,0,15,1,1);
+
+
+  // Choix de la destination
+  GtkTreeSelection *choix;
+  gpointer donnee;
   
+  choix = gtk_tree_view_get_selection (GTK_TREE_VIEW (liste_dest));
+  gtk_tree_selection_set_mode (choix, GTK_SELECTION_SINGLE);
+  g_signal_connect_swapped (Valider_btn, "clicked",G_CALLBACK (ChoixDestination), G_OBJECT (choix));
+  ChoixDestination (choix, donnee);
+
+ /*********************************************************************************************************/
+  /*********************************************************************************************************/
   
   // Création de la map
  

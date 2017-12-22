@@ -44,4 +44,21 @@ void majCoords(double lat, double lon);
 void alert(int type_error);
 
 
+/*********************** Choix de la destination **********************
+Gestion de la liste contenant les destinations
+***********************************************************************/
+enum {
+  DESTINATIONS
+};
+
+// Fonction creant la liste de destinations
+void CreerListe (GtkTreeStore *destinations, GtkWidget *liste_dest);
+
+// Fonction de selection destination
+void ChoixDestination (GtkTreeSelection *choix, gpointer donnee);
+
+
+// Fonction de remplissage de la liste
+void RemplirListe(GtkTreeStore *destinations);
+
 #endif
