@@ -24,19 +24,32 @@
 
 #include "can_var.h"
 
-/*********************** InitMessage **********************
- * Initialisation d'un message à envoyer
- * INPUTS : frame : pointeur vers trame CAN à transmettre
- *          id : id du message à trasmettre
- *          taille : nb octets contenus dans le message
- *********************************************************/
-void InitMessage (struct can_frame *frame, int id, int taille);
+
+#define INITIALIZED_VAR 1
 
 /*********************** Init ******************************
  * Initialisation globale des communications
  * INPUTS :
 ************************************************************/
 void Init ();
+
+/*********************** setSockSend ******************************
+ * Initialisation du socket de communication
+ * INPUTS : socket: valeur du socket CAN à set
+ ***************************************************************/
+void setSockSend(int socket);
+
+/*********************** sendAngle******************************
+ * Envoi d'un ordre d'angle au STM 
+ * INPUTS : angle: valeur de l'angle a envoyer
+ ***************************************************************/
+void sendAngle(int angle);
+
+/*********************** sendVitesse ******************************
+ * Envoi d'un ordre de vitesse à la voiture
+ * INPUTS : vitesse: valeur de la vitesse a envoyer
+ ***************************************************************/
+void sendVitesse(int vitesse);
 
 /********************** EnvoiMessage ************************
  * Envoi d'un message

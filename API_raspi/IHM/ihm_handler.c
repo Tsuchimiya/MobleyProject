@@ -37,10 +37,10 @@ void majBatterie(int value){
 // todo check lat/lon
 void majCoords(double lat, double lon){
 
- char valLatCast [14];
- char valLongCast [14];
- sprintf(valLatCast, "Lat: %lf",lat);
- sprintf(valLongCast, "Lon: %lf",lon);
+ char valLatCast [13];
+ char valLongCast [13];
+ sprintf(valLatCast, "Lat %lf",lat);
+ sprintf(valLongCast, "Lon %lf",lon);
  if (DEBUG) {
    printf("[ihm_handler] maj coords a %lf, %lf \n", lat,lon);
    printf("[ihm_handler] %s %s  \n", valLatCast,valLongCast);

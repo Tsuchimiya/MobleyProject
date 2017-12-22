@@ -40,6 +40,7 @@
 #define ID_MOTOR_PROP								0x003
 #define ID_MOTOR_DIR								0x001
 #define ID_MOTOR_ENABLE							0x002
+#define ID_BATTERY									0x07
 
 
 #include "stm32f10x.h"
@@ -73,4 +74,5 @@ void CAN_Send_Front_US(void);
 void CAN_Send_Rear_US(void);
 void CAN_Send_Wheel_Position(void);
 void  CAN_Send_Current(void);
+void CAN_Send_Battery (void);
 #endif /* CAN_H_ */

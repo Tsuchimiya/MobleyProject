@@ -1,38 +1,7 @@
 #include "gps_comm.h"
 
-#define PI 3.14159265
 
-void computeCourse(struct gps_data_t* data,struct gps_data_t* before)
-{
-  double toDeg = 180.0/PI;
-  double course;
-  double x2=data->fix.longitude;
-  double x1=before->fix.longitude;
-  double y2=data->fix.latitude;
-  double y1=before->fix.latitude;
-  double dx=x2-x1;
-  double dy=y2-y1;
-
-  if (dx==0 && dy==0) {
-    course=0;
-  } else if(dx==0 && dy>0) {
-    course=0;
-  } else if(dx>0 && dy!=0) {
-    course=atan2(dx,dy)*toDeg;
-  } else if(dx>0 && dy==0) { //atan2(dx,0) returns error
-    course=90.0;
-  } else if(dx==0 && dy<0) {
-    course=180.0;
-  } else if(dx<0 && dy!=0) {
-    course=360.0+atan2(dx,dy)*toDeg;
-  } else if(dx<0 && dy==0) {
-    course=270.0;
-  } else {
-    printf("[GPS] course out of range\n");
-  }
-
-  data->fix.track=course;
-}
+int initGPS = 0;
 
 void *listenGPS(void * arg)
 {
@@ -48,10 +17,11 @@ void *listenGPS(void * arg)
     exit(-1);
   }
   gps_stream(&data, WATCH_ENABLE | WATCH_JSON, NULL);
-
+  int jump = 0;
   while(1)
   {
-    before=data;
+    if (jump)
+      before=data;
     if (gps_waiting(&data, timeout))
     {
       if (gps_read(&data)==-1)
@@ -63,21 +33,46 @@ void *listenGPS(void * arg)
         && !isnan(data.fix.latitude)
         && !isnan(data.fix.longitude))
         {
-          nbMeasures++;
-          if(nbMeasures>1)
+         
+	  double l = data.fix.latitude;
+	  double l1 = data.fix.longitude;
+          if(initGPS>=1)
           {
-            computeCourse(&data, &before);
-          }
+            printf("[GPS] update des coords\n");
+	      // update des coordonnees
+	    if (jump){
+	      jump = 0;
+	    }
+	    else{
+	      jump = 1;
+	      update_coords(data.fix.longitude,data.fix.latitude,before.fix.longitude,before.fix.latitude);
+	    }
+          }else{
+	    if (jump){
+	      jump = 0;
+	    }
+	    else{
+	      jump = 1;
+	    }
+	    
+	    printf("[GPS] init \n");
+	    sendVitesse(40);
+		 nbMeasures++; 
+		if (nbMeasures > 10){
+			initGPS = 2;
+			nbMeasures = 0;
+		}
+	  }
 
 	  if (DEBUG){
           printf("latitude: %lf, longitude: %lf, speed: %lf, course: %lf, latt. error: %.2lf, long. error: %.2lf, timestamp: %lf\n",
           data.fix.latitude, data.fix.longitude, data.fix.speed, data.fix.track, data.fix.epy, data.fix.epx, data.fix.time);
-
 	  }
-
-	  majCoords(data.fix.latitude,data.fix.longitude);
-
-
+	
+	  // maj des coords sur l'IHM
+		
+	//  majCoords(l,l1);
+	  
 
         } else {
           printf("no GPS data available\n");
@@ -86,3 +81,4 @@ void *listenGPS(void * arg)
     }
   }
 }
+
