@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include "codeRegulPos.h"
 #include "../../API_raspi/debug.h"
+#include "../../parser/mapparser.h"
 
 #define NOT_INIT 0
 #define INIT_POINT 2
@@ -15,6 +16,7 @@
 #define SEUIL_DISTANCE 0.00005 // ptêt que l'unité chie TODO check
 
 
+
 #define VOITURE_STOPPED 0
 #define VOITURE_FORWARD 1
 
@@ -22,7 +24,7 @@
 
 #define PI 3.14159265
 
-
+int stateVoiture;
 int nbErrors;
 double previousAngle;
 struct coordonnees{
@@ -30,6 +32,15 @@ struct coordonnees{
   double longitude;
 };
 struct coordonnees destination;
+
+typedef struct savedPoint{
+  int idPoint;
+  int idStep;
+}savedPoint;
+
+savedPoint currentDest;
+
+
 // Point de destination du segment a atteindre
 void goToPoint(double longitude, double latitude);
 

@@ -1,6 +1,5 @@
 #include "init_all.h"
-// 51 % voiture s'arrete
-// avvertissement à 54 %
+
 int init_filter(int *sock){
   idTab[0]=ANGLEVOLANTMESURE;
   idTab[1]=VITESSEMESUREGAUCHE;
@@ -77,13 +76,43 @@ main(void)
 {
   pthread_t test;
   pthread_t gps;
+  FILE *fpts;
+  FILE *fsteps;
+
 
   // initialisation des variables de com can (A FAIRE AVANT LES THREADS)
   int sockSend;
   init_socket(&sockSend);
   Init();
   setSockSend(sockSend);
-  goToPoint(1.4668290317058563,43.571076884255085);
+
+
+  // Init du parser ( A FAIRE AVANT LES THREADS ) 
+  fpts=fopen("../parser/points.map", "r");
+  printf("[Init_all] Parse : points file opened.\n");
+  fsteps=fopen("../parser/steps.map","r");
+  printf("[Init_all] Parse : steps file opened.\n");
+
+  if (fpts==NULL || fsteps==NULL) {
+    printf("[Init_all] Parse: Error: a map file can't be read.\n");
+  } else {
+    parsePoints(fpts, &world);
+    printf("[Init_all] points file parsed.\n");
+    parseSteps(fsteps, &world);
+    printf("[Init_all] steps file parsed.\n");
+
+
+//// TEST DECLOSEST POINT a effacer
+   // closestPoint(1.4674500,43.5704470);
+
+
+//    fclose(fpts);
+  //  fclose(fsteps);
+   
+    // printSteps(world);
+  }
+
+  //  goToPoint(1.4668290317058563,43.571076884255085);
   
   int s;
   init_socket(&s);
@@ -103,8 +132,7 @@ main(void)
 
   if(pthread_create(&gps,NULL,listenGPS,NULL) <0 ){
     perror("[Init_all] pthread failure with listen GPS ");
-  }
-
+    }
   //test_maj();
 
   

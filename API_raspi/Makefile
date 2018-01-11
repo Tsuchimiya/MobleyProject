@@ -9,7 +9,7 @@ all : main
 
 
 main:
-	gcc init_all.c com_CAN/listen.c com_CAN/communicationSTM.c IHM/ihm_handler.c ../GPS/gps_comm.c ../GPS/Trajectoires/demiTour.c ../GPS/Trajectoires/segment.c ../GPS/Trajectoires/codeRegulPos.c -o init $(PACKAGE) $(CFLAGS) -lgps -lpthread  -lm
+	gcc init_all.c com_CAN/listen.c com_CAN/communicationSTM.c IHM/ihm_handler.c ../GPS/gps_comm.c ../GPS/Trajectoires/demiTour.c ../GPS/Trajectoires/segment.c ../GPS/Trajectoires/codeRegulPos.c ../parser/mapparser.c -o init $(PACKAGE) $(CFLAGS) -lgps -lpthread  -lm
 
 
 clean:

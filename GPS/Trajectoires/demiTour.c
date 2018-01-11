@@ -3,9 +3,8 @@
 
 void demi_tour()
 {
-	printf("[demi_tour]debut demitour\n");
+	printf("[demi_tour]debut demitour\n \n");
 	sendAngle(20);
-	printf("[demi_tour]go left\n");
 	sleep(1);
 	sendVitesse(60);
 	usleep(3500000);
@@ -19,6 +18,10 @@ void demi_tour()
 	sleep(1);
 	sendVitesse(60);
 	sleep(3);
-	printf("[demi_tour]presque findemitour tmtc jupp bbq\n");
+	//sendVitesse(0);
+	sendAngle(0);
+	//sleep(1);
 	sendVitesse(0);
+	
+	
 }

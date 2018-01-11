@@ -33,21 +33,25 @@ void majBatterie(int value){
   gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(batterie),(gdouble)(value/100.0));
   
 }
+ char valLatCast [13];
+ char valLongCast [13];
+double longitude_coord;
+double latitude_coord;
 
 // todo check lat/lon
 void majCoords(double lat, double lon){
 
- char valLatCast [13];
- char valLongCast [13];
- sprintf(valLatCast, "Lat %lf",lat);
- sprintf(valLongCast, "Lon %lf",lon);
+
+ //sprintf(valLatCast, "Lat %lf",lat);
+ //sprintf(valLongCast, "Lon %lf",lon);
  if (DEBUG) {
    printf("[ihm_handler] maj coords a %lf, %lf \n", lat,lon);
    printf("[ihm_handler] %s %s  \n", valLatCast,valLongCast);
   }
-
- gtk_label_set_text (GTK_LABEL(lattitude), valLatCast);
- gtk_label_set_text (GTK_LABEL(longitude), valLongCast);
+ longitude_coord = lon;
+ latitude_coord = lat;
+// gtk_label_set_text (GTK_LABEL(lattitude), valLatCast);
+ //gtk_label_set_text (GTK_LABEL(longitude), valLongCast);
 
 }
 
@@ -80,10 +84,39 @@ void CreerListe (GtkTreeStore *destinations, GtkWidget *liste_dest) {
   gtk_tree_view_append_column (GTK_TREE_VIEW (liste_dest), colonne);
 
 }
+// cherche le point final le plus proche de notre position actuelle
+int  closestPoint(double lon, double lat){
+  int size = world.sizePoints;
+  int i;
+  point *tab = world.tabPoints;
+  double minDist;
+  int save;
+  double tmp;
 
+  if(tab==NULL) {
+    printf("[ihm_handler] tab null, can't find the closest point\n");
+  }
+  else {
+    minDist = sqrt(pow(100*(tab[0].x-lon),2)+pow(100*(tab[0].y-lat),2));
+    save = 0;
+    for(i=1;i<7;i++)
+      {
+	tmp = sqrt(pow(100*(tab[i].x-lon),2)+pow(100*(tab[i].y-lat),2)) ;
+	printf("[ihm_handler] min = %lf \n",tmp);
+	if (tmp <= minDist){
+	  save = i;
+	  minDist = tmp;
+	}
+      }
+
+  }
+	printf("[ihm_handler] parser : closest point id = %d\n",save);
+  return save;
+}
 // Fonction de selection destination
 void ChoixDestination (GtkTreeSelection *choix, gpointer donnee) {
-
+  point departPoint;
+  point destPoint;
   GtkTreeIter iterateur;
   GtkTreeModel *model;
   gchar *dest;
@@ -102,6 +135,15 @@ void ChoixDestination (GtkTreeSelection *choix, gpointer donnee) {
       gtk_dialog_run (GTK_DIALOG (dialog));
       gtk_widget_destroy (dialog);
 
+      int depart = closestPoint(longitude_coord,latitude_coord);
+      departPoint = world.tabPoints[depart];
+      findSeqStep(world,departPoint.name,dest);
+      destPoint = getStep(world,resuFinal.data[0]).points[1];
+      currentDest.idPoint = 1;
+      currentDest.idStep = 0;
+	  printf("[ihm_handler] going to point %f , %f\n",destPoint.x,destPoint.y);
+      goToPoint(destPoint.x,destPoint.y);
+      
       g_free (dest);
       }
 }
@@ -206,10 +248,10 @@ void initWindow(){
   destTitre = gtk_label_new(NULL);
   gtk_label_set_markup(GTK_LABEL(destTitre),g_markup_printf_escaped(format,"Où voulez-vous aller ?"));
 
-  gtk_grid_attach (GTK_GRID (table), gpsTitre,0,0,2,1);
-  gtk_grid_attach (GTK_GRID (table), batTitre,2,0,1,1);
-  gtk_grid_attach (GTK_GRID (table), statusTitre,0,4,3,1);
-  gtk_grid_attach (GTK_GRID (table), destTitre,0,5,3,8);
+  gtk_grid_attach (GTK_GRID (table), gpsTitre,0,6,2,1);
+//  gtk_grid_attach (GTK_GRID (table), batTitre,2,0,1,1);
+//  gtk_grid_attach (GTK_GRID (table), statusTitre,0,4,3,1);
+//  gtk_grid_attach (GTK_GRID (table), destTitre,0,5,3,8);
 
 
   /*label#title-label {
@@ -222,12 +264,12 @@ void initWindow(){
   gtk_progress_bar_set_show_text (GTK_PROGRESS_BAR(batterie),TRUE);
   GdkColor col;
   majBatterie(100);
-  gtk_grid_attach (GTK_GRID (table), batterie,2,1,1,1);
+ // gtk_grid_attach (GTK_GRID (table), batterie,2,1,1,1);
 
 
   // Creation du label d'erreur attaché à la batterie
   error = gtk_statusbar_new();
-  gtk_grid_attach(GTK_GRID(table), error, 0,5,3,1);
+//  gtk_grid_attach(GTK_GRID(table), error, 0,5,3,1);
 
 
   // Creation des labels coord
@@ -235,8 +277,8 @@ void initWindow(){
   longitude = gtk_label_new(NULL);
   majCoords(43.570600,1.466499);
   
-  gtk_grid_attach (GTK_GRID (table), lattitude,0,1,1,1);
-  gtk_grid_attach (GTK_GRID (table), longitude,1,1,1,1);
+  gtk_grid_attach (GTK_GRID (table), lattitude,0,7,1,1);
+  gtk_grid_attach (GTK_GRID (table), longitude,1,8,1,1);
 
   /************************************************* DESTINATIONS ***********************************************/
  /*********************************************************************************************************/
@@ -266,12 +308,12 @@ void initWindow(){
   // Ajout de la colonne à la vue
   gtk_tree_view_append_column (GTK_TREE_VIEW (liste_dest), colonne);
 
-  gtk_grid_attach (GTK_GRID (table), liste_dest,0,10,4,4);
+  gtk_grid_attach (GTK_GRID (table), liste_dest,0,0,4,4);
 
   // Bouton valider
   GtkWidget * Valider_btn;
   Valider_btn=gtk_button_new_with_label ("Confirmer");
-  gtk_grid_attach (GTK_GRID (table),Valider_btn ,0,15,1,1);
+  gtk_grid_attach (GTK_GRID (table),Valider_btn ,0,5,1,1);
 
 
   // Choix de la destination

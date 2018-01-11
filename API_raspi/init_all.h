@@ -6,6 +6,8 @@
 #include <pthread.h>
 #include "com_CAN/communicationSTM.h"
 #include "../GPS/gps_comm.h"
+#include "../parser/mapparser.h"
+
 
 /***********************  init_socket   *******************
  * Initialise et configure un socket conformément aux variables

@@ -5,7 +5,8 @@
 #include "../debug.h"
 #include <stdlib.h>
 #include <gtk/gtk.h>
-
+#include "../../GPS/Trajectoires/segment.h"
+#include "../init_all.h"
 
 
 #define MAX_BUFFER 50
@@ -15,6 +16,7 @@
 #define MSG_BAT_FAIBLE "Batterie faible: la voiture va bientot s'arreter"
 #define BATTERIE_CRITIC 1
 #define MSG_BAT_CRITIC "Plus de batterie: arret automatique de la voiture"
+
 
 
 
@@ -56,7 +58,6 @@ void CreerListe (GtkTreeStore *destinations, GtkWidget *liste_dest);
 
 // Fonction de selection destination
 void ChoixDestination (GtkTreeSelection *choix, gpointer donnee);
-
 
 // Fonction de remplissage de la liste
 void RemplirListe(GtkTreeStore *destinations);

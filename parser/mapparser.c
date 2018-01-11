@@ -1,5 +1,5 @@
 #include "mapparser.h"
-
+#define MAXTRY 5
 void parsePoints(FILE *fpoints, map* world) {
   int size, id;
   int i=0;
@@ -25,7 +25,8 @@ void parseSteps(FILE *fsteps, map* world) {
   int size, id;
   int nbPoints;
   int idPt;
-  char name[MAXSIZE];
+  char src[MAXSIZE];
+  char dest[MAXSIZE];
   int i=0;
   int j;
   point pnt;
@@ -33,10 +34,11 @@ void parseSteps(FILE *fsteps, map* world) {
     fscanf(fsteps, "%d", &size);
     world->sizeSteps=size;
     world->tabSteps=(step *)malloc(size*sizeof(step));
-    while(fscanf(fsteps, "%d %s %d", &id, name, &nbPoints)!=EOF)
+    while(fscanf(fsteps, "%d %s %s %d", &id, src, dest, &nbPoints)!=EOF)
     {
       world->tabSteps[i].id=id;
-      strcpy(world->tabSteps[i].name, name);
+      strcpy(world->tabSteps[i].dest, dest);
+      strcpy(world->tabSteps[i].src, src);
       world->tabSteps[i].nbPoints=nbPoints;
       world->tabSteps[i].points=(point *)malloc(nbPoints*sizeof(point));
       for (j=0;j<nbPoints;j++)
@@ -81,7 +83,7 @@ void printSteps(map world) {
     printf("\n----ARRAY OF %d STEPS----\n\n", size);
     for(i=0;i<size;i++)
     {
-      printf("Id %d : %s. %d points\n", tab[i].id, tab[i].name, tab[i].nbPoints);
+      printf("Id %d : %s to %s. %d points\n", tab[i].id, tab[i].src, tab[i].dest, tab[i].nbPoints);
       for(j=0;j<tab[i].nbPoints;j++)
       {
         printf("   -");
@@ -104,4 +106,108 @@ point getPoint(map world, int id)
   }
   printf("[ERROR] : no point of the id %d\n", id);
   exit(-1);
+}
+
+int searchDirectStep(map world, char * dest, char * src){
+  int trouve= 0;
+  int i=0;
+  step *tab=world.tabSteps; 
+  if(tab==NULL) {
+    printf("[PARSE] Can't display tabSteps: its value is NULL.\n");
+  }else{
+    while (!trouve && i<world.sizeSteps){
+      if (strcmp(tab[i].dest,dest)==0 && strcmp(tab[i].src,src) == 0){
+	trouve = 1;
+	return tab[i].id;
+
+      }
+      i++;
+    }
+    return -1;
+  }
+}
+
+
+int searchIntermPoint(map world, char * dest){
+  int trouve= 0;
+  int i=0;
+  step *tab=world.tabSteps; 
+  if(tab==NULL) {
+    printf("[PARSE] Can't display tabSteps: its value is NULL.\n");
+  }else{
+    while (!trouve && i<world.sizeSteps){
+      if (strcmp(tab[i].dest,dest)==0){
+	trouve = 1;
+	return tab[i].id;
+
+      }
+      i++;
+    }
+    return -1;
+  }
+}
+
+tab findSeqStep (map world, char * src, char *dest){
+
+  int trouve = 0;
+  int i = 0;
+  step *tab=world.tabSteps; 
+  int resu [20];
+ 
+  int tmp;
+  int indexResu = 0;
+  int tailleIndex = 0;
+  int try =0;
+  
+  char dest1[10];
+  if(tab==NULL) {
+    printf("[PARSE] Can't display tabSteps: its value is NULL.\n");
+  }
+  else {
+  
+    // cherche un chemin direct vers la destination s'il existe
+    tmp = searchDirectStep(world, dest,src);
+    if (tmp >= 0){
+       printf("[PARSER] found 1 direct path \n");
+      resuFinal.size = 1;
+      resuFinal.data = malloc (sizeof(int));
+      *(resuFinal.data)=tmp;
+      return resuFinal;
+    }
+     printf("[PARSER] direct path not found searching interm \n");
+
+    strcpy(dest1,dest);
+    while (!trouve && try < MAXTRY){
+      
+      tmp = searchIntermPoint(world,dest1);
+      printf("[PARSER] tmp = %d \n",tmp);
+      if (tmp >= 0){
+	resu[tailleIndex]=tmp;
+	tailleIndex ++;
+	//	printf("[PARSER] found 1 interm point %d \n",tmp);
+      }
+      if (strcmp(tab[tmp].src,src)==0){
+	trouve = 1;
+      }
+
+      strcpy(dest1,tab[tmp].src);
+      try ++;
+    }
+    resuFinal.size = tailleIndex;
+    resuFinal.data = malloc (sizeof(int)*(resuFinal.size));
+    int i = 0;
+    int j = 0;
+    for (i=(tailleIndex-1);i>=0;i--){
+      resuFinal.data[j] = resu[i];
+      j ++;
+    }
+    
+    return resuFinal;
+  }
+}
+
+
+
+step getStep(map world, int id){
+  return world.tabSteps[id];
 }
