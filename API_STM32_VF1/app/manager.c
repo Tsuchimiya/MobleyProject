@@ -79,12 +79,14 @@ void Tournervolant(int degree_I)
 {	
 	degree_I = degree_I + 142;
 	
-	if(Direction_get() >= degree_I+3)
+	if(Direction_get() >= degree_I+4)
 	{
+		//-0°
 		FrontMotor_turn(RIGHT);
 	}
-	else if(Direction_get() <= degree_I-3)
+	else if(Direction_get() <= degree_I-4)
 	{
+		//+0°
 		FrontMotor_turn(LEFT);
 	}
 	else
