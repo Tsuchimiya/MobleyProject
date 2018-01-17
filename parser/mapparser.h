@@ -33,6 +33,7 @@ typedef struct str_map {
 typedef struct str_tab {
   int * data;
   int size;
+  int inverse;
 } tab;
 
 tab resuFinal; 
@@ -44,5 +45,5 @@ void printPoints(map world);
 void printPoint(point pnt);
 point getPoint(map world, int id);
 step getStep(map world, int id);
-tab findSeqStep (map world, char * src, char *dest);
+tab findSeqStep (map world, char * src, char *dest, int nbRec);
 #endif

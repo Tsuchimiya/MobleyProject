@@ -26,7 +26,7 @@
 
 
 #define INITIALIZED_VAR 1
-
+#define STOPALL -1
 /*********************** Init ******************************
  * Initialisation globale des communications
  * INPUTS :
@@ -75,4 +75,8 @@ INPUTS : socket :
  ****************************************************************/
 void Tests (int *s);
   
+
+void stopSending();
+void continueSending();
+
 #endif

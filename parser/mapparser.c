@@ -21,6 +21,8 @@ void parsePoints(FILE *fpoints, map* world) {
   }
 }
 
+
+
 void parseSteps(FILE *fsteps, map* world) {
   int size, id;
   int nbPoints;
@@ -147,62 +149,90 @@ int searchIntermPoint(map world, char * dest){
   }
 }
 
-tab findSeqStep (map world, char * src, char *dest){
+tab findSeqStep (map world, char * src, char *dest, int nbRec){
 
-  int trouve = 0;
-  int i = 0;
-  step *tab=world.tabSteps; 
-  int resu [20];
+
+  if (nbRec <= 1) {
+    int trouve = 0;
+    int i = 0;
+    step *tab=world.tabSteps; 
+    int resu [20];
  
-  int tmp;
-  int indexResu = 0;
-  int tailleIndex = 0;
-  int try =0;
+    int tmp;
+    int indexResu = 0;
+    int tailleIndex = 0;
+    int try =0;
   
-  char dest1[10];
-  if(tab==NULL) {
-    printf("[PARSE] Can't display tabSteps: its value is NULL.\n");
-  }
-  else {
+    char dest1[10];
+    if(tab==NULL) {
+      printf("[PARSE] Can't display tabSteps: its value is NULL.\n");
+    }
+    else {
   
-    // cherche un chemin direct vers la destination s'il existe
-    tmp = searchDirectStep(world, dest,src);
-    if (tmp >= 0){
-       printf("[PARSER] found 1 direct path \n");
-      resuFinal.size = 1;
-      resuFinal.data = malloc (sizeof(int));
-      *(resuFinal.data)=tmp;
+      // cherche un chemin direct vers la destination s'il existe
+      tmp = searchDirectStep(world, dest,src);
+      if (tmp >= 0){
+	printf("[PARSER] found 1 direct path \n");
+	resuFinal.size = 1;
+	resuFinal.data = malloc (sizeof(int));
+	*(resuFinal.data)=tmp;
+	return resuFinal;
+      }
+      printf("[PARSER] direct path not found searching interm \n");
+
+      strcpy(dest1,dest);
+      while (!trouve && try < MAXTRY){
+      
+	tmp = searchIntermPoint(world,dest1);
+	printf("[PARSER] tmp = %d \n",tmp);
+	if (tmp >= 0){
+	  resu[tailleIndex]=tmp;
+	  tailleIndex ++;
+	  //	printf("[PARSER] found 1 interm point %d \n",tmp);
+	}
+	if (strcmp(tab[tmp].src,src)==0){
+	  trouve = 1;
+	}
+
+	strcpy(dest1,tab[tmp].src);
+	try ++;
+      }
+
+
+      // recherche de chemin inverse
+      if (! trouve){
+	printf("[PARSE] looking for a reverse path \n");
+	resuFinal = findSeqStep(world,dest,src,(nbRec+1));
+	// recherche de chemin normal
+      } else {
+	printf("nbRec = %d\n",nbRec);
+	if(nbRec){
+	  resuFinal.size = tailleIndex;
+	  resuFinal.data = malloc (sizeof(int)*(resuFinal.size));
+	  int i = 0;
+	  int j = 0;
+	  resuFinal.inverse = -1;
+	  for (i=0;i<tailleIndex;i++){
+	    resuFinal.data[j] = resu[i];
+	    j ++;
+	  }
+	}else{
+	  resuFinal.size = tailleIndex;
+	  resuFinal.data = malloc (sizeof(int)*(resuFinal.size));
+	  int i = 0;
+	  int j = 0;
+	  resuFinal.inverse = 1;
+	  for (i=(tailleIndex-1);i>=0;i--){
+	    resuFinal.data[j] = resu[i];
+	    j ++;
+	  }
+	}
+      }
+    
       return resuFinal;
     }
-     printf("[PARSER] direct path not found searching interm \n");
-
-    strcpy(dest1,dest);
-    while (!trouve && try < MAXTRY){
-      
-      tmp = searchIntermPoint(world,dest1);
-      printf("[PARSER] tmp = %d \n",tmp);
-      if (tmp >= 0){
-	resu[tailleIndex]=tmp;
-	tailleIndex ++;
-	//	printf("[PARSER] found 1 interm point %d \n",tmp);
-      }
-      if (strcmp(tab[tmp].src,src)==0){
-	trouve = 1;
-      }
-
-      strcpy(dest1,tab[tmp].src);
-      try ++;
-    }
-    resuFinal.size = tailleIndex;
-    resuFinal.data = malloc (sizeof(int)*(resuFinal.size));
-    int i = 0;
-    int j = 0;
-    for (i=(tailleIndex-1);i>=0;i--){
-      resuFinal.data[j] = resu[i];
-      j ++;
-    }
-    
-    return resuFinal;
+  }else {
+    perror("Can't find a path to the destination, stopping everything\n");
   }
 }
 

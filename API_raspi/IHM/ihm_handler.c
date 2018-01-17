@@ -1,16 +1,61 @@
 #include "ihm_handler.h"
+#define CAR_NOT_INIT -1
+#define CAR_INIT 2
+int etat;
+point destPoint;
+int batterieLvl = 100;
+int onceFaible =0;
+gboolean  alertBatterie( GtkWidget *widget,
+                              GdkEvent  *event,
+                              gpointer   data )
+{
+  GtkDialogFlags flags = GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT;
+  GtkWidget * dialog2;
+  // printf("SIGNAL \n");
+  // METTRE MUTEX SUR BATTERIE TODO
+  if(batterieLvl <= 8){
+    if (batterieLvl <= 2){
+      dialog2  = gtk_message_dialog_new (GTK_WINDOW(window),flags, GTK_MESSAGE_INFO, GTK_BUTTONS_NONE,MSG_BAT_CRITIC);
+      gtk_dialog_run (GTK_DIALOG (dialog2));
+      gtk_widget_destroy (dialog2);
+    }else{
+      if(!onceFaible){
+       dialog2  = gtk_message_dialog_new (GTK_WINDOW(window),flags, GTK_MESSAGE_INFO, GTK_BUTTONS_OK,MSG_BAT_FAIBLE);
+      gtk_dialog_run (GTK_DIALOG (dialog2));
+      gtk_widget_destroy (dialog2);
+      onceFaible = 1;
+      }
+    
+    }
+  }
+     
+    return TRUE;
+}
 
 
 void alert(int type_error){
+  //GtkWidget * dialog;
+  //GtkWidget * dialog;
+
+     
   if (DEBUG)
     printf("ALERT \n");
   switch (type_error){
     
   case BATTERIE_CRITIC:
-    gtk_statusbar_push(GTK_STATUSBAR(error),BATTERIE_CRITIC,MSG_BAT_CRITIC);
+    /* dialog = gtk_message_dialog_new (GTK_WINDOW(window),flags, GTK_MESSAGE_INFO, GTK_BUTTONS_OK,"ERREUR");
+       sleep(1);
+     gtk_dialog_run (GTK_DIALOG (dialog));
+     sleep(1);*/
+     // gtk_widget_destroy (dialog);
+
+    //gtk_dialog_run (GTK_DIALOG (dialog1));
     break;
   case BATTERIE_FAIBLE:
-    gtk_statusbar_push(GTK_STATUSBAR(error),BATTERIE_FAIBLE,MSG_BAT_FAIBLE);
+    // dialog = gtk_message_dialog_new (GTK_WINDOW(window),flags, GTK_MESSAGE_INFO, GTK_BUTTONS_OK,"ERREUR \n");//MSG_BAT_FAIBLE);
+    //   gtk_dialog_run (GTK_DIALOG (dialog));
+     //  gtk_widget_destroy (dialog);
+   
     break;
   default:
     printf("Erreur alerte de type inconnue\n");
@@ -18,6 +63,28 @@ void alert(int type_error){
 
   }
 
+}
+
+// TODO choix de la destination memorise si on clique sur dest avant init
+
+// Controle la voiture depuis l'ihm
+void control(){
+
+  // soit on lance l'initialisation pour demarrer une regulation apres
+  if (etat == CAR_NOT_INIT){
+    etat = CAR_INIT;
+    printf("init en cours\n");
+    initVoiture();
+    gtk_button_set_label(GTK_BUTTON(controlButton),"STOP");
+  }
+
+  // soit on stoppe la voiture
+  else {
+    printf("stopping the car\n");
+    gtk_button_set_label(GTK_BUTTON(controlButton),"Demarrer");
+    etat = CAR_NOT_INIT;
+    stopVoiture();
+  }
 }
 
 // Lance une fenetre
@@ -28,9 +95,16 @@ void majBatterie(int value){
   }
   char valueCasted [7];
   sprintf(valueCasted,"%d %%",value);
-
+  batterieLvl = value;
   gtk_progress_bar_set_text (GTK_PROGRESS_BAR(batterie), valueCasted);
   gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(batterie),(gdouble)(value/100.0));
+  /*if(value <= 8){
+    if (value <= 2){
+      alert(BATTERIE_CRITIC);
+    }else{
+      alert(BATTERIE_FAIBLE);
+    }
+    }*/
   
 }
  char valLatCast [13];
@@ -50,9 +124,6 @@ void majCoords(double lat, double lon){
   }
  longitude_coord = lon;
  latitude_coord = lat;
-// gtk_label_set_text (GTK_LABEL(lattitude), valLatCast);
- //gtk_label_set_text (GTK_LABEL(longitude), valLongCast);
-
 }
 
 // Fonction creant la liste de destinations
@@ -116,10 +187,11 @@ int  closestPoint(double lon, double lat){
 // Fonction de selection destination
 void ChoixDestination (GtkTreeSelection *choix, gpointer donnee) {
   point departPoint;
-  point destPoint;
+
   GtkTreeIter iterateur;
   GtkTreeModel *model;
   gchar *dest;
+
 
   if (gtk_tree_selection_get_selected (choix, &model, &iterateur)) 
     {
@@ -137,11 +209,18 @@ void ChoixDestination (GtkTreeSelection *choix, gpointer donnee) {
 
       int depart = closestPoint(longitude_coord,latitude_coord);
       departPoint = world.tabPoints[depart];
-      findSeqStep(world,departPoint.name,dest);
-      destPoint = getStep(world,resuFinal.data[0]).points[1];
-      currentDest.idPoint = 1;
+      findSeqStep(world,departPoint.name,dest,0);
+      if (resuFinal.inverse > 0 ){
+	destPoint = getStep(world,resuFinal.data[0]).points[1];
+	currentDest.idPoint = 1;
+      }
+      else {
+	currentDest.idPoint = getStep(world,resuFinal.data[0]).nbPoints - 2;
+	destPoint =   getStep(world,resuFinal.data[0]).points[currentDest.idPoint];
+      }
+     
       currentDest.idStep = 0;
-	  printf("[ihm_handler] going to point %f , %f\n",destPoint.x,destPoint.y);
+      printf("[ihm_handler] going to point %f , %f\n",destPoint.x,destPoint.y);
       goToPoint(destPoint.x,destPoint.y);
       
       g_free (dest);
@@ -206,6 +285,7 @@ void initWindow(){
   GtkWidget *map;
   GtkTreeStore *destinations;
   GtkWidget *liste_dest;
+  
 
   int argc = 0;
   char *argv[]={"main"};
@@ -215,6 +295,14 @@ void initWindow(){
   /* if (gtk_clutter_init (&argc, &argv) != CLUTTER_INIT_SUCCESS)
     return 1;
   */
+
+
+
+ 
+
+  etat = CAR_NOT_INIT;
+
+
   // Creation de la fenetre de l'IHM et parametrage
   window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
   gtk_window_set_title (GTK_WINDOW (window), "GeoCar");
@@ -228,8 +316,9 @@ void initWindow(){
   table = gtk_grid_new ();
  
  //ecartement des colonnes
-  gtk_grid_set_row_homogeneous(GTK_GRID(table),TRUE);
-  gtk_grid_set_column_spacing(GTK_GRID (table),50);
+  //gtk_grid_set_row_homogeneous(GTK_GRID(table),TRUE);
+  gtk_grid_set_column_spacing(GTK_GRID (table),0);
+  gtk_grid_set_row_spacing(GTK_GRID (table),10);
   gtk_container_add (GTK_CONTAINER (window), table);
 
   // Creation des labels de titre
@@ -248,7 +337,7 @@ void initWindow(){
   destTitre = gtk_label_new(NULL);
   gtk_label_set_markup(GTK_LABEL(destTitre),g_markup_printf_escaped(format,"Où voulez-vous aller ?"));
 
-  gtk_grid_attach (GTK_GRID (table), gpsTitre,0,6,2,1);
+  //gtk_grid_attach (GTK_GRID (table), gpsTitre,0,6,2,1);
 //  gtk_grid_attach (GTK_GRID (table), batTitre,2,0,1,1);
 //  gtk_grid_attach (GTK_GRID (table), statusTitre,0,4,3,1);
 //  gtk_grid_attach (GTK_GRID (table), destTitre,0,5,3,8);
@@ -264,12 +353,7 @@ void initWindow(){
   gtk_progress_bar_set_show_text (GTK_PROGRESS_BAR(batterie),TRUE);
   GdkColor col;
   majBatterie(100);
- // gtk_grid_attach (GTK_GRID (table), batterie,2,1,1,1);
-
-
-  // Creation du label d'erreur attaché à la batterie
-  error = gtk_statusbar_new();
-//  gtk_grid_attach(GTK_GRID(table), error, 0,5,3,1);
+  gtk_grid_attach (GTK_GRID (table), batterie,2,0,1,1);
 
 
   // Creation des labels coord
@@ -277,8 +361,8 @@ void initWindow(){
   longitude = gtk_label_new(NULL);
   majCoords(43.570600,1.466499);
   
-  gtk_grid_attach (GTK_GRID (table), lattitude,0,7,1,1);
-  gtk_grid_attach (GTK_GRID (table), longitude,1,8,1,1);
+  //gtk_grid_attach (GTK_GRID (table), lattitude,0,7,1,1);
+  //gtk_grid_attach (GTK_GRID (table), longitude,1,8,1,1);
 
   /************************************************* DESTINATIONS ***********************************************/
  /*********************************************************************************************************/
@@ -308,12 +392,18 @@ void initWindow(){
   // Ajout de la colonne à la vue
   gtk_tree_view_append_column (GTK_TREE_VIEW (liste_dest), colonne);
 
-  gtk_grid_attach (GTK_GRID (table), liste_dest,0,0,4,4);
+  gtk_grid_attach (GTK_GRID (table), liste_dest,2,1,1,1);
 
   // Bouton valider
   GtkWidget * Valider_btn;
   Valider_btn=gtk_button_new_with_label ("Confirmer");
-  gtk_grid_attach (GTK_GRID (table),Valider_btn ,0,5,1,1);
+  gtk_grid_attach (GTK_GRID (table),Valider_btn ,2,2,1,1);
+
+
+  // Bouton de controle init puis arret d'urgence
+  controlButton = gtk_button_new_with_label ("Demarrer");
+  gtk_grid_attach (GTK_GRID (table),controlButton ,0,3,3,1);
+  g_signal_connect (controlButton, "clicked",G_CALLBACK(control),NULL);
 
 
   // Choix de la destination
@@ -330,8 +420,9 @@ void initWindow(){
   
   // Création de la map
  
-  //GdkPixbuf * img = gdk_pixbuf_new_from_file("IHM/map.svg",NULL);
-  //map = gtk_image_new_from_pixbuf(img);
+  // GdkPixbuf * img = gdk_pixbuf_new_from_file("IHM/map.svg",NULL);
+  GdkPixbuf * img = gdk_pixbuf_new_from_file("IHM/index.png",NULL);
+   map = gtk_image_new_from_pixbuf(img);
 
   //map = gtk_champlain_embed_new ();
   //gtk_widget_set_size_request (map, 200, 280);
@@ -340,12 +431,41 @@ void initWindow(){
   //gtk_container_add (GTK_CONTAINER (window), map);
 
   
-  //gtk_grid_attach(GTK_GRID (table), map, 2,0,300,300);
-  // affichage de tous les widgets (TODO recursif)
-  gtk_grid_set_column_homogeneous(GTK_GRID(table),TRUE);
+   gtk_grid_attach(GTK_GRID (table), map, 0,1,2,2);
+   
 
-  gtk_widget_show_all (window);
+
+   gtk_grid_set_column_homogeneous(GTK_GRID(table),TRUE);
+   gtk_window_fullscreen(GTK_WINDOW(window));
+   gtk_widget_show_all (window);
+
+
+   // init du signal de la batterie
+
+
+  g_signal_new("batterie_critique",
+             G_TYPE_OBJECT, G_SIGNAL_RUN_FIRST,
+             0, NULL, NULL,
+             g_cclosure_marshal_VOID__POINTER,
+             G_TYPE_NONE, 1, G_TYPE_POINTER);
+
+ g_signal_new("batterie_faible",
+             G_TYPE_OBJECT, G_SIGNAL_RUN_FIRST,
+             0, NULL, NULL,
+             g_cclosure_marshal_VOID__POINTER,
+             G_TYPE_NONE, 1, G_TYPE_POINTER);
+
+// si on enleve la ligne idle add, on chiale le poppup peut pas s'ouvrir depuis un autre thread, cf internet et les regles des ihm
+  g_idle_add((GSourceFunc ) (alertBatterie),NULL);
+  //  g_signal_connect(window, "batterie_critique",G_CALLBACK(alertBatterieCritic),NULL);
+
+  // si on enleve la ligne idle add, on chiale le poppup peut pas s'ouvrir depuis un autre thread, cf internet, et les regles des ihm
+  //g_idle_add((GSourceFunc ) (alertBatterieFaible),batterie);
+  // g_signal_connect(window, "batterie_faible",G_CALLBACK(alertBatterieFaible),NULL);
   
+ 
+   // ajoute l'ecoute sur l'event de la batterie
+  //    gtk_widget_add_events(window,GDK_CLIENT_EVENT);
 
   if(pthread_create(&IHM,NULL,launchWindow,NULL)<0){
      perror("[ihm_handler] erreur de création du thread de l'ihm");

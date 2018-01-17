@@ -36,6 +36,7 @@ struct coordonnees destination;
 typedef struct savedPoint{
   int idPoint;
   int idStep;
+  int sens;
 }savedPoint;
 
 savedPoint currentDest;

@@ -13,9 +13,9 @@
 
 // Definition de la status bar (ultrason / batterie ...) 
 #define BATTERIE_FAIBLE 0
-#define MSG_BAT_FAIBLE "Batterie faible: la voiture va bientot s'arreter"
+#define MSG_BAT_FAIBLE "Batterie faible: la voiture va bientot s'arreter\n"
 #define BATTERIE_CRITIC 1
-#define MSG_BAT_CRITIC "Plus de batterie: arret automatique de la voiture"
+#define MSG_BAT_CRITIC "Plus de batterie: arret automatique de la voiture\n"
 
 
 
@@ -29,6 +29,7 @@ GtkWidget *longitude;
 GtkWidget *lattitude;
 GtkWidget *window;
 GtkWidget *error;
+GtkWidget *controlButton;
 
 /*********************** initWindow **********************
 Initialise et affiche une fenetre utilisateur

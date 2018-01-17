@@ -1,4 +1,7 @@
 #include "init_all.h"
+pthread_t gps;
+
+
 
 int init_filter(int *sock){
   idTab[0]=ANGLEVOLANTMESURE;
@@ -21,6 +24,7 @@ int init_filter(int *sock){
    return setsockopt(*sock, SOL_CAN_RAW, CAN_RAW_FILTER, &rfilter, sizeof(rfilter));
 
 }
+
 
 
 void test_maj(){
@@ -71,11 +75,32 @@ void init_socket(int *s){
 }
 
 
+void initVoiture(){
+  continueSending();
+  initializeGPS();
+}
+
+void stopVoiture(){
+  int old;
+  sendVitesse(0);
+  sendAngle(0);
+  stopSending();
+  //pthread_setcancelstate( PTHREAD_CANCEL_ASYNCHRONOUS, &old);
+  pthread_cancel(gps);
+  pthread_join(gps,NULL);
+
+  
+  if(pthread_create(&gps,NULL,listenGPS,NULL) <0 ){
+    perror("[Init_all] pthread failure with listen GPS ");
+    }
+  
+
+}
+
 int
 main(void)
 {
   pthread_t test;
-  pthread_t gps;
   FILE *fpts;
   FILE *fsteps;
 
@@ -130,7 +155,7 @@ main(void)
   
   // demarage thread gps
 
-  if(pthread_create(&gps,NULL,listenGPS,NULL) <0 ){
+   if(pthread_create(&gps,NULL,listenGPS,NULL) <0 ){
     perror("[Init_all] pthread failure with listen GPS ");
     }
   //test_maj();

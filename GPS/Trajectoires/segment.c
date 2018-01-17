@@ -77,8 +77,8 @@ double distanceFromPoint (double long_vago, double lat_vago){
 struct coordonnees nextPoint(){
   struct coordonnees resu;
   step tmp = getStep(world,resuFinal.data[currentDest.idStep]);
-  if (currentDest.idPoint+1 < tmp.nbPoints){
-    currentDest.idPoint ++;
+  if (currentDest.idPoint+1 < tmp.nbPoints && currentDest.idPoint > 0){
+    currentDest.idPoint = currentDest.idPoint + currentDest.sens;
     point dest = tmp.points[currentDest.idPoint];
     resu.latitude = dest.y;
     resu.longitude = dest.x;
@@ -87,7 +87,10 @@ struct coordonnees nextPoint(){
     }
   } else {
     if(currentDest.idStep +1 < resuFinal.size){
-      currentDest.idPoint = 0;
+      if ( currentDest.sens > 0)
+	currentDest.idPoint = 1; // correction, avant = 0 mais on allait 2 fois au meme point 
+      else
+	currentDest.idPoint = tmp.nbPoints - 2; // correction, pour les chemins inverses 
       currentDest.idStep++;
       tmp =  getStep(world,resuFinal.data[currentDest.idStep]);
       point dest = tmp.points[currentDest.idPoint];

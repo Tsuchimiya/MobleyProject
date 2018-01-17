@@ -43,14 +43,12 @@ void * treatMsg(struct can_frame canFrame){
 	if (value <= 51){
 
 	  if (DEBUG)
+	    //g_signal_emit_by_name(window,"batterie_critique");
 	    printf("%s PLUS DE BATTERIE \n",TH_NAME);
-	  
-	  alert(BATTERIE_CRITIC);
 	}else{
 	  if (DEBUG)
 	    printf("%s BATTERIE FAIBLE \n",TH_NAME);
-	  
-	  alert(BATTERIE_FAIBLE);
+	  // g_signal_emit_by_name(window,"batterie_faible");
 	}
       }
       value = (value - 50) *2;

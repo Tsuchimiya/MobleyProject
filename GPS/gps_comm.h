@@ -7,8 +7,8 @@
 #include "../API_raspi/IHM/ihm_handler.h"
 #include "../API_raspi/debug.h"
 #include "Trajectoires/segment.h"
-
+#include <pthread.h>
 
 void *listenGPS(void * arg);
-
+void initializeGPS();
 #endif

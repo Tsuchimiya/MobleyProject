@@ -6,7 +6,7 @@ struct can_frame AngleVolantCommande, VitesseCommandeGauche, VitesseCommandeDroi
 int sockCANRaspi;
 int initMsg = 0;
 int initSock = 0;
-
+int everythingOK = 1;
 void InitMessage (struct can_frame *frame, int id, int taille)
 {
   (*frame).can_id  = id;
@@ -112,14 +112,25 @@ void setSockSend(int socket){
   initSock = INITIALIZED_VAR;
 }
 
+void stopSending(){
+  everythingOK = STOPALL;
+}
+
+void continueSending(){
+  everythingOK = 1;
+}
+
 // TODO PROTECTIONS ? 
 void sendAngle(int angle){
   // verification que les variables qu'on utilise sont initialisees
   
   if (initSock == INITIALIZED_VAR && initMsg == INITIALIZED_VAR){
-    
+	int valuetoSend = 0;
+    if ( everythingOK != STOPALL){
+	valuetoSend= angle;
+    }
     // envoi de la data, verif de son bon envoi
-    if (EnvoiMessage (&AngleVolantCommande,(char)angle,sockCANRaspi) < 0){
+    if (EnvoiMessage (&AngleVolantCommande,(char)valuetoSend,sockCANRaspi) < 0){
       printf("[ComCAN] Erreur d'envoi angle volant\n");
     }
     
@@ -134,9 +145,12 @@ void sendVitesse(int vitesse){
   // verification que les variables qu'on utilise sont initialisees
   
   if (initSock == INITIALIZED_VAR && initMsg == INITIALIZED_VAR){
-    
+    int valuetoSend = 0;
+    if ( everythingOK != STOPALL){
+	valuetoSend= vitesse;
+    }
     // envoi de la data, verif de son bon envoi
-    if (EnvoiMessage (&VitesseCommandeGauche,(char)vitesse,sockCANRaspi) < 0){
+    if (EnvoiMessage (&VitesseCommandeGauche,(char)valuetoSend,sockCANRaspi) < 0){
       printf("[ComCAN] Erreur d'envoi vitesse voiture\n");
     }
     
