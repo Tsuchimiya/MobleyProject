@@ -1,7 +1,11 @@
+
 /***************************************************
-* Une Description brève mais claire de la fonction *
-* Une Description brève mais claire de la fonction *
-* Une Description brève mais claire de la fonction *
+ * ---- communicationSTM.h ----
+ * Fonctions en charge de l'envoi de messages depuis
+ * la STM32 vers la Raspberry Pi
+ *
+ * Auteur(s) : Team Mobley
+ * Date : 11/01/2018
 ****************************************************/
 
 #ifndef COMMUNICATIONSTM
@@ -27,6 +31,8 @@
 
 #define INITIALIZED_VAR 1
 #define STOPALL -1
+
+// ----------------------- INITIALISATION -----------------------
 /*********************** Init ******************************
  * Initialisation globale des communications
  * INPUTS :
@@ -68,6 +74,8 @@ INPUTS : id : id du message
          tabFiltre : tableau contenant les filtres
  *********************************************************/
 void CreerFiltre (int id, int indice, struct can_filter *tabFiltre);
+
+// ------------------------ TEST DES ENVOIS ---------------------
 
 /**************************** Tests *****************************
 Teste les envois de messages

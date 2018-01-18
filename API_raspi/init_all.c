@@ -2,7 +2,12 @@
 pthread_t gps;
 
 
-
+/***********************  init_filter   *******************
+ * Initialise les filtres autorisant l'envoi des trames sur
+ * le bus CAN
+ * INPUTS : sock : pointeur sur le socket à utiliser pour
+ *                 l'initialisation
+ *********************************************************/
 int init_filter(int *sock){
   idTab[0]=ANGLEVOLANTMESURE;
   idTab[1]=VITESSEMESUREGAUCHE;
@@ -10,8 +15,7 @@ int init_filter(int *sock){
   idTab[3]=ULTRASONMESURE;
   idTab[4]=BATTERIE;
   idTab[5]=VITESSECMDDROITE;
-  //idTab[6]=VITESSECMDGAUCHE;
-  //idTab[7]= ANGLEVOLANTCMD;
+  
   int i = 0;
   // defining filters for CAN :
   struct can_filter rfilter[NBVARFILTER];
@@ -21,12 +25,16 @@ int init_filter(int *sock){
     rfilter[i].can_id=idTab[i];
   }
 
-   return setsockopt(*sock, SOL_CAN_RAW, CAN_RAW_FILTER, &rfilter, sizeof(rfilter));
+  return setsockopt(*sock, SOL_CAN_RAW, CAN_RAW_FILTER, &rfilter, sizeof(rfilter));
 
 }
 
 
-
+/***********************  test_maj   *******************
+ * Teste la mise a jour des coordonnees GPS
+ * INPUTS : --
+ * OUTPUT : --
+ *********************************************************/
 void test_maj(){
   double lt = 2.0;
   double lg  = 50.0;
@@ -39,39 +47,44 @@ void test_maj(){
 
 }
 
+/***********************  init_socket   *******************
+ * Initialise et configure un socket conformément aux variables
+ * qu'on veut recevoir
+ * INPUTS : s : socket à initialiser
+ *********************************************************/
 void init_socket(int *s){
   	
-	int nbytes;
-	struct sockaddr_can addr;
-	struct can_frame frame;
-	struct ifreq ifr;
+  int nbytes;
+  struct sockaddr_can addr;
+  struct can_frame frame;
+  struct ifreq ifr;
 
-	const char *ifname = "can0";
-	// opening socket CAN_RAW//SOCK_RAW or CAN_BCM // SOCK_DGRAM BCM = cyclique
-	printf("[init_all] starting socket\n");
-	if((*s = socket(PF_CAN, SOCK_RAW, CAN_RAW)) < 0) {
-		perror("Error while opening socket");
-		//	return -1;
-	}
+  const char *ifname = "can0";
+  // opening socket CAN_RAW//SOCK_RAW or CAN_BCM // SOCK_DGRAM BCM = cyclique
+  printf("[init_all] starting socket\n");
+  if((*s = socket(PF_CAN, SOCK_RAW, CAN_RAW)) < 0) {
+    perror("Error while opening socket");
+    //	return -1;
+  }
 
-	//finding dynamically the can0 interface (to bind to all can interface put 0 into the index)
-	strcpy(ifr.ifr_name, ifname);
-	ioctl(*s, SIOCGIFINDEX, &ifr);
+  //finding dynamically the can0 interface (to bind to all can interface put 0 into the index)
+  strcpy(ifr.ifr_name, ifname);
+  ioctl(*s, SIOCGIFINDEX, &ifr);
 	
-	addr.can_family  = AF_CAN;
-	addr.can_ifindex = ifr.ifr_ifindex;
+  addr.can_family  = AF_CAN;
+  addr.can_ifindex = ifr.ifr_ifindex;
 
-	printf("%s at index %d\n", ifname, ifr.ifr_ifindex);
+  printf("%s at index %d\n", ifname, ifr.ifr_ifindex);
 
-	// bind the socket to a can interface
-	if(bind(*s, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
-		perror("Error in socket bind");
-		//return -2;
-	}
+  // bind the socket to a can interface
+  if(bind(*s, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
+    perror("Error in socket bind");
+    //return -2;
+  }
 
-	init_filter(s);
+  init_filter(s);
 
-	//setsockopt(s, SOL_CAN_RAW, CAN_RAW_FILTER, &rfilter, sizeof(rfilter));
+  //setsockopt(s, SOL_CAN_RAW, CAN_RAW_FILTER, &rfilter, sizeof(rfilter));
 }
 
 
@@ -92,7 +105,7 @@ void stopVoiture(){
   
   if(pthread_create(&gps,NULL,listenGPS,NULL) <0 ){
     perror("[Init_all] pthread failure with listen GPS ");
-    }
+  }
   
 
 }
@@ -125,48 +138,36 @@ main(void)
     printf("[Init_all] points file parsed.\n");
     parseSteps(fsteps, &world);
     printf("[Init_all] steps file parsed.\n");
-
-
-//// TEST DECLOSEST POINT a effacer
-   // closestPoint(1.4674500,43.5704470);
-
-
-//    fclose(fpts);
-  //  fclose(fsteps);
-   
-    // printSteps(world);
-  }
-
-  //  goToPoint(1.4668290317058563,43.571076884255085);
   
-  int s;
-  init_socket(&s);
-  printf("[Init_all] starting listenCAN\n");
+    int s;
+    init_socket(&s);
+    printf("[Init_all] starting listenCAN\n");
 
-  // demarage thread de reception des msg can
-  if(pthread_create(&test,NULL,listenCAN,&s) <0 ){
-    perror("[Init_all] pthread failure with listen CAN");
-  }
-
-  printf("[Init_all] opening window\n");
-  initWindow();
-
-
-  
-  // demarage thread gps
-
-   if(pthread_create(&gps,NULL,listenGPS,NULL) <0 ){
-    perror("[Init_all] pthread failure with listen GPS ");
+    // demarage thread de reception des msg can
+    if(pthread_create(&test,NULL,listenCAN,&s) <0 ){
+      perror("[Init_all] pthread failure with listen CAN");
     }
-  //test_maj();
+
+    printf("[Init_all] opening window\n");
+    initWindow();
+
 
   
- printf("[Init_all] starting test\n");
- sleep(3);
- //Tests(&s);
+    // demarage thread gps
 
-  pthread_join(test,NULL);
-  pthread_join(gps,NULL);
+    if(pthread_create(&gps,NULL,listenGPS,NULL) <0 ){
+      perror("[Init_all] pthread failure with listen GPS ");
+    }
+    //test_maj();
 
-  return 0;
+  
+    printf("[Init_all] starting test\n");
+    sleep(3);
+    //Tests(&s);
+
+    pthread_join(test,NULL);
+    pthread_join(gps,NULL);
+
+    return 0;
+  }
 }

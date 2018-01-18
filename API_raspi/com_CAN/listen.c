@@ -8,8 +8,11 @@
 
 // http://copperhilltech.com/what-is-socketcan/
 
-
-// traitement des messages reçus: mise à jour des variables globale selon le type de trame reçu
+/*********************  treatMsg   **********************
+ * traitement des messages reçus: 
+ * mise à jour des variables globale selon le type de trame reçu
+ * INPUTS : canFrame : trame CAN à traiter 
+ *********************************************************/
 void * treatMsg(struct can_frame canFrame){
 
   switch (canFrame.can_id){
@@ -43,12 +46,12 @@ void * treatMsg(struct can_frame canFrame){
 	if (value <= 51){
 
 	  if (DEBUG)
-	    //g_signal_emit_by_name(window,"batterie_critique");
+	    
 	    printf("%s PLUS DE BATTERIE \n",TH_NAME);
 	}else{
 	  if (DEBUG)
 	    printf("%s BATTERIE FAIBLE \n",TH_NAME);
-	  // g_signal_emit_by_name(window,"batterie_faible");
+	  
 	}
       }
       value = (value - 50) *2;
@@ -97,7 +100,10 @@ void * treatMsg(struct can_frame canFrame){
 
 }
 
-
+/*********************  ListenCAN   **********************
+ * Réception/traitement des messages provenant du CAN
+ * INPUTS : socketCAN : socket can 
+ *********************************************************/
 void * listenCAN (void * socketCAN){
   printf("%s Starting thread\n",TH_NAME);
   int *s = (int*) socketCAN;

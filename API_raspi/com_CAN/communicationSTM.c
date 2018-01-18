@@ -7,6 +7,15 @@ int sockCANRaspi;
 int initMsg = 0;
 int initSock = 0;
 int everythingOK = 1;
+
+
+/********************** InitMessage ************************
+ * Creation d'un message
+ * INPUTS : frame : pointeur vers trame CAN à transmettre
+ *          id : id du message à transmettre
+ *          taille : nombre d'octets des donnees à envoyer 
+ * OUTPUT : --
+ *********************************************************/
 void InitMessage (struct can_frame *frame, int id, int taille)
 {
   (*frame).can_id  = id;
@@ -107,10 +116,16 @@ void Tests (int *s)
 
 }
 
+
+/*********************** setSockSend ******************************
+ * Initialisation du socket de communication
+ * INPUTS : socket: valeur du socket CAN à set
+ ***************************************************************/
 void setSockSend(int socket){
   sockCANRaspi = socket;
   initSock = INITIALIZED_VAR;
 }
+
 
 void stopSending(){
   everythingOK = STOPALL;
@@ -120,6 +135,10 @@ void continueSending(){
   everythingOK = 1;
 }
 
+/*********************** sendAngle******************************
+ * Envoi d'un ordre d'angle au STM 
+ * INPUTS : angle: valeur de l'angle a envoyer
+ ***************************************************************/
 // TODO PROTECTIONS ? 
 void sendAngle(int angle){
   // verification que les variables qu'on utilise sont initialisees
@@ -140,6 +159,10 @@ void sendAngle(int angle){
   }
 }
 
+/*********************** sendVitesse ******************************
+ * Envoi d'un ordre de vitesse à la voiture
+ * INPUTS : vitesse: valeur de la vitesse a envoyer
+ ***************************************************************/
 // TODO PROTECTIONS?
 void sendVitesse(int vitesse){
   // verification que les variables qu'on utilise sont initialisees

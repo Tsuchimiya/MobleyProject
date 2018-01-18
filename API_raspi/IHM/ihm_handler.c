@@ -33,39 +33,6 @@ gboolean  alertBatterie( GtkWidget *widget,
 }
 
 
-void alert(int type_error){
-  //GtkWidget * dialog;
-  //GtkWidget * dialog;
-
-     
-  if (DEBUG)
-    printf("ALERT \n");
-  switch (type_error){
-    
-  case BATTERIE_CRITIC:
-    /* dialog = gtk_message_dialog_new (GTK_WINDOW(window),flags, GTK_MESSAGE_INFO, GTK_BUTTONS_OK,"ERREUR");
-       sleep(1);
-     gtk_dialog_run (GTK_DIALOG (dialog));
-     sleep(1);*/
-     // gtk_widget_destroy (dialog);
-
-    //gtk_dialog_run (GTK_DIALOG (dialog1));
-    break;
-  case BATTERIE_FAIBLE:
-    // dialog = gtk_message_dialog_new (GTK_WINDOW(window),flags, GTK_MESSAGE_INFO, GTK_BUTTONS_OK,"ERREUR \n");//MSG_BAT_FAIBLE);
-    //   gtk_dialog_run (GTK_DIALOG (dialog));
-     //  gtk_widget_destroy (dialog);
-   
-    break;
-  default:
-    printf("Erreur alerte de type inconnue\n");
-    break;
-
-  }
-
-}
-
-// TODO choix de la destination memorise si on clique sur dest avant init
 
 // Controle la voiture depuis l'ihm
 void control(){
@@ -115,9 +82,6 @@ double latitude_coord;
 // todo check lat/lon
 void majCoords(double lat, double lon){
 
-
- //sprintf(valLatCast, "Lat %lf",lat);
- //sprintf(valLongCast, "Lon %lf",lon);
  if (DEBUG) {
    printf("[ihm_handler] maj coords a %lf, %lf \n", lat,lon);
    printf("[ihm_handler] %s %s  \n", valLatCast,valLongCast);
@@ -292,14 +256,6 @@ void initWindow(){
 
   // initialisation de gtk (ici avec des parametres par defaut vides)
   gtk_init(&argc,&argv);
-  /* if (gtk_clutter_init (&argc, &argv) != CLUTTER_INIT_SUCCESS)
-    return 1;
-  */
-
-
-
- 
-
   etat = CAR_NOT_INIT;
 
 
@@ -316,7 +272,6 @@ void initWindow(){
   table = gtk_grid_new ();
  
  //ecartement des colonnes
-  //gtk_grid_set_row_homogeneous(GTK_GRID(table),TRUE);
   gtk_grid_set_column_spacing(GTK_GRID (table),0);
   gtk_grid_set_row_spacing(GTK_GRID (table),10);
   gtk_container_add (GTK_CONTAINER (window), table);
@@ -328,25 +283,11 @@ void initWindow(){
   GtkWidget * destTitre;
 
   const char *format = "<span underline='double' font_weight='bold' color=\"black\" > %s </span>";
-  gpsTitre = gtk_label_new(NULL);
-  gtk_label_set_markup(GTK_LABEL(gpsTitre),g_markup_printf_escaped(format,"Données GPS"));
   batTitre = gtk_label_new(NULL);
   gtk_label_set_markup(GTK_LABEL(batTitre),g_markup_printf_escaped(format,"Batterie"));
-  statusTitre = gtk_label_new(NULL);
-  gtk_label_set_markup(GTK_LABEL(statusTitre),g_markup_printf_escaped(format,"Informations voiture"));
-  destTitre = gtk_label_new(NULL);
-  gtk_label_set_markup(GTK_LABEL(destTitre),g_markup_printf_escaped(format,"Où voulez-vous aller ?"));
 
-  //gtk_grid_attach (GTK_GRID (table), gpsTitre,0,6,2,1);
 //  gtk_grid_attach (GTK_GRID (table), batTitre,2,0,1,1);
-//  gtk_grid_attach (GTK_GRID (table), statusTitre,0,4,3,1);
-//  gtk_grid_attach (GTK_GRID (table), destTitre,0,5,3,8);
 
-
-  /*label#title-label {
-  font: 15px Sans
-  }*/
- 
 
   // Creation du label batterie, parametrage
   batterie = gtk_progress_bar_new();
@@ -455,17 +396,9 @@ void initWindow(){
              g_cclosure_marshal_VOID__POINTER,
              G_TYPE_NONE, 1, G_TYPE_POINTER);
 
-// si on enleve la ligne idle add, on chiale le poppup peut pas s'ouvrir depuis un autre thread, cf internet et les regles des ihm
+// ajout du watchdog surveillant le niveau de batterie dans l'ihm
   g_idle_add((GSourceFunc ) (alertBatterie),NULL);
-  //  g_signal_connect(window, "batterie_critique",G_CALLBACK(alertBatterieCritic),NULL);
 
-  // si on enleve la ligne idle add, on chiale le poppup peut pas s'ouvrir depuis un autre thread, cf internet, et les regles des ihm
-  //g_idle_add((GSourceFunc ) (alertBatterieFaible),batterie);
-  // g_signal_connect(window, "batterie_faible",G_CALLBACK(alertBatterieFaible),NULL);
-  
- 
-   // ajoute l'ecoute sur l'event de la batterie
-  //    gtk_widget_add_events(window,GDK_CLIENT_EVENT);
 
   if(pthread_create(&IHM,NULL,launchWindow,NULL)<0){
      perror("[ihm_handler] erreur de création du thread de l'ihm");
