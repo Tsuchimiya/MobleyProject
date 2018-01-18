@@ -76,4 +76,4 @@ Convention de codage adoptée.
 - Utiliser la caméra pour améliorer la régulation de trajectoire ou la détection d'obstacles.
 - Augmenter la vitesse des moteurs arrières pour améliorer la précision du GPS/IMU.
 - La Wi-Fi du raspbian ne fonctionne plus.
-- Les ID des variables CAN sont indiqués dans le fichier API\_raspi/com\_CAN
+- Les ID des variables CAN sont indiqués dans le fichier API\_raspi/com\_CAN/can_var.h.
