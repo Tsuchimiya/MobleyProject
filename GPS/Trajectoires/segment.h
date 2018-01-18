@@ -11,8 +11,8 @@
 #define NOT_INIT 0
 #define INIT_POINT 2
 #define ERROR_UPDATE_COORDS -12
-#define SEUIL_ANGLE 360
-#define SEUIL_ERREUR_CONSEQ 4
+#define SEUIL_ANGLE 45
+#define SEUIL_ERREUR_CONSEQ 5
 #define SEUIL_DISTANCE 0.00005 // ptêt que l'unité chie TODO check
 
 

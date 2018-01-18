@@ -35,20 +35,22 @@ gboolean  alertBatterie( GtkWidget *widget,
 
 
 // Controle la voiture depuis l'ihm
-void control(){
+void controlStart(){
 
   // soit on lance l'initialisation pour demarrer une regulation apres
   if (etat == CAR_NOT_INIT){
     etat = CAR_INIT;
     printf("init en cours\n");
     initVoiture();
-    gtk_button_set_label(GTK_BUTTON(controlButton),"STOP");
+    //gtk_button_set_label(GTK_BUTTON(controlButton),"STOP");
   }
+}
 
+void controlStop(){
   // soit on stoppe la voiture
-  else {
+  if (etat == CAR_INIT){
     printf("stopping the car\n");
-    gtk_button_set_label(GTK_BUTTON(controlButton),"Demarrer");
+    //gtk_button_set_label(GTK_BUTTON(controlButton),"Demarrer");
     etat = CAR_NOT_INIT;
     stopVoiture();
   }
@@ -277,16 +279,14 @@ void initWindow(){
   gtk_container_add (GTK_CONTAINER (window), table);
 
   // Creation des labels de titre
-  GtkWidget * gpsTitre;
   GtkWidget * batTitre;
-  GtkWidget * statusTitre;
   GtkWidget * destTitre;
 
   const char *format = "<span underline='double' font_weight='bold' color=\"black\" > %s </span>";
   batTitre = gtk_label_new(NULL);
   gtk_label_set_markup(GTK_LABEL(batTitre),g_markup_printf_escaped(format,"Batterie"));
 
-//  gtk_grid_attach (GTK_GRID (table), batTitre,2,0,1,1);
+gtk_grid_attach (GTK_GRID (table), batTitre,2,0,1,1);
 
 
   // Creation du label batterie, parametrage
@@ -294,7 +294,7 @@ void initWindow(){
   gtk_progress_bar_set_show_text (GTK_PROGRESS_BAR(batterie),TRUE);
   GdkColor col;
   majBatterie(100);
-  gtk_grid_attach (GTK_GRID (table), batterie,2,0,1,1);
+  gtk_grid_attach (GTK_GRID (table), batterie,2,1,1,1);
 
 
   // Creation des labels coord
@@ -333,19 +333,24 @@ void initWindow(){
   // Ajout de la colonne à la vue
   gtk_tree_view_append_column (GTK_TREE_VIEW (liste_dest), colonne);
 
-  gtk_grid_attach (GTK_GRID (table), liste_dest,2,1,1,1);
+  gtk_grid_attach (GTK_GRID (table), liste_dest,2,2,1,1);
 
   // Bouton valider
   GtkWidget * Valider_btn;
   Valider_btn=gtk_button_new_with_label ("Confirmer");
-  gtk_grid_attach (GTK_GRID (table),Valider_btn ,2,2,1,1);
+  gtk_grid_attach (GTK_GRID (table),Valider_btn ,2,3,1,1);
 
 
-  // Bouton de controle init puis arret d'urgence
+  // Bouton de controle init
   controlButton = gtk_button_new_with_label ("Demarrer");
-  gtk_grid_attach (GTK_GRID (table),controlButton ,0,3,3,1);
-  g_signal_connect (controlButton, "clicked",G_CALLBACK(control),NULL);
+  gtk_grid_attach (GTK_GRID (table),controlButton ,0,4,1,2);
+  g_signal_connect (controlButton, "clicked",G_CALLBACK(controlStart),NULL);
 
+
+// Bouton de controle arret d'urgence
+  controlButton = gtk_button_new_with_label ("STOP");
+  gtk_grid_attach (GTK_GRID (table),controlButton ,1,4,1,2);
+  g_signal_connect (controlButton, "clicked",G_CALLBACK(controlStop),NULL);
 
   // Choix de la destination
   GtkTreeSelection *choix;
@@ -372,7 +377,7 @@ void initWindow(){
   //gtk_container_add (GTK_CONTAINER (window), map);
 
   
-   gtk_grid_attach(GTK_GRID (table), map, 0,1,2,2);
+   gtk_grid_attach(GTK_GRID (table), map, 0,0,4,4);
    
 
 

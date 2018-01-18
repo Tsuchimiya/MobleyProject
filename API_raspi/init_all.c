@@ -155,9 +155,9 @@ main(void)
   
     // demarage thread gps
 
-    if(pthread_create(&gps,NULL,listenGPS,NULL) <0 ){
+    /*  if(pthread_create(&gps,NULL,listenGPS,NULL) <0 ){
       perror("[Init_all] pthread failure with listen GPS ");
-    }
+      }*/
     //test_maj();
 
   
