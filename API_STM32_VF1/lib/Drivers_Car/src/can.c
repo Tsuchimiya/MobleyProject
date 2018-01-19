@@ -187,10 +187,8 @@ void CAN_Send_Distance(void){
 void CAN_Send_Front_US(void)
 {
 			// Todo : Change array index by US contant in us_sensor.h
-			data_paquet paquet;			
-			paquet.intMessage[0] = sensors[FRONT_LEFT].COUNTER_DIFF;
-			paquet.intMessage[1] = sensors[FRONT_CENTER].COUNTER_DIFF;
-			paquet.intMessage[2] = sensors[FRONT_RIGHT].COUNTER_DIFF;
+			data_paquet paquet;
+			paquet.intMessage[0]=pDataITF_STM->ultrasonic_sensors[0];
 			CAN_Send(ID_FRONT_US, paquet.stringMessage);
 }
 

@@ -44,7 +44,6 @@ uint32_t Manager_remainingTimeInCommandPeriod = MANAGER_TIME_BETWEEN_TWO_UPDATES
 * @brief  Initializes all the sensors / actuators
 * @retval none  
 */
-
 void Manager_Init(void) {
     
     FrontMotor_QuickInit();
@@ -100,15 +99,18 @@ void Tournervolant(int degree_I)
  * @retval	None
 */
 int Bat_level;
+float distance_US[6];
+
 void Manager_Callback(void) {
-	int Bat_surveillance=0;	
+	int surveillance=0;	
+	int US_surveillance;
 	
     Manager_remainingTimeInCommandPeriod --;
     pDataITF_PI->enable_motors_control = ENABLE; //Modif SumSum
     if (Manager_remainingTimeInCommandPeriod == 0) {
 			
 			// Batterie pas faible (Batterie>8.1V)
-			if (Bat_surveillance==0) {
+			if (surveillance==0) {
 			// ACTUATORS    
 					// Rear motors
 					if(motor_prop_old != pDataITF_PI->motor_prop)
@@ -132,7 +134,7 @@ void Manager_Callback(void) {
 					}
 				}
 			// Batterie faible (Batterie<=8.1V)
-			else if (Bat_surveillance==1) {
+			else if (surveillance==1) {
 				// Arret moteurs
 				RearMotors_setSpeed(0);
 				Tournervolant(0);
@@ -149,18 +151,33 @@ void Manager_Callback(void) {
 					
 					
 					//motors current
-				 // pDataITF_STM->motor_current_R = ;
-				 // pDataITF_STM->motor_current_L = ;
 					Manager_remainingTimeInCommandPeriod = MANAGER_TIME_BETWEEN_TWO_UPDATES;  
 				
 		}
 		
+		//US_Sensor in front
+			//Gauche
+			/*distance_US[0] = US_CalcDistance(0);
+			//Milieux
+			distance_US[1] = US_CalcDistance(1);
+			//Droite
+			distance_US[2] = US_CalcDistance(2);
+		
+		if(distance_US[0] < 10 || distance_US[1] < 20 || distance_US[2] < 10)
+		{
+			pDataITF_STM->ultrasonic_sensors[0] = 1;
+			surveillance=1;
+		}
+		else
+		{
+			pDataITF_STM->ultrasonic_sensors[0] = 0;;
+		}
+		*/
 		// Get battery level
 		Bat_level=Battery_get();
 		
 		// Arret moteurs si Batterie <= 8.1V (51% de 16V)
 		if (Bat_level<=51) {
-			Bat_surveillance=1;
-		}
-		
+			surveillance=1;
+		}		
 }

@@ -1,0 +1,5664 @@
+/* $********** SCADE Suite KCG 32-bit 6.6 (build i19) ***********
+** Command: kcg66.exe -config U:/5A/Prog_synchrone/GeoCar_US/KCG/config.txt
+** Generation date: 2018-01-18T13:27:05
+*************************************************************$ */
+
+/* xscade source: U:/5A/Prog_synchrone/TD1/Operator1.xscade */
+function checkThreshold(Sensor_value : float64; Threshold : float64)
+  returns (Alarm : bool)
+var
+  _L1 : bool;
+  _L2 : float64;
+  _L3 : float64;
+let
+  _L1= _L2 #1 > _L3;
+  _L2= Sensor_value;
+  _L3= Threshold;
+  Alarm= _L1;
+tel
+
+
+/* xscade source: U:/5A/Prog_synchrone/GeoCar_US/Operator2.xscade */
+node US_handler(
+    Left_Sensor : float64;
+    Middle_Sensor : float64;
+    Right_Sensor : float64)
+  returns (Emergency_stop : bool)
+var
+  Obstacle_L : bool;
+  Obstacle_M : bool;
+  Obstacle_R : bool;
+  _L1 : bool;
+  _L2 : bool;
+  _L3 : bool;
+  _L4 : float64;
+  _L5 : float64;
+  _L6 : float64;
+  _L7 : float64;
+  _L8 : float64;
+  _L9 : float64;
+  _L14 : bool;
+  _L15 : bool;
+  _L16 : bool;
+let
+  _L1= #3 checkThreshold(_L7, _L4);
+  _L2= #4 checkThreshold(_L8, _L5);
+  _L3= #5 checkThreshold(_L9, _L6);
+  _L4= 50.0;
+  _L5= 100.0;
+  _L6= 50.0;
+  _L7= Left_Sensor;
+  _L8= Middle_Sensor;
+  _L9= Right_Sensor;
+  Obstacle_L= _L14;
+  Obstacle_M= _L15;
+  Obstacle_R= _L16;
+
+  automaton Emergency_stop_SM
+    initial state IDLE
+      unless
+        if Obstacle_M #4 or Obstacle_R #4 or Obstacle_L
+          restart WaitForConfirmation;
+      var
+        _L1 : bool;
+      let
+        Emergency_stop= _L1;
+        _L1= false;
+      tel
+
+    state Stop
+      unless
+        if #4 not (Obstacle_M #2 or Obstacle_R #2 or Obstacle_L) restart IDLE;
+      var
+        _L1 : bool;
+      let
+        Emergency_stop= _L1;
+        _L1= true;
+      tel
+
+    state WaitForConfirmation
+      unless
+        if #9 not (Obstacle_M #5 or Obstacle_R #5 or Obstacle_L) restart IDLE;
+        if NbCyclesConfirmation #3 times true restart Stop;
+      var
+        _L2 : bool;
+      let
+        Emergency_stop= _L2;
+        _L2= false;
+      tel
+  returns ..;
+  _L14= #5 not _L1;
+  _L15= #6 not _L2;
+  _L16= #7 not _L3;
+tel
+
+
+/* xscade source: U:/5A/Prog_synchrone/GeoCar_US/GeoCar_US.xscade */
+const NbCyclesConfirmation : int16 = 50;
+
+
+/* xscade source: C:/Program Files/ANSYS Inc/v182/SCADE/SCADE/libraries/SC65/libdigital/digital.xscade */
+package digital
+  node FallingEdge(FE_Input : bool) returns (FE_Output : bool)
+  var
+    _L1 : bool;
+    _L3 : bool;
+    _L4 : bool;
+    _L5 : bool;
+    _L6 : bool;
+  let
+    _L1= FE_Input;
+    FE_Output= _L6;
+    _L3= _L4 #1 and _L5;
+    _L4= #2 fby(_L1; 1; false);
+    _L5= #3 not _L1;
+    _L6= (false) #1 -> (_L3);
+  tel
+
+  node FallingEdgeNoRetrigger(FENR_Input : bool; NumberOfCycle : 'T)
+    returns (FENR_Output : bool)
+    where 'T integer
+  var
+    _L10 : bool;
+    _L11 : bool;
+    _L12 : bool;
+    _L22 : 'T;
+    _L23 : bool;
+    _L26 : 'T;
+    _L36 : bool;
+    _L37 : bool;
+    _L9 : bool;
+    _L40 : bool;
+    _L47 : bool;
+    _L50 : bool;
+    _L61 : bool;
+    _L63 : bool;
+    _L64 : bool;
+    _L65 : 'T;
+    _L68 : 'T;
+  let
+    _L9= FENR_Input;
+    FENR_Output= _L40;
+    _L10= #1 pre (_L9);
+    _L11= #2 not _L9;
+    _L12= _L11 #3 and _L10;
+    _L22= (0 #2 : 'T);
+    _L23= _L22 #4 < _L65;
+    _L26= NumberOfCycle;
+    _L36= _L37 #5 and _L63;
+    _L37= #6 not _L50;
+    _L40= _L47 #7 and _L23;
+    _L47= _L50 #8 or _L63;
+    _L50= #9 fby(_L40; 1; _L61);
+    _L61= false;
+    _L63= (_L64) #10 -> (_L12);
+    _L64= false;
+    _L65= ( activate #13 count_down every _L47 initial default (_L68))(_L36, _L26);
+    _L68= (0 #1 : 'T);
+  tel
+
+  node FallingEdgeRetrigger(FER_Input : bool; NumberOfCycle : 'T)
+    returns (FER_Output : bool)
+    where 'T integer
+  var
+    _L1 : bool;
+    _L76 : bool;
+    _L74 : bool;
+    _L73 : bool;
+    _L71 : 'T;
+    _L70 : bool;
+    _L68 : bool;
+    _L65 : bool;
+    _L64 : bool;
+    _L63 : 'T;
+    _L62 : bool;
+    _L61 : bool;
+    _L59 : bool;
+    _L77 : 'T;
+    _L79 : 'T;
+  let
+    _L1= FER_Input;
+    FER_Output= _L62;
+    _L76= _L63 #1 < _L77;
+    _L74= false;
+    _L73= #2 fby(_L62; 1; _L74);
+    _L71= NumberOfCycle;
+    _L70= false;
+    _L68= _L61 #3 and _L59;
+    _L65= _L73 #4 or _L64;
+    _L64= (_L70) #5 -> (_L68);
+    _L63= (0 #2 : 'T);
+    _L62= _L65 #8 and _L76;
+    _L61= #9 not _L1;
+    _L59= #10 pre (_L1);
+    _L77= ( activate #11 count_down every _L65 initial default (_L79))(_L64, _L71);
+    _L79= (0 #1 : 'T);
+  tel
+
+  node FlipFlopJK(Set : bool; Reset : bool; Init : bool)
+    returns (Output : bool last = Init)
+  var
+    _L10 : bool;
+    _L5 : bool;
+    _L6 : bool;
+    _L18 : bool;
+    _L20 : bool;
+    _L21 : bool;
+    _L22 : bool;
+    _L23 : bool;
+    _L24 : bool;
+  let
+    _L5= Set;
+    _L6= Reset;
+    Output= _L10;
+    _L10= #5 if _L24 then (_L22) else (_L18);
+    _L18= _L5 #10 or _L21;
+    _L20= #11 not _L6;
+    _L21= _L20 #12 and _L23;
+    _L22= #12 not last 'Output;
+    _L23= last 'Output;
+    _L24= Set #13 and Reset;
+  tel
+
+  node #pragma kcg expand #end FlipFlopReset(
+      Set : bool;
+      Reset : bool;
+      Init : bool)
+    returns (FFR_Output : bool)
+  var
+    _L10 : bool;
+    _L2 : bool;
+    _L4 : bool;
+    _L7 : bool;
+    _L8 : bool;
+    _L11 : bool;
+    _L12 : bool;
+    _L14 : bool;
+  let
+    _L2= (_L10) #1 -> (_L14);
+    _L4= #4 pre (_L2);
+    _L7= Set;
+    _L8= Reset;
+    FFR_Output= _L2;
+    _L10= Init;
+    _L11= _L7 #5 or _L4;
+    _L12= #6 not _L8;
+    _L14= _L12 #7 and _L11;
+  tel
+
+  node #pragma kcg expand #end FlipFlopSet(
+      Set : bool;
+      Reset : bool;
+      Init : bool)
+    returns (FFS_Output : bool)
+  var
+    _L10 : bool;
+    _L2 : bool;
+    _L4 : bool;
+    _L5 : bool;
+    _L6 : bool;
+    _L11 : bool;
+    _L12 : bool;
+    _L13 : bool;
+  let
+    _L2= (_L10) #1 -> (_L13);
+    _L4= #4 pre (_L2);
+    FFS_Output= _L2;
+    _L5= Set;
+    _L6= Reset;
+    _L10= Init;
+    _L11= #5 not _L6;
+    _L12= _L11 #6 and _L4;
+    _L13= _L5 #7 or _L12;
+  tel
+
+  node RisingEdge(RE_Input : bool) returns (RE_Output : bool)
+  var
+    _L1 : bool;
+    _L6 : bool;
+    _L3 : bool;
+    _L8 : bool;
+    _L9 : bool;
+  let
+    _L1= RE_Input;
+    RE_Output= _L9;
+    _L3= #1 fby(_L1; 1; false);
+    _L6= _L8 #2 and _L1;
+    _L8= #3 not _L3;
+    _L9= (false) #1 -> (_L6);
+  tel
+
+  node RisingEdgeRetrigger(RER_Input : bool; NumberOfCycle : 'T)
+    returns (RER_Output : bool)
+    where 'T integer
+  var
+    _L13 : bool;
+    _L14 : bool;
+    _L16 : bool;
+    _L31 : bool;
+    _L44 : 'T;
+    _L43 : bool;
+    _L41 : 'T;
+    _L39 : bool;
+    _L38 : bool;
+    _L36 : bool;
+    _L35 : bool;
+    _L46 : bool;
+    _L47 : bool;
+    _L48 : 'T;
+    _L50 : 'T;
+  let
+    RER_Output= _L43;
+    _L13= RER_Input;
+    _L14= #1 pre (_L31);
+    _L16= _L13 #2 and _L14;
+    _L31= #3 not _L13;
+    _L44= (0 #2 : 'T);
+    _L43= _L38 #4 and _L35;
+    _L41= NumberOfCycle;
+    _L39= #5 fby(_L43; 1; _L36);
+    _L38= _L39 #6 or _L46;
+    _L36= false;
+    _L35= _L44 #7 < _L48;
+    _L46= (_L47) #8 -> (_L16);
+    _L47= false;
+    _L48= ( activate #11 count_down every _L38 initial default (_L50))(_L46, _L41);
+    _L50= (0 #1 : 'T);
+  tel
+
+  function #pragma kcg expand #end Toggle(T_Input : bool)
+    returns (T_On : bool; T_Off : bool)
+  var
+    _L3 : bool;
+    _L9 : bool;
+  let
+    _L3= T_Input;
+    T_On= _L3;
+    T_Off= _L9;
+    _L9= #1 not _L3;
+  tel
+
+  node RisingEdgeNoRetrigger(RENR_Input : bool; NumberOfCycle : 'T)
+    returns (RENR_Output : bool)
+    where 'T integer
+  var
+    _L90 : bool;
+    _L87 : bool;
+    _L86 : 'T;
+    _L85 : bool;
+    _L84 : bool;
+    _L82 : bool;
+    _L81 : bool;
+    _L80 : 'T;
+    _L79 : bool;
+    _L78 : bool;
+    _L77 : bool;
+    _L76 : bool;
+    _L75 : bool;
+    _L91 : bool;
+    _L92 : bool;
+    _L93 : 'T;
+    _L95 : 'T;
+  let
+    RENR_Output= _L78;
+    _L90= _L80 #1 < _L93;
+    _L87= #2 fby(_L78; 1; _L92);
+    _L86= NumberOfCycle;
+    _L85= _L91 #3 and _L76;
+    _L84= false;
+    _L82= _L87 #4 or _L79;
+    _L81= _L75 #5 and _L79;
+    _L80= (0 #2 : 'T);
+    _L79= (_L84) #6 -> (_L85);
+    _L78= _L82 #9 and _L90;
+    _L77= #10 not _L91;
+    _L76= #11 pre (_L77);
+    _L75= #12 not _L87;
+    _L91= RENR_Input;
+    _L92= false;
+    _L93= ( activate #13 count_down every _L82 initial default (_L95))(_L81, _L86);
+    _L95= (0 #1 : 'T);
+  tel
+
+  node count_down(Reset : bool; N : 'T) returns (cpt : 'T) where 'T integer
+  var
+    _L1 : bool;
+    _L2 : 'T;
+    _L3 : 'T;
+    _L4 : 'T;
+    _L7 : 'T;
+    _L8 : 'T;
+    _L13 : 'T;
+  let
+    _L1= Reset;
+    _L2= N;
+    cpt= _L3;
+    _L3= #1 if _L1 then (_L2) else (_L8);
+    _L4= _L3 #4 - _L7;
+    _L7= (1 #1 : 'T);
+    _L8= (_L2) #5 -> (_L13);
+    _L13= #8 pre (_L4);
+  tel
+
+  node EitherEdge(EE_Input : bool) returns (EE_Output : bool)
+  var
+    _L1 : bool;
+    _L3 : bool;
+    _L4 : bool;
+    _L5 : bool;
+  let
+    _L1= EE_Input;
+    EE_Output= _L5;
+    _L3= _L4 #1 xor _L1;
+    _L4= #2 fby(_L1; 1; false);
+    _L5= (false) #1 -> (_L3);
+  tel
+
+  function #pragma kcg expand #end BoolVect2IntElt(Acc : 'T; bi : bool)
+    returns (AccOut : 'T)
+    where 'T integer
+  var
+    _L1 : 'T;
+    _L2 : bool;
+    _L4 : 'T;
+    _L5 : 'T;
+    _L6 : 'T;
+    _L7 : 'T;
+    _L8 : 'T;
+    _L9 : 'T;
+  let
+    AccOut= _L8;
+    _L1= Acc;
+    _L2= bi;
+    _L4= _L1 #1 * _L9;
+    _L5= #2 if _L2 then (_L6) else (_L7);
+    _L6= (1 #2 : 'T);
+    _L7= (0 #3 : 'T);
+    _L8= _L5 #5 + _L4;
+    _L9= (2 #1 : 'T);
+  tel
+
+  function Int2BoolVectElt(Acc : 'T)
+    returns (AccOut : 'T; bi : bool)
+    where 'T integer
+  var
+    _L1 : 'T;
+    _L9 : 'T;
+    _L10 : 'T;
+    _L11 : 'T;
+    _L12 : bool;
+    _L13 : 'T;
+  let
+    AccOut= _L10;
+    _L1= Acc;
+    _L9= (2 #1 : 'T);
+    _L10= _L1 #1 / _L9;
+    bi= _L12;
+    _L11= _L1 #2 mod _L9;
+    _L12= _L11 #3 = _L13;
+    _L13= (1 #2 : 'T);
+  tel
+
+  function BoolVect2Int8<<Nbool>>(BV : bool^Nbool) returns (Out : int8)
+  var
+    _L2 : int8;
+    _L3 : int8;
+    _L4 : bool^Nbool;
+  let
+    _L2= ( fold #1 BoolVect2IntElt <<Nbool>>)(_L3, _L4);
+    _L3= (0 #2 : int8);
+    _L4= BV;
+    Out= _L2;
+  tel
+
+  function Int2BoolVect<<Nbool>>(In : 'T)
+    returns (BV : bool^Nbool)
+    where 'T integer
+  var
+    #pragma kcg keep #end Acc : 'T;
+    _L1 : 'T;
+    _L4 : bool^Nbool;
+    _L5 : bool^Nbool;
+  let
+    _L1= In;
+    BV= _L5;
+    Acc, _L4= ( mapfold 1 #1 Int2BoolVectElt <<Nbool>>)(_L1);
+    _L5= #3 reverse _L4;
+    _= Acc;
+  tel
+
+  function BoolVect2Int16<<Nbool>>(BV : bool^Nbool) returns (Out : int16)
+  var
+    _L2 : int16;
+    _L3 : int16;
+    _L4 : bool^Nbool;
+  let
+    _L2= ( fold #1 BoolVect2IntElt <<Nbool>>)(_L3, _L4);
+    _L3= (0 #2 : int16);
+    _L4= BV;
+    Out= _L2;
+  tel
+
+  function BoolVect2Uint16<<Nbool>>(BV : bool^Nbool) returns (Out : uint16)
+  var
+    _L2 : uint16;
+    _L3 : uint16;
+    _L4 : bool^Nbool;
+  let
+    _L2= ( fold #1 BoolVect2IntElt <<Nbool>>)(_L3, _L4);
+    _L3= (0 #2 : uint16);
+    _L4= BV;
+    Out= _L2;
+  tel
+
+  function BoolVect2Uint32<<Nbool>>(BV : bool^Nbool) returns (Out : uint32)
+  var
+    _L2 : uint32;
+    _L3 : uint32;
+    _L4 : bool^Nbool;
+  let
+    _L2= ( fold #1 BoolVect2IntElt <<Nbool>>)(_L3, _L4);
+    _L3= (0 #2 : uint32);
+    _L4= BV;
+    Out= _L2;
+  tel
+
+  function BoolVect2Uint64<<Nbool>>(BV : bool^Nbool) returns (Out : uint64)
+  var
+    _L2 : uint64;
+    _L3 : uint64;
+    _L4 : bool^Nbool;
+  let
+    _L2= ( fold #1 BoolVect2IntElt <<Nbool>>)(_L3, _L4);
+    _L3= (0 #3 : uint64);
+    _L4= BV;
+    Out= _L2;
+  tel
+
+  function BoolVect2Uint8<<Nbool>>(BV : bool^Nbool) returns (Out : uint8)
+  var
+    _L2 : uint8;
+    _L3 : uint8;
+    _L4 : bool^Nbool;
+  let
+    _L2= ( fold #1 BoolVect2IntElt <<Nbool>>)(_L3, _L4);
+    _L3= (0 #2 : uint8);
+    _L4= BV;
+    Out= _L2;
+  tel
+
+  function BoolVect2Int32<<Nbool>>(BV : bool^Nbool) returns (Out : int32)
+  var
+    _L2 : int32;
+    _L3 : int32;
+    _L4 : bool^Nbool;
+  let
+    _L2= ( fold #1 BoolVect2IntElt <<Nbool>>)(_L3, _L4);
+    _L3= (0 #3 : int32);
+    _L4= BV;
+    Out= _L2;
+  tel
+
+  function BoolVect2Int64<<Nbool>>(BV : bool^Nbool) returns (Out : int64)
+  var
+    _L2 : int64;
+    _L3 : int64;
+    _L4 : bool^Nbool;
+  let
+    _L2= ( fold #1 BoolVect2IntElt <<Nbool>>)(_L3, _L4);
+    _L3= (0 #2 : int64);
+    _L4= BV;
+    Out= _L2;
+  tel
+
+  node InactiveTime(Cond : bool; TimeCycle : 'T)
+    returns (DeltaT : 'T)
+    where 'T numeric
+  var
+    Cpt : 'T last = (0 #2 : 'T);
+    _L1 : bool;
+    _L2 : 'T;
+    _L6 : 'T;
+    _L8 : 'T;
+    _L9 : 'T;
+    _L10 : 'T;
+  let
+    _L1= Cond;
+    _L2= last 'Cpt;
+    _L6= _L2 #1 + _L10;
+    _L8= #1 if _L1 then (_L9) else (_L6);
+    _L9= (0 #3 : 'T);
+    Cpt= _L8;
+    _L10= TimeCycle;
+    DeltaT= _L6;
+  tel
+
+  node InactiveCycles(Cond : bool) returns (DeltaCycles : int32)
+  var
+    Cpt : int32 last = 0;
+    _L1 : bool;
+    _L2 : int32;
+    _L6 : int32;
+    _L8 : int32;
+    _L9 : int32;
+    _L13 : int32;
+  let
+    _L1= Cond;
+    _L2= last 'Cpt;
+    _L6= _L2 #1 + _L13;
+    _L8= #1 if _L1 then (_L9) else (_L6);
+    _L9= 0;
+    Cpt= _L8;
+    DeltaCycles= _L6;
+    _L13= (1 #1 : int32);
+  tel
+
+  node Relay(
+      Input1 : 'T;
+      UpperLimit_On : 'T;
+      LowerLimit_Off : 'T;
+      OutputWhenOn : 'T;
+      OutputWhenOff : 'T)
+    returns (Output1 : 'T)
+    where 'T numeric
+  var
+    _L1 : 'T;
+    _L2 : 'T;
+    _L4 : 'T;
+    _L5 : 'T;
+    _L6 : 'T;
+    _L11 : bool;
+    _L14 : 'T;
+    _L16 : bool;
+    _L17 : 'T;
+    _L18 : bool;
+    _L19 : 'T;
+    _L20 : 'T;
+    _L22 : 'T;
+  let
+    _L1= Input1;
+    _L2= UpperLimit_On;
+    _L4= LowerLimit_Off;
+    _L5= OutputWhenOn;
+    _L6= OutputWhenOff;
+    _L11= _L20 #1 = _L22;
+    _L14= #1 if _L11 then (_L17) else (_L19);
+    _L16= _L1 #1 >= _L2;
+    _L17= #2 if _L16 then (_L5) else (_L6);
+    _L18= _L1 #1 <= _L4;
+    _L19= #3 if _L18 then (_L6) else (_L5);
+    Output1= _L14;
+    _L20= #1 fby(_L14; 1; _L22);
+    _L22= OutputWhenOff;
+  tel
+
+  node TriggerRise(Input : 'T) returns (Output : bool) where 'T numeric
+  var
+    _L1 : 'T;
+    _L4 : bool;
+    _L10 : bool;
+    _L18 : bool;
+    _L22 : 'T;
+  let
+    _L1= Input;
+    _L4= _L1 #1 < _L22;
+    Output= _L18;
+    _L10= _L22 #1 = _L1;
+    _L18= #1 EntryDetect(_L4, _L10);
+    _L22= (0 #3 : 'T);
+  tel
+
+  node TriggerFall(Input : 'T) returns (Output : bool) where 'T numeric
+  var
+    _L25 : 'T;
+    _L29 : bool;
+    _L28 : bool;
+    _L26 : bool;
+    _L33 : 'T;
+  let
+    _L25= Input;
+    Output= _L26;
+    _L26= #1 EntryDetect(_L29, _L28);
+    _L28= _L33 #1 = _L25;
+    _L29= _L25 #1 > _L33;
+    _L33= (0 #3 : 'T);
+  tel
+
+  node EntryDetect(Outside : bool; OnTheBorder : bool) returns (Entry : bool)
+  var
+    _L1 : bool;
+    _L2 : bool;
+    _L3 : bool;
+    _L10 : bool;
+    _L14 : bool;
+    _L22 : bool;
+    _L25 : bool;
+    _L26 : bool;
+    _L27 : bool;
+    _L28 : bool;
+    _L29 : bool;
+    _L30 : bool;
+  let
+    _L1= Outside;
+    _L2= OnTheBorder;
+    _L3= _L22 #1 or _L10 #1 or _L14;
+    _L10= _L26 #1 and _L2;
+    _L27= #1 fby(_L2; 1; _L2);
+    _L28= #2 fby(_L3; 1; false);
+    _L26= #3 fby(_L1; 1; _L1);
+    _L14= _L29 #2 and _L27 #2 and _L30;
+    _L25= _L1 #2 or _L2;
+    _L22= _L26 #3 and _L29;
+    Entry= _L3;
+    _L29= #1 not _L25;
+    _L30= #2 not _L28;
+  tel
+
+  node TriggerEither(Input : 'T) returns (Output : bool) where 'T numeric
+  var
+    _L8 : 'T;
+    _L28 : bool;
+    _L29 : bool;
+    _L30 : bool;
+  let
+    _L8= Input;
+    Output= _L28;
+    _L28= _L29 #1 or _L30;
+    _L29= #2 TriggerFall(_L8);
+    _L30= #2 TriggerRise(_L8);
+  tel
+
+end;
+
+
+/* xscade source: C:/Program Files/ANSYS Inc/v182/SCADE/SCADE/libraries/SC65/libdigital/TruthTables.xscade */
+package truthtables
+  open digital;
+  type TruthTableValues = enum { T, F, X };
+
+  function TruthTableElt(AccIn : bool; Cond : bool; TTelt : TruthTableValues)
+    returns (AccOut : bool)
+  var
+    _L1 : bool;
+    _L2 : bool;
+    _L13 : bool;
+    _L15 : bool;
+    _L14 : bool;
+    _L16 : bool;
+    _L17 : TruthTableValues;
+  let
+    _L1= _L2 #1 and _L13;
+    _L2= AccIn;
+    AccOut= _L1;
+    _L13= (#2 case _L17 of | T: _L14 | F: _L15 | _: _L16);
+    _L14= Cond;
+    _L15= #5 not _L14;
+    _L16= true;
+    _L17= TTelt;
+  tel
+
+  function TruthTableLineIdx<<Ncond>>(
+      Idx : int16;
+      AccIn : int16;
+      Conditions : bool^Ncond;
+      TTline : TruthTableValues^Ncond)
+    returns (AccOut : int16)
+  var
+    _L2 : bool;
+    _L3 : int16;
+    _L4 : int16;
+    _L8 : int16;
+    _L10 : bool^Ncond;
+    _L11 : bool;
+    _L12 : TruthTableValues^Ncond;
+  let
+    _L2= ( fold #1 TruthTableElt <<Ncond>>)(_L11, _L10, _L12);
+    _L3= #3 if _L2 then (_L8) else (_L4);
+    AccOut= _L3;
+    _L4= AccIn;
+    _L8= Idx;
+    _L10= Conditions;
+    _L11= true;
+    _L12= TTline;
+  tel
+
+  function TruthTableIdx<<Ncond, Nlines>>(
+      Conditions : bool^Ncond;
+      Ttable : TruthTableValues^Ncond^Nlines)
+    returns (LineIdx : int16)
+  var
+    _L1 : bool^Ncond;
+    _L2 : TruthTableValues^Ncond^Nlines;
+    _L6 : int16;
+    _L8 : bool^Ncond^Nlines;
+    _L9 : TruthTableValues^Ncond^Nlines;
+    _L10 : int16;
+    _L11 : int16;
+    _L12 : int16;
+  let
+    _L1= Conditions;
+    _L2= Ttable;
+    LineIdx= _L10;
+    _L6= #1 - (1 #2 : int16);
+    _L8= (_L1)#3^Nlines;
+    _L9= #4 reverse _L2;
+    _L10= _L11 #5 - _L12;
+    _L11= (Nlines #4 : int16) #7 - (1 #5 : int16);
+    _L12= ( foldi (#2 TruthTableLineIdx <<Ncond>>) <<Nlines>>)(_L6, _L8, _L9);
+  tel
+
+  function TruthTableExh<<Nbool, Nres>>(BV : bool^Nbool; ResultValues : 'T^Nres)
+    returns (Result : 'T)
+  var
+    _L1 : bool^Nbool;
+    _L3 : 'T;
+    _L4 : 'T^Nres;
+    _L5 : int8;
+  let
+    _L1= BV;
+    _L3= (_L4#1 . [_L5] default ResultValues #0[0]);
+    _L4= ResultValues;
+    Result= _L3;
+    _L5= (#3 BoolVect2Int8 <<Nbool>>)(_L1);
+    assume A1 : Nres #4 =
+    (#1 fold #3 $*$ <<Nbool>>)((1 #1 : int32), ((2 #2 : int32))#2^Nbool);
+  tel
+
+  function TruthTableLine<<Ncond>>(
+      AccIn : 'T;
+      Conditions : bool^Ncond;
+      ResultValue : 'T;
+      TTline : TruthTableValues^Ncond)
+    returns (Continue : bool; AccOut : 'T)
+  var
+    _L2 : bool;
+    _L3 : 'T;
+    _L4 : 'T;
+    _L10 : bool^Ncond;
+    _L11 : bool;
+    _L12 : TruthTableValues^Ncond;
+    _L14 : 'T;
+    _L15 : bool;
+  let
+    _L2= ( fold #1 TruthTableElt <<Ncond>>)(_L11, _L10, _L12);
+    _L3= #3 if _L2 then (_L14) else (_L4);
+    AccOut= _L3;
+    _L4= AccIn;
+    _L10= Conditions;
+    _L11= true;
+    _L12= TTline;
+    _L14= ResultValue;
+    Continue= _L15;
+    _L15= #6 not _L2;
+  tel
+
+  function TruthTable<<Ncond, Nlines>>(
+      Conditions : bool^Ncond;
+      ResultValues : 'T^(Nlines + 1);
+      Ttable : TruthTableValues^Ncond^Nlines)
+    returns (Result : 'T)
+  var
+    _L1 : bool^Ncond;
+    _L2 : TruthTableValues^Ncond^Nlines;
+    _L7 : 'T^(Nlines + 1);
+    _L9 : bool^Ncond^Nlines;
+    _L12 : 'T;
+    _L16 : 'T^(Nlines + 1);
+    _L17 : bool;
+    _L19 : 'T;
+    _L18 : int16;
+    _L21 : 'T^(Nlines - 1 - 0 + 1);
+  let
+    _L1= Conditions;
+    _L2= Ttable;
+    Result= _L19;
+    _L7= ResultValues;
+    _L9= (_L1)#1^Nlines;
+    _L12= _L16 #3[Nlines];
+    _L16= ResultValues;
+    _L17= true;
+    _L18, _L19=
+      ( foldw (#4 TruthTableLine <<Ncond>>) <<Nlines>> if _L17)(_L12, _L9, _L21, _L2);
+    _= _L18;
+    _L21= _L7 #6 [0 .. Nlines - 1];
+  tel
+
+end;
+
+
+/* xscade source: C:/Program Files/ANSYS Inc/v182/SCADE/SCADE/libraries/SC65/liblinear/linear.xscade */
+package linear
+  function #pragma kcg expand #end Gain(G_Input : 'T; Gain : 'T)
+    returns (G_Output : 'T)
+    where 'T numeric
+  var
+    _L1 : 'T;
+    _L2 : 'T;
+    _L3 : 'T;
+  let
+    _L1= G_Input;
+    _L2= Gain;
+    G_Output= _L3;
+    _L3= _L1 #1 * _L2;
+  tel
+
+  node MeanCycle2(U : 'T) returns (MeanOn2Steps : 'T) where 'T float
+  var
+    _L1 : 'T;
+    _L13 : 'T;
+    _L14 : 'T;
+    _L8 : 'T;
+    _L9 : 'T;
+  let
+    _L1= U;
+    MeanOn2Steps= _L8;
+    _L8= _L14 #1 / _L9;
+    _L9= (2 #2 : 'T);
+    _L13= #2 fby(_L1; 1; _L1);
+    _L14= _L1 #3 + _L13;
+  tel
+
+  node MeanCycle3(U : 'T) returns (MeanOn3Step : 'T) where 'T float
+  var
+    _L10 : 'T;
+    _L11 : 'T;
+    _L12 : 'T;
+    _L6 : 'T;
+    _L7 : 'T;
+    _L9 : 'T;
+  let
+    MeanOn3Step= _L12;
+    _L6= U;
+    _L7= #1 fby(_L6; 1; _L6);
+    _L9= #2 fby(_L7; 1; _L6);
+    _L10= (3 #2 : 'T);
+    _L11= _L6 #3 + _L7 #3 + _L9;
+    _L12= _L11 #4 / _L10;
+  tel
+
+  node Derivative(u : 'T; TimeCycle : 'T)
+    returns (Derivative : 'T)
+    where 'T float
+  var
+    _L1 : 'T;
+    _L2 : 'T;
+    _L3 : 'T;
+    _L6 : 'T;
+    _L7 : 'T;
+    _L8 : 'T;
+    _L9 : 'T;
+  let
+    _L1= _L3 #1 - _L2;
+    _L2= #2 pre (_L3);
+    _L3= u;
+    Derivative= _L6;
+    _L6= (_L7) #3 -> (_L8);
+    _L7= (0.0 #1 : 'T);
+    _L8= _L1 #6 / _L9;
+    _L9= TimeCycle;
+  tel
+
+  node #pragma kcg expand #end Filter1stOrderLoop(
+      F1OL_Input : 'T;
+      K1 : 'T;
+      K2 : 'T;
+      Init : 'T)
+    returns (F1OL_Output : 'T)
+    where 'T numeric
+  var
+    _L9 : 'T;
+    _L8 : 'T;
+    _L7 : 'T;
+    _L6 : 'T;
+    _L5 : 'T;
+    _L4 : 'T;
+    _L3 : 'T;
+    _L2 : 'T;
+    _L1 : 'T;
+  let
+    _L9= Init;
+    _L8= (_L9) #1 -> (_L7);
+    _L7= _L4 #4 - _L6;
+    _L6= _L5 #5 * _L2;
+    _L5= #6 pre (_L8);
+    _L4= _L3 #7 * _L1;
+    F1OL_Output= _L8;
+    _L3= F1OL_Input;
+    _L2= K2;
+    _L1= K1;
+  tel
+
+  node #pragma kcg expand #end Memory(
+      M_Input : 'T;
+      Reset : bool;
+      MemCond : bool;
+      InitVal : 'T)
+    returns (Out : 'T)
+  var
+    _L8 : 'T;
+    _L7 : 'T;
+    _L6 : 'T;
+    _L5 : 'T;
+    _L3 : bool;
+    _L2 : 'T;
+    _L1 : bool;
+    _L9 : 'T;
+  let
+    Out= _L8;
+    _L8= #1 if _L1 then (_L2) else (_L7);
+    _L7= #4 if _L3 then (_L6) else (_L5);
+    _L6= M_Input;
+    _L5= #7 fby(_L8; 1; _L9);
+    _L3= MemCond;
+    _L2= InitVal;
+    _L1= Reset;
+    _L9= InitVal;
+  tel
+
+  node HitCrossingEither(HCE_Input : 'T; Offset : 'T)
+    returns (HCE_Output : bool)
+    where 'T numeric
+  var
+    _L1 : 'T;
+    _L5 : 'T;
+    _L24 : bool;
+    _L25 : bool;
+    _L26 : bool;
+    _L28 : bool;
+    _L29 : bool;
+    _L30 : bool;
+    _L31 : bool;
+    _L43 : 'T;
+  let
+    _L1= HCE_Input;
+    _L5= Offset;
+    _L24= _L43 #1 <= _L5;
+    _L25= _L1 #2 >= _L5;
+    _L26= _L24 #3 and _L25;
+    _L28= _L43 #4 >= _L5;
+    _L29= _L1 #5 <= _L5;
+    _L30= _L28 #6 and _L29;
+    _L31= _L26 #7 or _L30;
+    HCE_Output= _L31;
+    _L43= #8 fby(_L1; 1; _L1);
+  tel
+
+  node HitCrossingFalling(HCF_Input : 'T; Offset : 'T)
+    returns (HCF_Output : bool)
+    where 'T numeric
+  var
+    _L1 : 'T;
+    _L5 : 'T;
+    _L10 : bool;
+    _L18 : bool;
+    _L22 : 'T;
+    _L24 : bool;
+    _L25 : bool;
+    _L26 : bool;
+    _L27 : bool;
+    _L28 : bool;
+    _L29 : bool;
+    _L30 : bool;
+  let
+    _L1= HCF_Input;
+    _L5= Offset;
+    _L10= (_L18) #1 -> (_L30);
+    _L18= false;
+    _L22= #4 pre (_L1);
+    _L24= _L22 #5 >= _L5;
+    _L25= _L1 #6 < _L5;
+    _L26= _L24 #7 and _L25;
+    HCF_Output= _L10;
+    _L27= _L22 #8 > _L5;
+    _L28= _L1 #9 = _L5;
+    _L29= _L27 #10 and _L28;
+    _L30= _L26 #11 or _L29;
+  tel
+
+  node HitCrossingRising(HCR_Input : 'T; Offset : 'T)
+    returns (HCR_Output : bool)
+    where 'T numeric
+  var
+    _L1 : 'T;
+    _L5 : 'T;
+    _L10 : bool;
+    _L18 : bool;
+    _L22 : 'T;
+    _L24 : bool;
+    _L25 : bool;
+    _L26 : bool;
+    _L27 : bool;
+    _L28 : bool;
+    _L29 : bool;
+    _L30 : bool;
+  let
+    _L1= HCR_Input;
+    _L5= Offset;
+    _L10= (_L18) #1 -> (_L30);
+    _L18= false;
+    _L22= #4 pre (_L1);
+    _L24= _L22 #5 <= _L5;
+    _L25= _L1 #6 > _L5;
+    _L26= _L24 #7 and _L25;
+    HCR_Output= _L10;
+    _L27= _L22 #8 < _L5;
+    _L28= _L1 #9 = _L5;
+    _L29= _L27 #10 and _L28;
+    _L30= _L26 #11 or _L29;
+  tel
+
+  node #pragma kcg expand #end MemoryBasic(
+      BM_Input : 'T;
+      Init : 'T;
+      Write : bool)
+    returns (Memorized : 'T)
+  var
+    _L2 : 'T;
+    _L4 : 'T;
+    _L5 : bool;
+    _L6 : 'T;
+    _L7 : 'T;
+  let
+    _L2= BM_Input;
+    Memorized= _L4;
+    _L4= #1 if _L5 then (_L2) else (_L6);
+    _L5= Write;
+    _L6= #4 fby(_L4; 1; _L7);
+    _L7= Init;
+  tel
+
+  node Backlash(input : 'T; deadband_width : 'T; initial_output : 'T)
+    returns (output : 'T last = initial_output)
+    where 'T float
+  var
+    _L81 : 'T;
+    _L79 : 'T;
+    _L78 : 'T;
+    _L75 : 'T;
+    _L74 : bool;
+    _L73 : 'T;
+    _L72 : bool;
+    _L70 : 'T;
+    _L69 : bool;
+    _L66 : 'T;
+    _L82 : 'T;
+    _L83 : 'T;
+    _L84 : 'T;
+    _L85 : 'T;
+    _L86 : 'T;
+    _L87 : 'T;
+    _L88 : 'T;
+    _L89 : 'T;
+  let
+    _L66= input;
+    _L69= _L66 #1 > _L70;
+    output= _L73;
+    _L70= _L84 #1 + _L82;
+    _L72= _L74 #1 or _L69;
+    _L73= #1 if _L72 then (_L75) else (_L85);
+    _L74= _L89 #1 < _L81;
+    _L75= _L79 #2 + _L78;
+    _L78= input;
+    _L79= #2 if _L69 then (_L88) else (_L87);
+    _L81= _L83 #1 - _L86;
+    _L82= deadband_width #2 / (2.0 #1 : 'T);
+    _L83= last 'output;
+    _L84= last 'output;
+    _L85= last 'output;
+    _L86= deadband_width #3 / (2.0 #2 : 'T);
+    _L87= deadband_width #4 / (2.0 #3 : 'T);
+    _L88= #2 - deadband_width #6 / (2.0 #5 : 'T);
+    _L89= input;
+  tel
+
+  node DetectRisePositive(Input : 'T) returns (Output : bool) where 'T numeric
+  var
+    _L16 : 'T;
+    _L15 : bool;
+    _L13 : 'T;
+    _L11 : bool;
+    _L10 : bool;
+    _L9 : 'T;
+    _L18 : bool;
+  let
+    Output= _L18;
+    _L9= #1 pre (_L16);
+    _L10= _L16 #1 > _L13;
+    _L11= _L10 #1 and _L15;
+    _L13= (0 #1 : 'T);
+    _L15= _L9 #1 <= _L13;
+    _L16= Input;
+    _L18= (false) #2 -> (_L11);
+  tel
+
+  node DetectRiseNonNegative(Input : 'T)
+    returns (Output : bool)
+    where 'T numeric
+  var
+    _L16 : bool;
+    _L15 : bool;
+    _L14 : 'T;
+    _L12 : bool;
+    _L11 : 'T;
+    _L9 : 'T;
+    _L18 : bool;
+  let
+    _L9= Input;
+    _L11= #1 pre (_L9);
+    _L12= _L9 #1 >= _L14;
+    Output= _L18;
+    _L14= (0 #1 : 'T);
+    _L15= _L12 #1 and _L16;
+    _L16= _L11 #1 < _L14;
+    _L18= (false) #2 -> (_L15);
+  tel
+
+  node DetectIncrease(Input : 'T; Init : 'T)
+    returns (Output : bool)
+    where 'T numeric
+  var
+    _L11 : 'T;
+    _L10 : bool;
+    _L9 : 'T;
+    _L8 : 'T;
+  let
+    _L8= #1 fby(_L11; 1; _L9);
+    _L9= Init;
+    _L10= _L11 #1 > _L8;
+    _L11= Input;
+    Output= _L10;
+  tel
+
+  node DetectFallNonPositive(Input : 'T)
+    returns (Output : bool)
+    where 'T numeric
+  var
+    _L17 : 'T;
+    _L16 : 'T;
+    _L14 : bool;
+    _L13 : 'T;
+    _L12 : bool;
+    _L11 : bool;
+    _L18 : bool;
+  let
+    Output= _L18;
+    _L11= _L14 #1 and _L12;
+    _L12= _L13 #1 > _L16;
+    _L13= #1 pre (_L17);
+    _L14= _L17 #1 <= _L16;
+    _L16= (0 #1 : 'T);
+    _L17= Input;
+    _L18= (false) #2 -> (_L11);
+  tel
+
+  node DetectFallNegative(Input : 'T) returns (Output : bool) where 'T numeric
+  var
+    _L1 : 'T;
+    _L3 : bool;
+    _L4 : 'T;
+    _L7 : bool;
+    _L8 : bool;
+    _L29 : 'T;
+    _L36 : bool;
+  let
+    _L1= Input;
+    Output= _L36;
+    _L3= _L1 #1 < _L4;
+    _L4= (0 #1 : 'T);
+    _L7= _L29 #1 >= _L4;
+    _L8= _L3 #1 and _L7;
+    _L29= #1 pre (_L1);
+    _L36= (false) #2 -> (_L8);
+  tel
+
+  node DetectDecrease(Input : 'T; Init : 'T)
+    returns (Output : bool)
+    where 'T numeric
+  var
+    _L11 : bool;
+    _L10 : 'T;
+    _L9 : 'T;
+    _L8 : 'T;
+  let
+    _L8= #1 fby(_L9; 1; _L10);
+    _L9= Input;
+    _L10= Init;
+    Output= _L11;
+    _L11= _L9 #1 < _L8;
+  tel
+
+  node DetectChange(Input : 'T; Init : 'T) returns (Output : bool)
+  var
+    _L1 : 'T;
+    _L3 : bool;
+    _L4 : 'T;
+    _L5 : 'T;
+  let
+    _L1= Input;
+    Output= _L3;
+    _L3= _L1 #1 <> _L4;
+    _L4= #1 fby(_L1; 1; _L5);
+    _L5= Init;
+  tel
+
+  node IntegralBackward(
+      Input : 'T;
+      Reset : bool;
+      HighLimit : 'T;
+      LowLimit : 'T;
+      init : 'T;
+      deltaT : 'T)
+    returns (Output : 'T; Saturation : bool)
+    where 'T numeric
+  var
+    _L1 : 'T;
+    _L2 : 'T;
+    _L4 : 'T;
+    _L9 : 'T;
+    _L10 : 'T;
+    _L12 : 'T;
+    _L13 : 'T;
+    _L14 : 'T;
+    _L16 : bool;
+    _L17 : bool;
+    _L28 : 'T;
+    _L25 : 'T;
+    _L30 : 'T;
+    _L31 : bool;
+    _L32 : 'T;
+    _L33 : bool;
+  let
+    _L1= Input;
+    _L2= deltaT;
+    _L4= init;
+    Output= _L28;
+    _L9= _L30 #1 + _L10;
+    _L10= _L1 #1 * _L2;
+    _L12= #1 if _L31 then (_L4) else (_L9);
+    _L13= LowLimit;
+    _L14= HighLimit;
+    _L16= _L32 #1 <= _L13;
+    _L17= _L32 #1 >= _L14;
+    Saturation= _L33;
+    _L28= #2 if _L17 then (_L14) else (_L25);
+    _L25= #3 if _L16 then (_L13) else (_L32);
+    _L30= #1 pre (_L28);
+    _L31= Reset;
+    _L32= (_L4) #1 -> (_L12);
+    _L33= _L16 #1 or _L17;
+    assume A1 : LowLimit #7 <= HighLimit;
+  tel
+
+  node IntegrTrapez(
+      U : 'T;
+      Reset : bool;
+      TimeCycle : 'T;
+      LowLimit : 'T;
+      HiLimit : 'T)
+    returns (Y : 'T)
+    where 'T float
+  var
+    _L1 : 'T;
+    _L10 : 'T;
+    _L11 : 'T;
+    _L12 : 'T;
+    _L2 : 'T;
+    _L3 : 'T;
+    _L4 : 'T;
+    _L6 : 'T;
+    _L7 : 'T;
+    _L8 : 'T;
+    _L9 : 'T;
+    _L13 : 'T;
+    _L14 : 'T;
+    _L15 : 'T;
+    _L16 : 'T;
+    _L17 : bool;
+    _L18 : bool;
+    _L20 : 'T;
+    _L21 : 'T;
+    _L22 : bool;
+  let
+    _L2= TimeCycle;
+    _L3= #1 pre (_L1);
+    _L4= #2 pre (_L20);
+    _L6= _L4 #1 + _L7;
+    _L7= _L12 #1 * _L8;
+    _L8= _L2 #1 / _L11;
+    _L9= (_L10) #1 -> (_L6);
+    Y= _L20;
+    _L10= (0.0 #1 : 'T);
+    _L11= (2.0 #2 : 'T);
+    _L12= _L1 #2 + _L3;
+    _L1= U;
+    _L13= LowLimit;
+    _L14= HiLimit;
+    _L15= #1 if _L17 then (_L13) else (_L9);
+    _L16= #2 if _L18 then (_L14) else (_L15);
+    _L17= _L9 #1 <= _L13;
+    _L18= _L15 #1 >= _L14;
+    _L20= #3 if _L22 then (_L21) else (_L16);
+    _L21= (0.0 #3 : 'T);
+    _L22= Reset;
+  tel
+
+  node IntegrFwd(
+      U : 'T;
+      Reset : bool;
+      TimeCycle : 'T;
+      LowLimit : 'T;
+      HiLimit : 'T)
+    returns (Y : 'T)
+    where 'T float
+  var
+    _L17 : bool;
+    _L16 : bool;
+    _L15 : 'T;
+    _L14 : 'T;
+    _L13 : 'T;
+    _L12 : 'T;
+    _L11 : 'T;
+    _L8 : 'T;
+    _L7 : 'T;
+    _L5 : 'T;
+    _L4 : 'T;
+    _L3 : 'T;
+    _L1 : 'T;
+    _L19 : 'T;
+    _L21 : 'T;
+    _L22 : bool;
+  let
+    _L17= _L14 #1 >= _L13;
+    _L16= _L7 #1 <= _L12;
+    _L15= #1 if _L17 then (_L13) else (_L14);
+    _L14= #2 if _L16 then (_L12) else (_L7);
+    _L13= HiLimit;
+    _L12= LowLimit;
+    _L11= U;
+    _L8= (0.0 #1 : 'T);
+    Y= _L19;
+    _L7= (_L8) #1 -> (_L4);
+    _L5= _L11 #1 * _L1;
+    _L4= _L3 #1 + _L5;
+    _L3= #1 pre (_L19);
+    _L1= TimeCycle;
+    _L19= #3 if _L22 then (_L21) else (_L15);
+    _L21= (0.0 #2 : 'T);
+    _L22= Reset;
+  tel
+
+end;
+
+
+/* xscade source: C:/Program Files/ANSYS Inc/v182/SCADE/SCADE/libraries/SC65/liblinear/filters.xscade */
+package filters
+  node TransferFcn01(In : 'T; Num : 'T; Den : 'T^2)
+    returns (Out : 'T)
+    where 'T float
+  var
+    _L44 : 'T;
+    _L40 : 'T;
+    _L29 : 'T;
+    _L65 : 'T;
+    _L66 : 'T;
+    _L69 : 'T;
+    _L72 : 'T;
+    _L77 : 'T;
+    _L78 : 'T;
+  let
+    Out= _L65;
+    _L44= _L72 #1 * _L65;
+    _L40= _L29 #2 * _L69;
+    _L29= In;
+    _L65= _L77 #3 / _L78;
+    _L66= _L40 #4 - _L44;
+    _L69= Num;
+    _L72= Den #1[1];
+    _L77= #6 fby(_L66; 1; 0.0);
+    _L78= Den #0[0];
+  tel
+
+  node private SumDelay(Delay : 'T; Val : 'T) returns (Out : 'T) where 'T float
+  var
+    _L2 : 'T;
+    _L3 : 'T;
+    _L15 : 'T;
+    _L21 : 'T;
+  let
+    _L2= Delay;
+    _L3= Val;
+    Out= _L15;
+    _L15= _L21 #1 + _L3;
+    _L21= #2 fby(_L2; 1; (0 #3 : 'T));
+  tel
+
+  node Filter01(In : 'T; Num : 'T; Den : 'T^2)
+    returns (Out : 'T)
+    where 'T numeric
+  var
+    _L46 : 'T;
+    _L66 : 'T;
+    _L69 : 'T;
+    _L71 : 'T;
+    _L72 : 'T;
+    _L73 : 'T;
+    _L74 : 'T;
+    _L76 : 'T;
+    _L77 : 'T;
+  let
+    _L46= _L73 #1 / _L66;
+    Out= _L46;
+    _L66= Den #2[0];
+    _L69= In;
+    _L71= _L69 #3 * _L72;
+    _L72= Num;
+    _L73= _L71 #4 - _L77;
+    _L74= _L76 #5 * _L46;
+    _L76= Den #1[1];
+    _L77= #7 fby(_L74; 1; (0 #2 : 'T));
+  tel
+
+  node Filter11(In : 'T; Num : 'T^2; Den : 'T^2)
+    returns (Out : 'T)
+    where 'T numeric
+  var
+    _L200 : 'T;
+    _L203 : 'T;
+    _L229 : 'T;
+    _L230 : 'T;
+    _L231 : 'T;
+    _L232 : 'T;
+    _L233 : 'T;
+    _L234 : 'T;
+    _L235 : 'T;
+    _L243 : 'T;
+    _L244 : 'T;
+    _L245 : 'T;
+  let
+    _L203= In;
+    _L200= _L230 #1 * _L203;
+    _L229= _L231 #2 / _L245;
+    Out= _L229;
+    _L230= Num #3[0];
+    _L231= _L200 #4 + _L244;
+    _L232= Den #1[1];
+    _L233= Num #2[1];
+    _L234= _L203 #7 * _L233;
+    _L235= _L232 #8 * _L229;
+    _L243= _L234 #9 - _L235;
+    _L244= #10 fby(_L243; 1; (0 #1 : 'T));
+    _L245= Den #0[0];
+  tel
+
+  node Filter0D<<Ds>>(In : 'T; Num : 'T; Den : 'T^Ds)
+    returns (Out : 'T)
+    where 'T float
+  var
+    _L3 : 'T;
+    _L14 : 'T^(Ds - 1);
+    _L68 : 'T;
+    _L73 : 'T^(Ds - 1);
+    _L16 : 'T^(Ds - 1);
+    _L116 : 'T;
+    _L126 : 'T;
+    _L129 : 'T;
+    _L132 : 'T^(Ds - 1 - 1 + 1);
+    _L134 : 'T^Ds;
+    _L135 : 'T;
+    _L136 : 'T;
+    _L137 : 'T;
+    _L138 : 'T;
+  let
+    _L3= In;
+    _L14= #1 reverse _L16;
+    _L68= ( fold #2 SumDelay <<Ds - 1>>)(_L126, _L14);
+    Out= _L116;
+    _L73= (_L116)#5^(Ds - 1);
+    _L116= _L138 #7 / _L136;
+    _L126= (0 #3 : 'T);
+    _L129= _L3 #8 * _L135;
+    _L132= _L134 #9 [1 .. Ds - 1];
+    _L134= Den;
+    _L135= Num;
+    _L136= Den #0[0];
+    _L137= #12 fby(_L68; 1; (0 #2 : 'T));
+    _L138= _L129 #13 - _L137;
+    _L16= ( map #14 $*$ <<Ds - 1>>)(_L132, _L73);
+  tel
+
+  node FilterNN<<Ns>>(In : 'T; Num : 'T^Ns; Den : 'T^Ns)
+    returns (Out : 'T)
+    where 'T float
+  var
+    _L3 : 'T;
+    _L7 : 'T^(Ns - 1);
+    _L68 : 'T;
+    _L71 : 'T^(Ns - 1);
+    _L73 : 'T^(Ns - 1);
+    _L10 : 'T^(Ns - 1);
+    _L16 : 'T^(Ns - 1);
+    _L116 : 'T;
+    _L126 : 'T;
+    _L128 : 'T^(Ns - 1);
+    _L129 : 'T^Ns;
+    _L132 : 'T^Ns;
+    _L133 : 'T;
+    _L134 : 'T^(Ns - 1 - 1 + 1);
+    _L135 : 'T;
+    _L141 : 'T;
+    _L140 : 'T;
+    _L142 : 'T;
+    _L143 : 'T;
+    _L144 : 'T^(Ns - 1 - 1 + 1);
+  let
+    _L3= In;
+    _L7= (_L3)#1^(Ns - 1);
+    _L68= ( fold #3 SumDelay <<Ns - 1>>)(_L126, _L128);
+    Out= _L116;
+    _L73= (_L116)#6^(Ns - 1);
+    _L116= _L143 #8 / _L133;
+    _L126= (0 #1 : 'T);
+    _L128= #9 reverse _L71;
+    _L129= Num;
+    _L132= Den;
+    _L133= Den #0[0];
+    _L134= _L129 #11 [1 .. Ns - 1];
+    _L135= #13 fby(_L68; 1; (0 #2 : 'T));
+    _L140= Num #1[0];
+    _L141= In;
+    _L142= _L141 #15 * _L140;
+    _L143= _L142 #16 + _L135;
+    _L144= _L132 #17 [1 .. Ns - 1];
+    _L10= ( map #19 $*$ <<Ns - 1>>)(_L7, _L134);
+    _L16= ( map #22 $*$ <<Ns - 1>>)(_L144, _L73);
+    _L71= ( map #25 $-$ <<Ns - 1>>)(_L10, _L16);
+  tel
+
+  node FilterND<<Ns, Ds>>(In : 'T; Num : 'T^Ns; Den : 'T^Ds)
+    returns (Out : 'T)
+    where 'T float
+  var
+    _L7 : 'T^(Ns - 1);
+    _L68 : 'T;
+    _L71 : 'T^(Ds - 1);
+    _L73 : 'T^(Ds - 1);
+    _L10 : 'T^(Ns - 1);
+    _L16 : 'T^(Ds - 1);
+    _L116 : 'T;
+    _L118 : 'T;
+    _L120 : 'T^(Ns - 1 + (Ds - Ns));
+    _L124 : 'T^(Ds - Ns);
+    _L126 : 'T;
+    _L128 : 'T;
+    _L129 : 'T^(Ds - 1);
+    _L130 : 'T^Ns;
+    _L133 : 'T^Ds;
+    _L134 : 'T;
+    _L135 : 'T^(Ds - 1 - 1 + 1);
+    _L136 : 'T^(Ns - 1 - 1 + 1);
+    _L137 : 'T;
+    _L139 : 'T;
+    _L138 : 'T;
+    _L140 : 'T;
+    _L143 : 'T;
+  let
+    _L7= (_L128)#1^(Ns - 1);
+    _L68= ( fold #3 SumDelay <<Ds - 1>>)(_L126, _L129);
+    Out= _L116;
+    _L73= (_L116)#6^(Ds - 1);
+    _L116= _L137 #8 / _L134;
+    _L118= (0 #1 : 'T);
+    _L120= _L10 #9 @ _L124;
+    _L124= (_L118)#10^(Ds - Ns);
+    _L126= (0 #3 : 'T);
+    _L128= In;
+    _L129= #12 reverse _L71;
+    _L130= Num;
+    _L133= Den;
+    _L134= Den #0[0];
+    _L135= _L133 #14 [1 .. Ds - 1];
+    _L136= _L130 #16 [1 .. Ns - 1];
+    _L137= _L140 #18 + _L143;
+    _L138= In;
+    _L139= Num #1[0];
+    _L140= _L138 #20 * _L139;
+    _L143= #21 fby(_L68; 1; (0 #2 : 'T));
+    _L10= ( map #22 $*$ <<Ns - 1>>)(_L7, _L136);
+    _L16= ( map #25 $*$ <<Ds - 1>>)(_L135, _L73);
+    _L71= ( map #28 $-$ <<Ds - 1>>)(_L120, _L16);
+  tel
+
+  node TransferFcn02(In : 'T; Num : 'T; Den : 'T^3)
+    returns (Out : 'T)
+    where 'T float
+  var
+    _L29 : 'T;
+    _L65 : 'T;
+    _L75 : 'T;
+    _L76 : 'T;
+    _L77 : 'T;
+    _L78 : 'T;
+    _L79 : 'T;
+    _L80 : 'T;
+    _L81 : 'T;
+    _L85 : 'T;
+    _L86 : 'T;
+    _L87 : 'T;
+    _L107 : 'T;
+  let
+    Out= _L65;
+    _L29= In;
+    _L65= _L107 #1 / _L87;
+    _L75= Den #2[2];
+    _L76= _L75 #3 * _L65;
+    _L77= _L29 #4 * _L78;
+    _L78= Num;
+    _L80= #5 fby(_L79; 1; (0 #1 : 'T));
+    _L81= _L85 #6 * _L65;
+    _L85= Den #1[1];
+    _L86= _L80 #8 - _L81;
+    _L87= Den #0[0];
+    _L79= _L77 #10 - _L76;
+    _L107= #11 fby(_L86; 1; (0 #2 : 'T));
+  tel
+
+  node Filter02(In : 'T; Num : 'T; Den : 'T^3) returns (Out : 'T) where 'T float
+  var
+    _L29 : 'T;
+    _L40 : 'T;
+    _L46 : 'T;
+    _L63 : 'T;
+    _L64 : 'T;
+    _L65 : 'T;
+    _L66 : 'T;
+    _L67 : 'T;
+    _L68 : 'T;
+    _L69 : 'T;
+    _L70 : 'T;
+    _L74 : 'T;
+    _L75 : 'T;
+  let
+    _L29= In;
+    _L40= _L29 #1 * _L63;
+    _L46= _L74 #2 / _L69;
+    Out= _L46;
+    _L63= Num;
+    _L65= Den #1[1];
+    _L66= _L65 #4 * _L46;
+    _L67= _L68 #5 * _L46;
+    _L68= Den #2[2];
+    _L69= Den #0[0];
+    _L70= #8 fby(_L66; 1; (0.0 #1 : 'T));
+    _L74= _L64 #9 - _L75;
+    _L75= #10 fby(_L67; 2; (0.0 #2 : 'T));
+    _L64= _L40 #11 - _L70;
+  tel
+
+  node TransferFcn0D<<Ds>>(In : 'T; Num : 'T; Den : 'T^Ds)
+    returns (Out : 'T)
+    where 'T float
+  var
+    _L4 : 'T^(Ds - 2 - 1 + 1);
+    _L5 : 'T^Ds;
+    _L6 : 'T;
+    _L7 : 'T;
+    _L8 : 'T;
+    _L9 : 'T;
+    _L10 : 'T;
+    _L11 : 'T;
+    _L18 : 'T;
+    _L19 : 'T^(Ds - 2);
+    _L20 : 'T;
+    _L21 : 'T;
+    _L22 : 'T;
+    _L23 : 'T^(Ds - 2);
+    _L26 : 'T^(Ds - 2);
+  let
+    _L4= _L5 #1 [1 .. Ds - 2];
+    _L5= Den;
+    _L6= In;
+    _L7= Num;
+    _L8= _L6 #3 * _L7;
+    _L9= Den #0[Ds #14 - 1];
+    _L10= _L9 #6 * _L21;
+    _L19= #7 reverse _L23;
+    _L20= #8 fby(_L18; 1; 0.0);
+    _L21= _L20 #9 / _L22;
+    _L22= Den #1[0];
+    Out= _L21;
+    _L26= (_L21)#11^(Ds - 2);
+    _L11= _L8 #13 - _L10;
+    _L18= ( fold #14 SumDelay <<Ds - 2>>)(_L11, _L19);
+    _L23= ( map #17 $*$ <<Ds - 2>>)(_L4, _L26);
+  tel
+
+  node Filter01Norm(In : 'T; Num : 'T; Den : 'T)
+    returns (Out : 'T)
+    where 'T numeric
+  var
+    _L69 : 'T;
+    _L71 : 'T;
+    _L72 : 'T;
+    _L73 : 'T;
+    _L74 : 'T;
+    _L76 : 'T;
+    _L77 : 'T;
+  let
+    Out= _L73;
+    _L69= In;
+    _L71= _L69 #1 * _L72;
+    _L72= Num;
+    _L73= _L71 #2 - _L77;
+    _L74= _L76 #3 * _L73;
+    _L76= Den;
+    _L77= #4 fby(_L74; 1; (0 #2 : 'T));
+  tel
+
+  node Filter12(In : 'T; Num : 'T^2; Den : 'T^3)
+    returns (Out : 'T)
+    where 'T numeric
+  var
+    _L200 : 'T;
+    _L203 : 'T;
+    _L229 : 'T;
+    _L230 : 'T;
+    _L231 : 'T;
+    _L232 : 'T;
+    _L233 : 'T;
+    _L234 : 'T;
+    _L235 : 'T;
+    _L243 : 'T;
+    _L244 : 'T;
+    _L245 : 'T;
+    _L248 : 'T;
+    _L249 : 'T;
+    _L250 : 'T;
+    _L253 : 'T;
+  let
+    _L203= In;
+    _L200= _L230 #1 * _L203;
+    _L229= _L248 #2 / _L245;
+    Out= _L229;
+    _L230= Num #0[0];
+    _L231= _L200 #4 + _L244;
+    _L232= Den #2[1];
+    _L233= Num #1[1];
+    _L234= _L203 #7 * _L233;
+    _L235= _L232 #8 * _L229;
+    _L243= _L234 #9 - _L235;
+    _L244= #10 fby(_L243; 1; (0 #2 : 'T));
+    _L245= Den #4[0];
+    _L248= _L231 #12 - _L250;
+    _L249= _L253 #13 * _L229;
+    _L250= #14 fby(_L249; 2; (0 #1 : 'T));
+    _L253= Den #3[2];
+  tel
+
+  node TransferFcn12(In : 'T; Num : 'T^2; Den : 'T^3)
+    returns (Out : 'T)
+    where 'T float
+  var
+    _L29 : 'T;
+    _L65 : 'T;
+    _L75 : 'T;
+    _L76 : 'T;
+    _L77 : 'T;
+    _L78 : 'T;
+    _L79 : 'T;
+    _L80 : 'T;
+    _L81 : 'T;
+    _L85 : 'T;
+    _L86 : 'T;
+    _L87 : 'T;
+    _L93 : 'T;
+    _L94 : 'T;
+    _L97 : 'T;
+    _L98 : 'T;
+    _L104 : 'T;
+  let
+    Out= _L65;
+    _L29= In;
+    _L65= _L98 #1 / _L87;
+    _L75= Den #1[2];
+    _L76= _L75 #3 * _L65;
+    _L77= _L78 #4 * _L29;
+    _L78= Num #0[1];
+    _L80= #6 fby(_L79; 1; (0 #1 : 'T));
+    _L81= _L85 #7 * _L65;
+    _L85= Den #3[1];
+    _L87= Den #4[0];
+    _L93= _L94 #10 - _L81;
+    _L86= _L80 #11 + _L93;
+    _L94= _L97 #12 * _L104;
+    _L97= Num #2[0];
+    _L98= #14 fby(_L86; 1; (0 #2 : 'T));
+    _L79= _L77 #15 - _L76;
+    _L104= In;
+  tel
+
+  node TransferFcnND<<Ns, Ds>>(In : 'T; Num : 'T^Ns; Den : 'T^Ds)
+    returns (Out : 'T)
+    where 'T float
+  var
+    _L4 : 'T^(Ds - 1 - 1 + 1);
+    _L5 : 'T^Ds;
+    _L6 : 'T;
+    _L7 : 'T^Ns;
+    _L18 : 'T;
+    _L19 : 'T^(Ds - 1);
+    _L20 : 'T;
+    _L21 : 'T;
+    _L22 : 'T;
+    _L23 : 'T^(Ds - 1);
+    _L26 : 'T^(Ds - 1);
+    _L31 : 'T^Ns;
+    _L32 : 'T^Ns;
+    _L36 : 'T^(Ds - Ns - 1 + Ns);
+    _L38 : 'T;
+    _L41 : 'T^(Ds - 1);
+    _L47 : 'T;
+    _L48 : 'T^(Ds - Ns - 1);
+  let
+    _L4= _L5 #1 [1 .. Ds - 1];
+    _L5= Den;
+    _L6= In;
+    _L7= Num;
+    _L18= ( fold #3 SumDelay <<Ds - 1>>)(_L47, _L19);
+    _L19= #6 reverse _L41;
+    _L20= #7 fby(_L18; 1; 0.0);
+    _L21= _L20 #8 / _L22;
+    _L22= Den #0[0];
+    Out= _L21;
+    _L26= (_L21)#10^(Ds - 1);
+    _L31= (_L6)#12^Ns;
+    _L36= _L48 #13 @ _L32;
+    _L48= (_L38)#14^(Ds - Ns - 1);
+    _L38= (0 #1 : 'T);
+    _L47= (0 #2 : 'T);
+    _L32= ( map #17 $*$ <<Ns>>)(_L31, _L7);
+    _L23= ( map #19 $*$ <<Ds - 1>>)(_L4, _L26);
+    _L41= ( map #22 $-$ <<Ds - 1>>)(_L36, _L23);
+  tel
+
+  node Filter02Norm(In : 'T; Num : 'T; Den : 'T^2)
+    returns (Out : 'T)
+    where 'T numeric
+  var
+    _L29 : 'T;
+    _L40 : 'T;
+    _L63 : 'T;
+    _L64 : 'T;
+    _L65 : 'T;
+    _L66 : 'T;
+    _L67 : 'T;
+    _L68 : 'T;
+    _L70 : 'T;
+    _L74 : 'T;
+    _L75 : 'T;
+  let
+    _L29= In;
+    _L40= _L29 #1 * _L63;
+    Out= _L74;
+    _L63= Num;
+    _L65= Den #0[0];
+    _L66= _L65 #3 * _L74;
+    _L67= _L68 #4 * _L74;
+    _L68= Den #1[1];
+    _L70= #6 fby(_L66; 1; (0 #4 : 'T));
+    _L74= _L64 #7 - _L75;
+    _L75= #8 fby(_L67; 2; (0 #3 : 'T));
+    _L64= _L40 #9 - _L70;
+  tel
+
+  node Filter11Norm(In : 'T; Num : 'T^2; Den : 'T)
+    returns (Out : 'T)
+    where 'T numeric
+  var
+    _L200 : 'T;
+    _L203 : 'T;
+    _L230 : 'T;
+    _L231 : 'T;
+    _L232 : 'T;
+    _L233 : 'T;
+    _L234 : 'T;
+    _L235 : 'T;
+    _L243 : 'T;
+    _L244 : 'T;
+  let
+    _L203= In;
+    _L200= _L230 #1 * _L203;
+    Out= _L231;
+    _L230= Num #0[0];
+    _L231= _L200 #3 + _L244;
+    _L232= Den;
+    _L233= Num #1[1];
+    _L234= _L203 #5 * _L233;
+    _L235= _L232 #6 * _L231;
+    _L243= _L234 #7 - _L235;
+    _L244= #8 fby(_L243; 1; (0 #1 : 'T));
+  tel
+
+  node Filter12Norm(In : 'T; Num : 'T^2; Den : 'T^2)
+    returns (Out : 'T)
+    where 'T numeric
+  var
+    _L200 : 'T;
+    _L203 : 'T;
+    _L230 : 'T;
+    _L231 : 'T;
+    _L232 : 'T;
+    _L233 : 'T;
+    _L234 : 'T;
+    _L235 : 'T;
+    _L243 : 'T;
+    _L244 : 'T;
+    _L248 : 'T;
+    _L249 : 'T;
+    _L250 : 'T;
+    _L253 : 'T;
+  let
+    _L203= In;
+    _L200= _L230 #1 * _L203;
+    Out= _L248;
+    _L230= Num #0[0];
+    _L231= _L200 #3 + _L244;
+    _L232= Den #2[0];
+    _L233= Num #1[1];
+    _L234= _L203 #6 * _L233;
+    _L235= _L232 #7 * _L248;
+    _L243= _L234 #8 - _L235;
+    _L244= #9 fby(_L243; 1; (0 #2 : 'T));
+    _L248= _L231 #10 - _L250;
+    _L249= _L253 #11 * _L248;
+    _L250= #12 fby(_L249; 2; (0 #1 : 'T));
+    _L253= Den #3[1];
+  tel
+
+  node Filter0DNorm<<Ds>>(In : 'T; Num : 'T; Den : 'T^Ds)
+    returns (Out : 'T)
+    where 'T float
+  var
+    _L3 : 'T;
+    _L14 : 'T^Ds;
+    _L68 : 'T;
+    _L73 : 'T^Ds;
+    _L16 : 'T^Ds;
+    _L126 : 'T;
+    _L129 : 'T;
+    _L134 : 'T^Ds;
+    _L135 : 'T;
+    _L137 : 'T;
+    _L138 : 'T;
+  let
+    _L3= In;
+    _L14= #1 reverse _L16;
+    _L68= ( fold #2 SumDelay <<Ds>>)(_L126, _L14);
+    Out= _L138;
+    _L73= (_L138)#4^Ds;
+    _L126= (0 #4 : 'T);
+    _L129= _L3 #5 * _L135;
+    _L134= Den;
+    _L135= Num;
+    _L137= #6 fby(_L68; 1; (0 #3 : 'T));
+    _L138= _L129 #7 - _L137;
+    _L16= ( map #8 $*$ <<Ds>>)(_L134, _L73);
+  tel
+
+  node FilterNDNorm<<Ns, Ds>>(In : 'T; Num : 'T^Ns; Den : 'T^Ds)
+    returns (Out : 'T)
+    where 'T float
+  var
+    _L7 : 'T^(Ns - 1);
+    _L68 : 'T;
+    _L71 : 'T^Ds;
+    _L73 : 'T^Ds;
+    _L10 : 'T^(Ns - 1);
+    _L16 : 'T^Ds;
+    _L118 : 'T;
+    _L120 : 'T^(Ns - 1 + (Ds - Ns + 1));
+    _L124 : 'T^(Ds - Ns + 1);
+    _L126 : 'T;
+    _L128 : 'T;
+    _L129 : 'T^Ds;
+    _L130 : 'T^Ns;
+    _L133 : 'T^Ds;
+    _L136 : 'T^(Ns - 1 - 1 + 1);
+    _L137 : 'T;
+    _L139 : 'T;
+    _L138 : 'T;
+    _L140 : 'T;
+    _L143 : 'T;
+  let
+    _L7= (_L128)#1^(Ns - 1);
+    _L68= ( fold #3 SumDelay <<Ds>>)(_L126, _L129);
+    Out= _L137;
+    _L73= (_L137)#5^Ds;
+    _L118= (0 #1 : 'T);
+    _L120= _L10 #6 @ _L124;
+    _L124= (_L118)#7^(Ds - Ns + 1);
+    _L126= (0 #2 : 'T);
+    _L128= In;
+    _L129= #10 reverse _L71;
+    _L130= Num;
+    _L133= Den;
+    _L136= _L130 #11 [1 .. Ns - 1];
+    _L137= _L140 #13 + _L143;
+    _L138= In;
+    _L139= Num #0[0];
+    _L140= _L138 #15 * _L139;
+    _L143= #16 fby(_L68; 1; (0 #3 : 'T));
+    _L10= ( map #17 $*$ <<Ns - 1>>)(_L7, _L136);
+    _L16= ( map #20 $*$ <<Ds>>)(_L133, _L73);
+    _L71= ( map #22 $-$ <<Ds>>)(_L120, _L16);
+  tel
+
+  node FilterNNNorm<<Ns>>(In : 'T; Num : 'T^Ns; Den : 'T^(Ns - 1))
+    returns (Out : 'T)
+    where 'T float
+  var
+    _L3 : 'T;
+    _L7 : 'T^(Ns - 1);
+    _L68 : 'T;
+    _L71 : 'T^(Ns - 1);
+    _L73 : 'T^(Ns - 1);
+    _L10 : 'T^(Ns - 1);
+    _L16 : 'T^(Ns - 1);
+    _L126 : 'T;
+    _L128 : 'T^(Ns - 1);
+    _L129 : 'T^Ns;
+    _L132 : 'T^(Ns - 1);
+    _L134 : 'T^(Ns - 1 - 1 + 1);
+    _L135 : 'T;
+    _L141 : 'T;
+    _L140 : 'T;
+    _L142 : 'T;
+    _L143 : 'T;
+  let
+    _L3= In;
+    _L7= (_L3)#1^(Ns - 1);
+    _L68= ( fold #3 SumDelay <<Ns - 1>>)(_L126, _L128);
+    Out= _L143;
+    _L73= (_L143)#6^(Ns - 1);
+    _L126= (0 #1 : 'T);
+    _L128= #8 reverse _L71;
+    _L129= Num;
+    _L132= Den;
+    _L134= _L129 #9 [1 .. Ns - 1];
+    _L135= #11 fby(_L68; 1; (0 #2 : 'T));
+    _L140= Num #0[0];
+    _L141= In;
+    _L142= _L141 #13 * _L140;
+    _L143= _L142 #14 + _L135;
+    _L10= ( map #15 $*$ <<Ns - 1>>)(_L7, _L134);
+    _L16= ( map #18 $*$ <<Ns - 1>>)(_L132, _L73);
+    _L71= ( map #21 $-$ <<Ns - 1>>)(_L10, _L16);
+  tel
+
+end;
+
+
+/* xscade source: C:/Program Files/ANSYS Inc/v182/SCADE/SCADE/libraries/SC65/libmath/vect.xscade */
+package vect
+  function #pragma kcg expand #end ScalProd<<n>>(V : 'T^n; W : 'T^n)
+    returns (SP : 'T)
+    where 'T numeric
+  var
+    _L2 : 'T^n;
+    _L3 : 'T^n;
+    _L4 : 'T;
+    _L6 : 'T;
+    _L7 : 'T^n;
+  let
+    _L2= V;
+    _L3= W;
+    SP= _L6;
+    _L4= (0 #1 : 'T);
+    _L6= ( fold #2 $+$ <<n>>)(_L4, _L7);
+    _L7= ( map #1 $*$ <<n>>)(_L2, _L3);
+  tel
+
+  function MatVectProd<<m, n>>(A : 'T^n^m; V : 'T^n)
+    returns (R : 'T^m)
+    where 'T numeric
+  var
+    _L1 : 'T^n^m;
+    _L2 : 'T^n;
+    _L4 : 'T^n^m;
+    _L7 : 'T^m;
+  let
+    _L1= A;
+    _L2= V;
+    R= _L7;
+    _L7= ( map (#1 ScalProd <<n>>) <<m>>)(_L1, _L4);
+    _L4= (_L2)#3^m;
+  tel
+
+  function MatProd<<m, n, p>>(A : 'T^n^m; B : 'T^p^n)
+    returns (C : 'T^p^m)
+    where 'T numeric
+  var
+    _L1 : 'T^n^m;
+    _L2 : 'T^p^n;
+    _L4 : 'T^p^n^m;
+    _L7 : 'T^p^m;
+  let
+    _L1= A;
+    _L2= B;
+    C= _L7;
+    _L4= (_L2)#3^m;
+    _L7= ( map (#1 VectMatProd <<n, p>>) <<m>>)(_L1, _L4);
+  tel
+
+  function VectMatProd<<m, n>>(V : 'T^m; A : 'T^n^m)
+    returns (R : 'T^n)
+    where 'T numeric
+  var
+    _L1 : 'T^n^m;
+    _L2 : 'T^m;
+    _L4 : 'T^m^n;
+    _L5 : 'T^m^n;
+    _L8 : 'T^n;
+  let
+    _L1= A;
+    _L2= V;
+    R= _L8;
+    _L8= ( map (#1 ScalProd <<m>>) <<n>>)(_L5, _L4);
+    _L4= (_L2)#1^n;
+    _L5= #1 transpose (_L1; 1; 2);
+  tel
+
+  function MatAdd<<m, n>>(A : 'T^n^m; B : 'T^n^m)
+    returns (C : 'T^n^m)
+    where 'T numeric
+  var
+    _L2 : 'T^n^m;
+    _L3 : 'T^n^m;
+    _L4 : 'T^n^m;
+  let
+    _L2= ( map (#1 VectAdd <<n>>) <<m>>)(_L3, _L4);
+    _L3= A;
+    _L4= B;
+    C= _L2;
+  tel
+
+  function Inv4x4(A : 'T^4^4; Epsilon : 'T)
+    returns (InvA : 'T^4^4; Error : bool)
+    where 'T float
+  var
+    Det : 'T;
+    _L5 : bool;
+    _L4 : 'T;
+    _L3 : 'T;
+    _L2 : 'T^4^4;
+    _L1 : 'T;
+  let
+    _L5= _L3 #1 <= _L4;
+    _L4= Epsilon;
+    assume A1 : Epsilon #1 >= 0.0;
+    _L3= #1 if Det #2 < 0.0 then (#8 - Det) else (Det);
+    Error= _L5;
+    activate IfBlock1 if Error
+      then let
+        InvA= ((0.0)#2^4)#1^4;
+      tel
+      else var
+        C00 : 'T;
+        C01 : 'T;
+        C02 : 'T;
+        C10 : 'T;
+        C11 : 'T;
+        C12 : 'T;
+        C20 : 'T;
+        C21 : 'T;
+        C22 : 'T;
+        C03 : 'T;
+        C13 : 'T;
+        C23 : 'T;
+        C30 : 'T;
+        C31 : 'T;
+        C32 : 'T;
+        C33 : 'T;
+        C0011 : 'T;
+        C0021 : 'T;
+        C0031 : 'T;
+        C0110 : 'T;
+        C0120 : 'T;
+        C0130 : 'T;
+        C0210 : 'T;
+        C0220 : 'T;
+        C0230 : 'T;
+        C0310 : 'T;
+        C0320 : 'T;
+        C0330 : 'T;
+        C1001 : 'T;
+        C1021 : 'T;
+        C1031 : 'T;
+        C1100 : 'T;
+        C1120 : 'T;
+        C1130 : 'T;
+        C1200 : 'T;
+        C1220 : 'T;
+        C1230 : 'T;
+        C1300 : 'T;
+        C1320 : 'T;
+        C1330 : 'T;
+        C2001 : 'T;
+        C2031 : 'T;
+        C2011 : 'T;
+        C2100 : 'T;
+        C2110 : 'T;
+        C2130 : 'T;
+        C2200 : 'T;
+        C2210 : 'T;
+        C2230 : 'T;
+        C2300 : 'T;
+        C2310 : 'T;
+        C2330 : 'T;
+        C3001 : 'T;
+        C3011 : 'T;
+        C3021 : 'T;
+        C3100 : 'T;
+        C3110 : 'T;
+        C3120 : 'T;
+        C3200 : 'T;
+        C3220 : 'T;
+        C3210 : 'T;
+        C3300 : 'T;
+        C3310 : 'T;
+        C3320 : 'T;
+      let
+        InvA=
+          #16[#17[C00 #49 / Det, C10 #50 / Det, C20 #51 / Det, C30 #52 / Det],
+            #18[C01 #53 / Det, C11 #54 / Det, C21 #55 / Det, C31 #56 / Det],
+            #19[C02 #57 / Det, C12 #58 / Det, C22 #59 / Det, C32 #60 / Det],
+            #20[C03 #61 / Det, C13 #62 / Det, C23 #63 / Det, C33 #64 / Det]];
+        C00=
+          A #337[1][1] #199 * C0011 #55 + A #338[2][1] #200 * C0021 #55 +
+          A #339[3][1] #201 * C0031;
+        C0011= A #340[2][2] #202 * A #341[3][3] #36 - A #342[2][3] #203 * A #343[3][2];
+        C0021=
+          #35 - A #344[1][2] #204 * A #345[3][3] #56 + A #346[1][3] #205 * A #347[3][2];
+        C0031= A #348[1][2] #206 * A #349[2][3] #37 - A #350[1][3] #207 * A #351[2][2];
+        C01=
+          A #352[1][0] #208 * C0110 #57 + A #353[2][0] #209 * C0120 #57 +
+          A #354[3][0] #210 * C0130;
+        C0110=
+          #36 - A #355[2][2] #211 * A #356[3][3] #58 + A #357[2][3] #212 * A #358[3][2];
+        C0120= A #359[1][2] #213 * A #360[3][3] #38 - A #361[1][3] #214 * A #362[3][2];
+        C0130=
+          #37 - A #363[1][2] #215 * A #364[2][3] #59 + A #365[1][3] #216 * A #366[2][2];
+        C02=
+          A #367[1][0] #217 * C0210 #60 + A #368[2][0] #218 * C0220 #60 +
+          A #369[3][0] #219 * C0230;
+        C0210= A #370[2][1] #220 * A #371[3][3] #39 - A #372[2][3] #221 * A #373[3][1];
+        C0220=
+          #38 - A #374[1][1] #222 * A #375[3][3] #61 + A #376[1][3] #223 * A #377[3][1];
+        C0230= A #378[1][1] #224 * A #379[2][3] #40 - A #380[1][3] #225 * A #381[2][1];
+        C03=
+          A #382[1][0] #226 * C0310 #62 + A #383[2][0] #227 * C0320 #62 +
+          A #384[3][0] #228 * C0330;
+        C0310=
+          #39 - A #385[2][1] #229 * A #386[3][2] #63 + A #387[2][2] #230 * A #388[3][1];
+        C0320= A #389[1][1] #231 * A #390[3][2] #41 - A #391[1][2] #232 * A #392[3][1];
+        C0330=
+          #40 - A #393[1][1] #233 * A #394[2][2] #64 + A #395[1][2] #234 * A #396[2][1];
+        C10=
+          A #397[0][1] #235 * C1001 #65 + A #398[2][1] #236 * C1021 #65 +
+          A #399[3][1] #237 * C1031;
+        C1001=
+          #41 - A #400[2][2] #238 * A #401[3][3] #66 + A #402[2][3] #239 * A #403[3][2];
+        C1021= A #404[0][2] #240 * A #405[3][3] #42 - A #406[0][3] #241 * A #407[3][2];
+        C1031=
+          #42 - A #408[0][2] #242 * A #409[2][3] #67 + A #410[0][3] #243 * A #411[2][2];
+        C11=
+          A #412[0][0] #244 * C1100 #68 + A #413[2][0] #245 * C1120 #68 +
+          A #414[3][0] #246 * C1130;
+        C1100= A #415[2][2] #247 * A #416[3][3] #43 - A #417[2][3] #248 * A #418[3][2];
+        C1120=
+          #43 - A #419[0][2] #249 * A #420[3][3] #69 + A #421[0][3] #250 * A #422[3][2];
+        C1130= A #423[0][2] #251 * A #424[2][3] #44 - A #425[0][3] #252 * A #426[2][2];
+        C12=
+          A #427[0][0] #253 * C1200 #70 + A #428[2][0] #254 * C1220 #70 +
+          A #429[3][0] #255 * C1230;
+        C1200=
+          #44 - A #430[2][1] #256 * A #431[3][3] #71 + A #432[2][3] #257 * A #433[3][1];
+        C1220= A #434[0][1] #258 * A #435[3][3] #45 - A #436[0][3] #259 * A #437[3][1];
+        C1230=
+          #45 - A #438[0][1] #260 * A #439[2][3] #72 + A #440[0][3] #261 * A #441[2][1];
+        C13=
+          A #442[0][0] #262 * C1300 #73 + A #443[2][0] #263 * C1320 #73 +
+          A #444[3][0] #264 * C1330;
+        C1300= A #445[2][1] #265 * A #446[3][2] #46 - A #447[2][2] #266 * A #448[3][1];
+        C1320=
+          #46 - A #449[0][1] #267 * A #450[3][2] #74 + A #451[0][2] #268 * A #452[3][1];
+        C1330= A #453[0][1] #269 * A #454[2][2] #47 - A #455[0][2] #270 * A #456[2][1];
+        C20=
+          A #457[0][1] #271 * C2001 #75 + A #458[1][1] #272 * C2011 #75 +
+          A #459[3][1] #273 * C2031;
+        C2001= A #460[1][2] #274 * A #461[3][3] #48 - A #462[1][3] #275 * A #463[3][2];
+        C2011=
+          #47 - A #464[0][2] #276 * A #465[3][3] #76 + A #466[0][3] #277 * A #467[3][2];
+        C2031= A #468[0][2] #278 * A #469[1][3] #49 - A #470[0][3] #279 * A #471[1][2];
+        C21=
+          A #472[0][0] #280 * C2100 #77 + A #473[1][0] #281 * C2110 #77 +
+          A #474[3][0] #282 * C2130;
+        C2100=
+          #48 - A #475[1][2] #283 * A #476[3][3] #78 + A #477[1][3] #284 * A #478[3][2];
+        C2110= A #479[0][2] #285 * A #480[3][3] #50 - A #481[0][3] #286 * A #482[3][2];
+        C2130=
+          #49 - A #483[0][2] #287 * A #484[1][3] #79 + A #485[0][3] #288 * A #486[1][2];
+        C22=
+          A #487[0][0] #289 * C2200 #80 + A #488[1][0] #290 * C2210 #80 +
+          A #489[3][0] #291 * C2230;
+        C2200= A #490[1][1] #292 * A #491[3][3] #51 - A #492[1][3] #293 * A #493[3][1];
+        C2210=
+          #50 - A #494[0][1] #294 * A #495[3][3] #81 + A #496[0][3] #295 * A #497[3][1];
+        C2230= A #498[0][1] #296 * A #499[1][3] #52 - A #500[0][3] #297 * A #501[1][1];
+        C23=
+          A #502[0][0] #298 * C2300 #82 + A #503[1][0] #299 * C2310 #82 +
+          A #504[3][0] #300 * C2330;
+        C2300=
+          #51 - A #505[1][1] #301 * A #506[3][2] #83 + A #507[1][2] #302 * A #508[3][1];
+        C2310= A #509[0][1] #303 * A #510[3][2] #53 - A #511[0][2] #304 * A #512[3][1];
+        C2330=
+          #52 - A #513[0][1] #305 * A #514[1][2] #84 + A #515[0][2] #306 * A #516[1][1];
+        C30=
+          A #517[0][1] #307 * C3001 #85 + A #518[1][1] #308 * C3011 #85 +
+          A #519[2][1] #309 * C3021;
+        C3001=
+          #53 - A #520[1][2] #310 * A #521[2][3] #86 + A #522[1][3] #311 * A #523[2][2];
+        C3011= A #524[0][2] #312 * A #525[2][3] #54 - A #526[0][3] #313 * A #527[2][2];
+        C3021=
+          #54 - A #528[0][2] #314 * A #529[1][3] #87 + A #530[0][3] #315 * A #531[1][2];
+        C31=
+          A #532[0][0] #316 * C3100 #88 + A #533[1][0] #317 * C3110 #88 +
+          A #534[2][0] #318 * C3120;
+        C3100= A #535[1][2] #319 * A #536[2][3] #55 - A #537[1][3] #320 * A #538[2][2];
+        C3110=
+          #55 - A #539[0][2] #321 * A #540[2][3] #89 + A #541[0][3] #322 * A #542[2][2];
+        C3120= A #543[0][2] #323 * A #544[1][3] #56 - A #545[0][3] #324 * A #546[1][2];
+        C32=
+          A #547[0][0] #325 * C3200 #90 + A #548[1][0] #326 * C3210 #90 +
+          A #549[2][0] #327 * C3220;
+        C3200=
+          #56 - A #550[1][1] #328 * A #551[2][3] #91 + A #552[1][3] #329 * A #553[2][1];
+        C3210= A #554[0][1] #330 * A #555[2][3] #57 - A #556[0][3] #331 * A #557[2][1];
+        C3220=
+          #57 - A #558[0][1] #332 * A #559[1][3] #92 + A #560[0][3] #333 * A #561[1][1];
+        C33=
+          A #562[0][0] #334 * C3300 #93 + A #563[1][0] #335 * C3310 #93 +
+          A #564[2][0] #336 * C3320;
+        C3300= A #565[1][1] #337 * A #566[2][2] #58 - A #567[1][2] #338 * A #568[2][1];
+        C3310=
+          #58 - A #569[0][1] #339 * A #570[2][2] #94 + A #571[0][2] #340 * A #572[2][1];
+        C3320= A #573[0][1] #341 * A #574[1][2] #59 - A #575[0][2] #342 * A #576[1][1];
+      tel
+    returns ..;
+    Det= _L1;
+    _L2= A;
+    _L1= #1 Det4x4(_L2);
+  tel
+
+  function Inv3x3(A : 'T^3^3; Epsilon : 'T)
+    returns (InvA : 'T^3^3; Error : bool)
+    where 'T float
+  var
+    Det : 'T;
+    _L8 : bool;
+    _L7 : 'T;
+    _L6 : 'T;
+    _L5 : 'T^3^3;
+    _L4 : 'T;
+  let
+    _L8= _L6 #1 <= _L7;
+    _L7= Epsilon;
+    assume A1 : Epsilon #1 >= 0.0;
+    _L6= #1 if Det #2 < 0.0 then (#8 - Det) else (Det);
+    Error= _L8;
+    activate IfBlock1 if Error
+      then let
+        InvA= ((0.0)#6^3)#5^3;
+      tel
+      else var
+        C00 : 'T;
+        C01 : 'T;
+        C02 : 'T;
+        C10 : 'T;
+        C11 : 'T;
+        C12 : 'T;
+        C20 : 'T;
+        C21 : 'T;
+        C22 : 'T;
+      let
+        InvA=
+          #25[#26[C00 #45 / Det, C10 #46 / Det, C20 #47 / Det], #27[C01 #48 /
+              Det, C11 #49 / Det, C21 #50 / Det], #28[C02 #51 / Det, C12 #52 /
+              Det, C22 #53 / Det]];
+        C00= A #197[1][1] #91 * A #198[2][2] #26 - A #199[1][2] #92 * A #200[2][1];
+        C01=
+          #29 - A #201[1][0] #93 * A #202[2][2] #21 + A #203[1][2] #94 * A #204[2][0];
+        C02= A #205[1][0] #95 * A #206[2][1] #27 - A #207[1][1] #96 * A #208[2][0];
+        C10=
+          #30 - A #209[0][1] #97 * A #210[2][2] #22 + A #211[0][2] #98 * A #212[2][1];
+        C11= A #213[0][0] #99 * A #214[2][2] #28 - A #215[0][2] #100 * A #216[2][0];
+        C12=
+          #31 - A #217[0][0] #101 * A #218[2][1] #23 + A #219[2][0] #102 * A #220[0][1];
+        C20= A #221[0][1] #103 * A #222[1][2] #29 - A #223[0][2] #104 * A #224[1][1];
+        C21=
+          #32 - A #225[0][0] #105 * A #226[1][2] #24 + A #227[0][2] #106 * A #228[1][0];
+        C22= A #229[0][0] #107 * A #230[1][1] #30 - A #231[0][1] #108 * A #232[1][0];
+      tel
+    returns ..;
+    Det= _L4;
+    _L5= A;
+    _L4= #1 Det3x3(_L5);
+  tel
+
+  function Inv2x2(A : 'T^2^2; Epsilon : 'T)
+    returns (InvA : 'T^2^2; Error : bool)
+    where 'T float
+  var
+    Det : 'T;
+    _L1 : 'T;
+    _L2 : 'T^2^2;
+    _L3 : 'T;
+    _L4 : 'T;
+    _L5 : bool;
+  let
+    _L1= #1 Det2x2(_L2);
+    _L2= A;
+    Det= _L1;
+    activate IfBlock1 if Error
+      then let
+        InvA= ((0.0)#6^2)#5^2;
+      tel
+      else let
+        InvA=
+          #22[#23[A #29[1][1] #20 / Det, #17 - A #30[0][1] #21 / Det], #24[#18
+              - A #31[1][0] #22 /
+              Det, A #32[0][0] #23 / Det]];
+      tel
+    returns ..;
+    Error= _L5;
+    _L3= #1 if Det #2 < 0.0 then (#8 - Det) else (Det);
+    assume A1 : Epsilon #1 >= 0.0;
+    _L4= Epsilon;
+    _L5= _L3 #1 <= _L4;
+  tel
+
+  function Det4x4(A : 'T^4^4) returns (Det : 'T) where 'T numeric
+  var
+    C00 : 'T;
+    C01 : 'T;
+    C02 : 'T;
+    C03 : 'T;
+    C0330 : 'T;
+    C0320 : 'T;
+    C0310 : 'T;
+    C0230 : 'T;
+    C0220 : 'T;
+    C0210 : 'T;
+    C0130 : 'T;
+    C0120 : 'T;
+    C0110 : 'T;
+    C0031 : 'T;
+    C0021 : 'T;
+    C0011 : 'T;
+  let
+    Det=
+      A #0[0][0] #0 * C00 #12 + A #2[0][1] #3 * C01 #12 + A #4[0][2] #5 * C02
+      #12 +
+      A #6[0][3] #7 * C03;
+    C00=
+      A #8[1][1] #115 * C0011 #13 + A #11[2][1] #12 * C0021 #13 +
+      A #13[3][1] #14 * C0031;
+    C0011= A #15[2][2] #9 * A #16[3][3] #23 - A #17[2][3] #18 * A #117[3][2];
+    C0021=
+      #13 - A #116[1][2] #20 * A #21[3][3] #115 + A #25[1][3] #24 * A #26[3][2];
+    C0031= A #27[1][2] #28 * A #29[2][3] #30 - A #31[1][3] #32 * A #33[2][2];
+    C01=
+      A #34[1][0] #35 * C0110 #14 + A #37[2][0] #38 * C0120 #14 +
+      A #39[3][0] #40 * C0130;
+    C0110= #14 - A #41[2][2] #42 * A #43[3][3] #118 + A #45[2][3] #46 * A #3[3][2];
+    C0120= A #47[1][2] #48 * A #49[3][3] #50 - A #51[1][3] #52 * A #53[3][2];
+    C0130= #15 - A #54[1][2] #55 * A #56[2][3] #57 + A #58[1][3] #59 * A #60[2][2];
+    C02=
+      A #61[1][0] #62 * C0210 #15 + A #64[2][0] #65 * C0220 #15 +
+      A #66[3][0] #67 * C0230;
+    C0210= A #68[2][1] #69 * A #70[3][3] #71 - A #72[2][3] #73 * A #74[3][1];
+    C0220= #16 - A #75[1][1] #76 * A #77[3][3] #78 + A #79[1][3] #80 * A #81[3][1];
+    C0230= A #82[1][1] #83 * A #84[2][3] #85 - A #86[1][3] #87 * A #88[2][1];
+    C03=
+      A #89[1][0] #90 * C0310 #16 + A #92[2][0] #93 * C0320 #16 +
+      A #94[3][0] #95 * C0330;
+    C0310= #17 - A #96[2][1] #97 * A #18[3][2] #98 + A #99[2][2] #100 * A #19[3][1];
+    C0320= A #101[1][1] #102 * A #103[3][2] #104 - A #105[1][2] #106 * A #107[3][1];
+    C0330=
+      #18 - A #108[1][1] #109 * A #110[2][2] #111 + A #112[1][2] #113 * A #114[2][1];
+  tel
+
+  function Det3x3(A : 'T^3^3) returns (Det : 'T) where 'T numeric
+  var
+    C00 : 'T;
+    C01 : 'T;
+    C02 : 'T;
+  let
+    Det= A #0[0][0] #1 * C00 #3 + A #3[0][1] #4 * C01 #3 + A #6[0][2] #7 * C02;
+    C00= A #8[1][1] #9 * A #1[2][2] #10 - A #11[1][2] #12 * A #2[2][1];
+    C01= #1 - A #13[1][0] #14 * A #15[2][2] #16 + A #17[1][2] #18 * A #19[2][0];
+    C02= A #20[1][0] #21 * A #22[2][1] #23 - A #25[1][1] #26 * A #27[2][0];
+  tel
+
+  function Det2x2(A : 'T^2^2) returns (Det : 'T) where 'T numeric
+  let
+    Det= A #0[0][0] #1 * A #2[1][1] #3 - A #4[0][1] #5 * A #6[1][0];
+  tel
+
+  function MatSub<<m, n>>(A : 'T^n^m; B : 'T^n^m)
+    returns (C : 'T^n^m)
+    where 'T numeric
+  var
+    _L3 : 'T^n^m;
+    _L2 : 'T^n^m;
+    _L1 : 'T^n^m;
+  let
+    _L1= ( map (#1 VectSub <<n>>) <<m>>)(_L3, _L2);
+    _L2= B;
+    _L3= A;
+    C= _L1;
+  tel
+
+  function VectSub<<n>>(U : 'T^n; V : 'T^n) returns (W : 'T^n) where 'T numeric
+  var
+    _L3 : 'T^n;
+    _L2 : 'T^n;
+    _L1 : 'T^n;
+  let
+    _L1= ( map #1 $-$ <<n>>)(_L3, _L2);
+    _L2= V;
+    W= _L1;
+    _L3= U;
+  tel
+
+  function VectAdd<<n>>(U : 'T^n; V : 'T^n) returns (W : 'T^n) where 'T numeric
+  var
+    _L1 : 'T^n;
+    _L2 : 'T^n;
+    _L3 : 'T^n;
+  let
+    _L1= ( map #1 $+$ <<n>>)(_L2, _L3);
+    _L2= U;
+    _L3= V;
+    W= _L1;
+  tel
+
+  function BuildArray<<N>>(StartValue : 'T; Increment : 'T)
+    returns (Output : 'T^N)
+    where 'T numeric
+  var
+    _L2 : 'T^N;
+    _L1 : 'T;
+    _L3 : 'T;
+    _L4 : 'T;
+    _L5 : 'T^N;
+    _L8 : 'T;
+    _L9 : 'T;
+  let
+    _L1, _L2= (#1 mapfold 1 #1 SumDup <<N>>)(_L9, _L5);
+    _L3= StartValue;
+    _L4= Increment;
+    Output= _L2;
+    _= _L1;
+    _L5= (_L4)#1^N;
+    _L8= (Increment #2 : 'T);
+    _L9= _L3 #1 - _L8;
+  tel
+
+  function private #pragma kcg expand #end SumDup(a : 'T; b : 'T)
+    returns (s1 : 'T; s2 : 'T)
+    where 'T numeric
+  var
+    _L1 : 'T;
+    _L2 : 'T;
+    _L3 : 'T;
+  let
+    _L1= a;
+    _L2= b;
+    _L3= _L1 #1 + _L2;
+    s1= _L3;
+    s2= _L3;
+  tel
+
+  function private #pragma kcg expand #end SelectorHelper<<DstSize>>(
+      Input : 'T^DstSize;
+      Index : 'I;
+      Default : 'T)
+    returns (Output : 'T)
+    where 'I integer
+  var
+    _L1 : 'T;
+    _L2 : 'T^DstSize;
+    _L3 : 'I;
+    _L4 : 'T;
+  let
+    _L1= (_L2#1 . [_L3] default _L4);
+    _L2= Input;
+    _L3= Index;
+    _L4= Default;
+    Output= _L1;
+  tel
+
+  function Selector<<SrcSize, DstSize>>(
+      Input : 'T^SrcSize;
+      Indices : 'I^DstSize;
+      Default : 'T)
+    returns (Output : 'T^DstSize)
+    where 'I integer
+  var
+    _L1 : 'T^DstSize;
+    _L2 : 'T^SrcSize;
+    _L3 : 'I^DstSize;
+    _L4 : 'T;
+    _L5 : 'T^SrcSize^DstSize;
+    _L6 : 'T^DstSize;
+  let
+    _L1= (#1 map (#1 SelectorHelper <<SrcSize>>) <<DstSize>>)(_L5, _L3, _L6);
+    _L2= Input;
+    _L3= Indices;
+    _L4= Default;
+    Output= _L1;
+    _L5= (_L2)#1^DstSize;
+    _L6= (_L4)#2^DstSize;
+  tel
+
+end;
+
+
+/* xscade source: C:/Program Files/ANSYS Inc/v182/SCADE/SCADE/libraries/SC65/libmath/math.xscade */
+package math
+  function #pragma kcg expand #end Abs(A_Input : 'T)
+    returns (A_Output : 'T)
+    where 'T numeric
+  var
+    _L1 : bool;
+    _L2 : 'T;
+    _L3 : 'T;
+    _L5 : 'T;
+    _L8 : 'T;
+  let
+    _L1= _L8 #1 <= _L5;
+    _L2= #2 if _L1 then (_L5) else (_L3);
+    _L3= #5 - _L5;
+    _L5= A_Input;
+    A_Output= _L2;
+    _L8= (0 #1 : 'T);
+  tel
+
+  function #pragma kcg expand #end BoolToInt16(BTI_Input : bool)
+    returns (BTI_Output : int16)
+  var
+    _L1 : bool;
+    _L2 : int16;
+    _L3 : int16;
+    _L4 : int16;
+  let
+    _L1= BTI_Input;
+    BTI_Output= _L2;
+    _L2= #1 if _L1 then (_L3) else (_L4);
+    _L3= (1 #1 : int16);
+    _L4= (0 #2 : int16);
+  tel
+
+  function #pragma kcg expand #end BoolToFloat32(BTR_Input : bool)
+    returns (BTR_Output : float32)
+  var
+    _L10 : float32;
+    _L5 : bool;
+    _L6 : float32;
+    _L9 : float32;
+  let
+    _L5= BTR_Input;
+    BTR_Output= _L6;
+    _L6= #1 if _L5 then (_L10) else (_L9);
+    _L9= (0.0 #2 : float32);
+    _L10= (1.0 #1 : float32);
+  tel
+
+  function #pragma kcg expand #end InRangeInIn(IRII_Input : 'T; A : 'T; B : 'T)
+    returns (IRII_Output : bool)
+    where 'T numeric
+  var
+    _L10 : 'T;
+    _L12 : bool;
+    _L13 : 'T;
+    _L2 : bool;
+    _L4 : bool;
+    _L8 : 'T;
+  let
+    _L2= _L12 #1 and _L4;
+    _L4= _L8 #2 >= _L10;
+    _L8= IRII_Input;
+    IRII_Output= _L2;
+    _L10= A;
+    _L12= _L13 #3 >= _L8;
+    _L13= B;
+    assume A1 : A #1 <= B;
+  tel
+
+  function #pragma kcg expand #end InRangeInOut(IRIO_Input : 'T; A : 'T; B : 'T)
+    returns (IRIO_Output : bool)
+    where 'T numeric
+  var
+    _L3 : 'T;
+    _L14 : bool;
+    _L13 : 'T;
+    _L12 : 'T;
+    _L10 : bool;
+    _L17 : bool;
+  let
+    _L3= IRIO_Input;
+    _L14= _L3 #1 >= _L12;
+    _L13= B;
+    _L12= A;
+    _L10= _L17 #2 and _L14;
+    IRIO_Output= _L10;
+    _L17= _L13 #3 > _L3;
+    assume A1 : A #1 <= B;
+  tel
+
+  function #pragma kcg expand #end InRangeOutIn(IROI_Input : 'T; A : 'T; B : 'T)
+    returns (IROI_Output : bool)
+    where 'T numeric
+  var
+    _L3 : 'T;
+    _L7 : bool;
+    _L29 : bool;
+    _L24 : 'T;
+    _L23 : 'T;
+    _L30 : bool;
+  let
+    _L3= IROI_Input;
+    IROI_Output= _L29;
+    _L7= _L3 #1 > _L23;
+    _L29= _L30 #2 and _L7;
+    _L24= B;
+    _L23= A;
+    _L30= _L24 #3 >= _L3;
+    assume A1 : A #1 <= B;
+  tel
+
+  function #pragma kcg expand #end InRangeOutOut(
+      IROO_Input : 'T;
+      A : 'T;
+      B : 'T)
+    returns (IROO_Output : bool)
+    where 'T numeric
+  var
+    _L3 : 'T;
+    _L29 : bool;
+    _L28 : bool;
+    _L24 : 'T;
+    _L23 : 'T;
+    _L30 : bool;
+  let
+    _L3= IROO_Input;
+    IROO_Output= _L29;
+    _L29= _L28 #1 and _L30;
+    _L28= _L24 #2 > _L3;
+    _L24= B;
+    _L23= A;
+    _L30= _L3 #3 > _L23;
+    assume A1 : A #1 <= B;
+  tel
+
+  function #pragma kcg expand #end Max(I1 : 'T; I2 : 'T)
+    returns (Ma_Output : 'T)
+    where 'T numeric
+  var
+    _L1 : 'T;
+    _L2 : 'T;
+    _L3 : bool;
+    _L4 : 'T;
+  let
+    _L1= I1;
+    _L2= I2;
+    _L3= _L1 #1 >= _L2;
+    _L4= #2 if _L3 then (_L1) else (_L2);
+    Ma_Output= _L4;
+  tel
+
+  function Max3(I1 : 'T; I2 : 'T; I3 : 'T)
+    returns (Ma3_Output : 'T)
+    where 'T numeric
+  var
+    _L1 : 'T;
+    _L2 : 'T;
+    _L3 : 'T;
+    _L4 : bool;
+    _L5 : bool;
+    _L6 : bool;
+    _L7 : bool;
+    _L8 : 'T;
+    _L9 : 'T;
+  let
+    _L1= I1;
+    _L2= I2;
+    _L3= I3;
+    _L4= _L1 #1 >= _L2;
+    _L5= _L1 #2 >= _L3;
+    _L6= _L2 #3 >= _L3;
+    _L7= _L4 #4 and _L5;
+    _L8= #5 if _L7 then (_L1) else (_L9);
+    _L9= #8 if _L6 then (_L2) else (_L3);
+    Ma3_Output= _L8;
+  tel
+
+  function #pragma kcg expand #end Mean3(I1 : 'T; I2 : 'T; I3 : 'T)
+    returns (Me3_Output : 'T)
+    where 'T numeric
+  var
+    _L1 : 'T;
+    _L2 : 'T;
+    _L3 : 'T;
+    _L4 : 'T;
+    _L5 : 'T;
+    _L7 : 'T;
+  let
+    _L1= I1;
+    _L2= I2;
+    _L3= I3;
+    _L4= _L1 #1 + _L2 #1 + _L3;
+    _L5= _L4 #2 / _L7;
+    Me3_Output= _L5;
+    _L7= (3 #1 : 'T);
+  tel
+
+  function #pragma kcg expand #end Min(I1 : 'T; I2 : 'T)
+    returns (Mi_Output : 'T)
+    where 'T numeric
+  var
+    _L21 : 'T;
+    _L22 : 'T;
+    _L24 : 'T;
+    _L25 : bool;
+  let
+    _L21= I1;
+    _L22= I2;
+    _L24= #1 if _L25 then (_L21) else (_L22);
+    _L25= _L21 #4 <= _L22;
+    Mi_Output= _L24;
+  tel
+
+  function Min3(I1 : 'T; I2 : 'T; I3 : 'T)
+    returns (Mi3_Output : 'T)
+    where 'T numeric
+  var
+    _L1 : bool;
+    _L2 : bool;
+    _L3 : bool;
+    _L4 : 'T;
+    _L5 : 'T;
+    _L6 : 'T;
+    _L7 : bool;
+    _L8 : 'T;
+    _L9 : 'T;
+  let
+    _L1= _L4 #1 <= _L5;
+    _L2= _L4 #2 <= _L6;
+    _L3= _L5 #3 <= _L6;
+    _L4= I1;
+    _L5= I2;
+    _L6= I3;
+    _L7= _L1 #4 and _L2;
+    _L8= #5 if _L7 then (_L4) else (_L9);
+    _L9= #8 if _L3 then (_L5) else (_L6);
+    Mi3_Output= _L8;
+  tel
+
+  function Sign(S_Input : 'T) returns (S_Ouput : 'T) where 'T numeric
+  var
+    _L1 : 'T;
+    _L15 : 'T;
+    _L16 : 'T;
+    _L4 : bool;
+    _L5 : bool;
+    _L7 : 'T;
+    _L8 : 'T;
+    _L20 : 'T;
+    _L21 : 'T;
+  let
+    _L1= S_Input;
+    _L4= _L1 #1 > _L15;
+    _L5= _L15 #2 = _L1;
+    S_Ouput= _L7;
+    _L7= #3 if _L4 then (_L16) else (_L8);
+    _L8= #6 if _L5 then (_L21) else (_L20);
+    _L15= (0 #3 : 'T);
+    _L16= (1 #4 : 'T);
+    _L20= #1 - (1 #1 : 'T);
+    _L21= (0 #2 : 'T);
+  tel
+
+  function #pragma kcg expand #end Mean(I1 : 'T; I2 : 'T)
+    returns (Me_output : 'T)
+    where 'T numeric
+  var
+    _L1 : 'T;
+    _L2 : 'T;
+    _L3 : 'T;
+    _L4 : 'T;
+    _L6 : 'T;
+  let
+    _L1= I1;
+    _L2= I2;
+    _L3= _L4 #1 / _L6;
+    _L4= _L1 #2 + _L2;
+    Me_output= _L3;
+    _L6= (2 #1 : 'T);
+  tel
+
+  function Round(R_Input : 'T) returns (R_Output : int32) where 'T float
+  var
+    _L2 : bool;
+    _L4 : 'T;
+    _L5 : 'T;
+    _L7 : 'T;
+    _L8 : int32;
+    _L9 : 'T;
+    _L10 : int32;
+    _L12 : 'T;
+    _L17 : 'T;
+    _L22 : 'T;
+    _L21 : 'T;
+    _L20 : 'T;
+    _L19 : 'T;
+    _L18 : bool;
+    _L25 : 'T;
+    _L26 : 'T;
+    _L27 : bool;
+    _L34 : 'T;
+  let
+    _L2= _L12 #1 >= _L17;
+    _L4= #2 if _L2 then (_L5) else (_L34);
+    _L5= _L34 #5 + _L7;
+    _L7= (1.0 #19 : 'T);
+    _L8= (_L25 #6 : int32);
+    R_Output= _L8;
+    _L9= R_Input;
+    _L10= (_L9 #7 : int32);
+    _L12= _L9 #8 - _L34;
+    _L17= (0.5 #20 : 'T);
+    _L22= _L34 #9 - _L21;
+    _L21= (1.0 #21 : 'T);
+    _L20= (- 0.5 #22 : 'T);
+    _L19= #10 if _L18 then (_L22) else (_L34);
+    _L18= _L12 #13 <= _L20;
+    _L25= #14 if _L27 then (_L19) else (_L4);
+    _L26= (0.0 #23 : 'T);
+    _L27= _L12 #17 < _L26;
+    _L34= (_L10 #18 : 'T);
+  tel
+
+  function ByteToUint8(
+      b1 : bool;
+      b2 : bool;
+      b3 : bool;
+      b4 : bool;
+      b5 : bool;
+      b6 : bool;
+      b7 : bool;
+      b8 : bool)
+    returns (OTI_Output : uint8)
+  var
+    _L1 : bool;
+    _L2 : bool;
+    _L3 : bool;
+    _L4 : bool;
+    _L5 : uint8;
+    _L6 : uint8;
+    _L7 : uint8;
+    _L10 : uint8;
+    _L9 : uint8;
+    _L8 : uint8;
+    _L13 : uint8;
+    _L12 : uint8;
+    _L11 : uint8;
+    _L16 : uint8;
+    _L15 : uint8;
+    _L14 : uint8;
+    _L17 : uint8;
+    _L18 : uint8;
+    _L19 : uint8;
+    _L23 : uint8;
+    _L22 : uint8;
+    _L21 : uint8;
+    _L20 : uint8;
+    _L31 : uint8;
+    _L30 : uint8;
+    _L29 : uint8;
+    _L28 : uint8;
+    _L32 : uint8;
+    _L33 : bool;
+    _L34 : bool;
+    _L35 : bool;
+    _L36 : bool;
+    _L40 : uint8;
+    _L39 : uint8;
+    _L38 : uint8;
+    _L37 : uint8;
+    _L43 : uint8;
+    _L42 : uint8;
+    _L41 : uint8;
+  let
+    _L1= b1;
+    _L2= b2;
+    _L3= b3;
+    _L4= b4;
+    _L5= #1 if _L1 then (_L6) else (_L7);
+    _L6= (1 #1 : uint8);
+    _L7= (0 #2 : uint8);
+    _L10= (2 #3 : uint8);
+    _L9= (0 #4 : uint8);
+    _L8= #4 if _L2 then (_L10) else (_L9);
+    _L13= (4 #5 : uint8);
+    _L12= (0 #6 : uint8);
+    _L11= #7 if _L3 then (_L13) else (_L12);
+    _L16= (8 #7 : uint8);
+    _L15= (0 #8 : uint8);
+    _L14= #10 if _L4 then (_L16) else (_L15);
+    _L17= _L11 #13 + _L32;
+    _L18= _L8 #14 + _L17;
+    _L19= _L5 #15 + _L18;
+    OTI_Output= _L19;
+    _L23= (0 #10 : uint8);
+    _L22= (16 #9 : uint8);
+    _L21= _L20 #16 + _L29;
+    _L20= #17 if _L33 then (_L22) else (_L23);
+    _L31= (0 #12 : uint8);
+    _L30= (32 #11 : uint8);
+    _L29= _L28 #20 + _L40;
+    _L28= #21 if _L34 then (_L30) else (_L31);
+    _L32= _L14 #24 + _L21;
+    _L33= b5;
+    _L34= b6;
+    _L35= b7;
+    _L36= b8;
+    _L40= _L37 #25 + _L43;
+    _L39= (64 #13 : uint8);
+    _L38= (0 #14 : uint8);
+    _L37= #26 if _L35 then (_L39) else (_L38);
+    _L43= #29 if _L36 then (_L42) else (_L41);
+    _L42= (128 #15 : uint8);
+    _L41= (0 #17 : uint8);
+  tel
+
+  function RoundCeil(RC_Input : 'T) returns (RC_Output : int32) where 'T float
+  var
+    _L1 : 'T;
+    _L2 : bool;
+    _L3 : 'T;
+    _L4 : int32;
+    _L6 : int32;
+    _L7 : 'T;
+    _L9 : int32;
+    _L10 : 'T;
+    _L11 : int32;
+    _L12 : 'T;
+    _L14 : bool;
+  let
+    _L1= RC_Input;
+    _L2= _L1 #1 <= _L3;
+    _L3= (0.0 #13 : 'T);
+    _L4= #2 if _L2 then (_L6) else (_L9);
+    _L6= (_L1 #5 : int32);
+    _L7= (_L6 #6 : 'T);
+    _L9= #7 if _L14 then (_L6) else (_L11);
+    _L10= _L1 #10 + _L12;
+    _L11= (_L10 #11 : int32);
+    _L12= (1.0 #12 : 'T);
+    RC_Output= _L4;
+    _L14= _L7 #12 = _L1;
+  tel
+
+  function RoundFloor(RF_Input : 'T)
+    returns (RF_Output : int32)
+    where 'T numeric
+  var
+    _L1 : 'T;
+    _L24 : bool;
+    _L25 : 'T;
+    _L26 : int32;
+    _L30 : 'T;
+    _L31 : 'T;
+    _L32 : int32;
+    _L33 : int32;
+    _L38 : int32;
+    _L41 : 'T;
+    _L43 : bool;
+  let
+    _L1= RF_Input;
+    RF_Output= _L26;
+    _L24= _L1 #1 >= _L25;
+    _L25= (0 #15 : 'T);
+    _L26= #2 if _L24 then (_L33) else (_L38);
+    _L30= _L1 #5 - _L31;
+    _L31= (1 #14 : 'T);
+    _L32= (_L30 #6 : int32);
+    _L33= (_L1 #7 : int32);
+    _L38= #8 if _L43 then (_L33) else (_L32);
+    _L41= (_L33 #11 : 'T);
+    _L43= _L41 #12 = _L1;
+  tel
+
+  function #pragma kcg expand #end IntToBool(ITB_Input : 'T)
+    returns (ITB_Output : bool)
+    where 'T integer
+  var
+    _L1 : 'T;
+    _L2 : bool;
+    _L3 : 'T;
+  let
+    _L1= ITB_Input;
+    _L2= _L1 #1 <> _L3;
+    ITB_Output= _L2;
+    _L3= (0 #1 : 'T);
+  tel
+
+  function #pragma kcg expand #end RealToBool(RTB_Input : 'T)
+    returns (RTB_Output : bool)
+    where 'T float
+  var
+    _L3 : bool;
+    _L2 : 'T;
+    _L1 : 'T;
+  let
+    _L3= _L2 #1 <> _L1;
+    _L2= RTB_Input;
+    _L1= (0.0 #1 : 'T);
+    RTB_Output= _L3;
+  tel
+
+  function #pragma kcg expand #end BoolToInt32(BTI_Input : bool)
+    returns (BTI_Output : int32)
+  var
+    _L1 : bool;
+    _L2 : int32;
+    _L3 : int32;
+    _L4 : int32;
+  let
+    _L1= BTI_Input;
+    BTI_Output= _L2;
+    _L2= #1 if _L1 then (_L3) else (_L4);
+    _L3= (1 #1 : int32);
+    _L4= (0 #2 : int32);
+  tel
+
+  function #pragma kcg expand #end BoolToUint8(BTI_Input : bool)
+    returns (BTI_Output : uint8)
+  var
+    _L1 : bool;
+    _L2 : uint8;
+    _L3 : uint8;
+    _L4 : uint8;
+  let
+    _L1= BTI_Input;
+    BTI_Output= _L2;
+    _L2= #1 if _L1 then (_L3) else (_L4);
+    _L3= (1 #3 : uint8);
+    _L4= (0 #4 : uint8);
+  tel
+
+  function #pragma kcg expand #end BoolToInt64(BTI_Input : bool)
+    returns (BTI_Output : int64)
+  var
+    _L1 : bool;
+    _L2 : int64;
+    _L3 : int64;
+    _L4 : int64;
+  let
+    _L1= BTI_Input;
+    BTI_Output= _L2;
+    _L2= #1 if _L1 then (_L3) else (_L4);
+    _L3= (1 #1 : int64);
+    _L4= (0 #2 : int64);
+  tel
+
+  function #pragma kcg expand #end BoolToInt8(BTI_Input : bool)
+    returns (BTI_Output : int8)
+  var
+    _L1 : bool;
+    _L2 : int8;
+    _L3 : int8;
+    _L4 : int8;
+  let
+    _L1= BTI_Input;
+    BTI_Output= _L2;
+    _L2= #1 if _L1 then (_L3) else (_L4);
+    _L3= (1 #1 : int8);
+    _L4= (0 #2 : int8);
+  tel
+
+  function #pragma kcg expand #end BoolToUint64(BTI_Input : bool)
+    returns (BTI_Output : uint64)
+  var
+    _L1 : bool;
+    _L2 : uint64;
+    _L3 : uint64;
+    _L4 : uint64;
+  let
+    _L1= BTI_Input;
+    BTI_Output= _L2;
+    _L2= #1 if _L1 then (_L3) else (_L4);
+    _L3= (1 #4 : uint64);
+    _L4= (0 #3 : uint64);
+  tel
+
+  function #pragma kcg expand #end BoolToUint16(BTI_Input : bool)
+    returns (BTI_Output : uint16)
+  var
+    _L1 : bool;
+    _L2 : uint16;
+    _L3 : uint16;
+    _L4 : uint16;
+  let
+    _L1= BTI_Input;
+    BTI_Output= _L2;
+    _L2= #1 if _L1 then (_L3) else (_L4);
+    _L3= (1 #1 : uint16);
+    _L4= (0 #2 : uint16);
+  tel
+
+  function #pragma kcg expand #end BoolToUint32(BTI_Input : bool)
+    returns (BTI_Output : uint32)
+  var
+    _L1 : bool;
+    _L2 : uint32;
+    _L3 : uint32;
+    _L4 : uint32;
+  let
+    _L1= BTI_Input;
+    BTI_Output= _L2;
+    _L2= #1 if _L1 then (_L3) else (_L4);
+    _L3= (1 #1 : uint32);
+    _L4= (0 #2 : uint32);
+  tel
+
+  function #pragma kcg expand #end BoolToFloat64(BTR_Input : bool)
+    returns (BTR_Output : float64)
+  var
+    _L10 : float64;
+    _L5 : bool;
+    _L6 : float64;
+    _L9 : float64;
+  let
+    _L5= BTR_Input;
+    BTR_Output= _L6;
+    _L6= #1 if _L5 then (_L10) else (_L9);
+    _L9= (0.0 #2 : float64);
+    _L10= (1.0 #1 : float64);
+  tel
+
+  function #pragma kcg expand #end NumericToUint8(Input1 : 'T)
+    returns (Output1 : uint8)
+    where 'T numeric
+  var
+    _L1 : 'T;
+    _L2 : uint8;
+  let
+    _L1= Input1;
+    Output1= _L2;
+    _L2= (_L1 #1 : uint8);
+  tel
+
+  function #pragma kcg expand #end NumericToInt8(Input1 : 'T)
+    returns (Output1 : int8)
+    where 'T numeric
+  var
+    _L1 : 'T;
+    _L2 : int8;
+  let
+    _L1= Input1;
+    Output1= _L2;
+    _L2= (_L1 #1 : int8);
+  tel
+
+  function #pragma kcg expand #end NumericToInt16(Input1 : 'T)
+    returns (Output1 : int16)
+    where 'T numeric
+  var
+    _L1 : 'T;
+    _L2 : int16;
+  let
+    _L1= Input1;
+    Output1= _L2;
+    _L2= (_L1 #1 : int16);
+  tel
+
+  function #pragma kcg expand #end NumericToInt32(Input1 : 'T)
+    returns (Output1 : int32)
+    where 'T numeric
+  var
+    _L1 : 'T;
+    _L2 : int32;
+  let
+    _L1= Input1;
+    Output1= _L2;
+    _L2= (_L1 #1 : int32);
+  tel
+
+  function #pragma kcg expand #end NumericToInt64(Input1 : 'T)
+    returns (Output1 : int64)
+    where 'T numeric
+  var
+    _L1 : 'T;
+    _L2 : int64;
+  let
+    _L1= Input1;
+    Output1= _L2;
+    _L2= (_L1 #1 : int64);
+  tel
+
+  function #pragma kcg expand #end NumericToUint16(Input1 : 'T)
+    returns (Output1 : uint16)
+    where 'T numeric
+  var
+    _L1 : 'T;
+    _L2 : uint16;
+  let
+    _L1= Input1;
+    Output1= _L2;
+    _L2= (_L1 #1 : uint16);
+  tel
+
+  function #pragma kcg expand #end NumericToUint32(Input1 : 'T)
+    returns (Output1 : uint32)
+    where 'T numeric
+  var
+    _L1 : 'T;
+    _L2 : uint32;
+  let
+    _L1= Input1;
+    Output1= _L2;
+    _L2= (_L1 #1 : uint32);
+  tel
+
+  function #pragma kcg expand #end NumericToUint64(Input1 : 'T)
+    returns (Output1 : uint64)
+    where 'T numeric
+  var
+    _L1 : 'T;
+    _L2 : uint64;
+  let
+    _L1= Input1;
+    Output1= _L2;
+    _L2= (_L1 #1 : uint64);
+  tel
+
+  function #pragma kcg expand #end NumericToFloat64(Input1 : 'T)
+    returns (Output1 : float64)
+    where 'T numeric
+  var
+    _L1 : 'T;
+    _L2 : float64;
+  let
+    _L1= Input1;
+    Output1= _L2;
+    _L2= (_L1 #1 : float64);
+  tel
+
+  function #pragma kcg expand #end NumericToFloat32(Input1 : 'T)
+    returns (Output1 : float32)
+    where 'T numeric
+  var
+    _L1 : 'T;
+    _L2 : float32;
+  let
+    _L1= Input1;
+    Output1= _L2;
+    _L2= (_L1 #1 : float32);
+  tel
+
+  function private #pragma kcg expand #end PolynomialStep(
+      Acc : 'T;
+      X : 'T;
+      C : 'T)
+    returns (Y : 'T)
+    where 'T numeric
+  var
+    _L1 : 'T;
+    _L2 : 'T;
+    _L3 : 'T;
+    _L4 : 'T;
+    _L5 : 'T;
+  let
+    _L1= Acc;
+    _L2= X;
+    _L3= C;
+    Y= _L5;
+    _L4= _L1 #1 * _L2;
+    _L5= _L4 #1 + _L3;
+  tel
+
+  function #pragma kcg expand #end Polynomial<<N>>(X : 'T; C : 'T^N)
+    returns (Y : 'T)
+    where 'T numeric
+  var
+    _L1 : 'T;
+    _L2 : 'T;
+    _L3 : 'T;
+    _L4 : 'T^N;
+    _L5 : 'T^N;
+  let
+    _L1= (#1 fold #1 PolynomialStep <<N>>)(_L2, _L4, _L5);
+    _L2= (0 #1 : 'T);
+    _L3= X;
+    _L4= (_L3)#1^N;
+    _L5= C;
+    Y= _L1;
+  tel
+
+  function Mod(value : 'T; modulus : 'T) returns (remain : 'T) where 'T numeric
+  var
+    _L25 : int32;
+    _L23 : 'T;
+    _L22 : 'T;
+    _L21 : 'T;
+    _L20 : 'T;
+    _L19 : bool;
+    _L18 : 'T;
+    _L17 : 'T;
+    _L16 : 'T;
+    _L15 : 'T;
+    _L14 : 'T;
+  let
+    remain= _L21;
+    _L14= _L20 #1 / _L16;
+    _L15= modulus;
+    _L16= #1 if _L19 then (_L22) else (_L15);
+    _L17= (_L25 #1 : 'T);
+    _L18= _L17 #1 * _L15;
+    _L19= _L15 #1 = _L23;
+    _L20= value;
+    _L21= _L20 #1 - _L18;
+    _L22= (1 #2 : 'T);
+    _L23= (0 #3 : 'T);
+    _L25= #1 RoundFloor(_L14);
+  tel
+
+end;
+
+
+/* xscade source: C:/Program Files/ANSYS Inc/v182/SCADE/SCADE/libraries/SC65/libmathext/mathext.xscade */
+package mathext
+  package private mathextimpl
+    function imported #pragma kcg C:name AcoshR32_mathext_mathextimpl #end
+      AcoshR32(i : float32) returns (o : float32) specialize AcoshR;
+
+    function imported #pragma kcg C:name AcosR32_mathext_mathextimpl #end
+      AcosR32(i : float32) returns (o : float32) specialize AcosR;
+
+    function imported #pragma kcg C:name AsinhR32_mathext_mathextimpl #end
+      AsinhR32(i : float32) returns (o : float32) specialize AsinhR;
+
+    function imported #pragma kcg C:name AsinR32_mathext_mathextimpl #end
+      AsinR32(i : float32) returns (o : float32) specialize AsinR;
+
+    function imported #pragma kcg C:name Atan2R32_mathext_mathextimpl #end
+      Atan2R32(y : float32; x : float32)
+      returns (o : float32)
+      specialize Atan2R;
+
+    function imported #pragma kcg C:name AtanhR32_mathext_mathextimpl #end
+      AtanhR32(i : float32) returns (o : float32) specialize AtanhR;
+
+    function imported #pragma kcg C:name AtanR32_mathext_mathextimpl #end
+      AtanR32(i : float32) returns (o : float32) specialize AtanR;
+
+    function imported #pragma kcg C:name CoshR32_mathext_mathextimpl #end
+      CoshR32(i : float32) returns (o : float32) specialize CoshR;
+
+    function imported #pragma kcg C:name CosR32_mathext_mathextimpl #end CosR32(
+        i : float32)
+      returns (o : float32)
+      specialize CosR;
+
+    function imported #pragma kcg C:name ExpR32_mathext_mathextimpl #end ExpR32(
+        i : float32)
+      returns (o : float32)
+      specialize ExpR;
+
+    function imported #pragma kcg C:name LnR32_mathext_mathextimpl #end LnR32(
+        i : float32)
+      returns (o : float32)
+      specialize LnR;
+
+    function imported #pragma kcg C:name LogR32_mathext_mathextimpl #end LogR32(
+        i : float32)
+      returns (o : float32)
+      specialize LogR;
+
+    function imported #pragma kcg C:name PowerR32_mathext_mathextimpl #end
+      PowerR32(i : float32; p : int32) returns (o : float32) specialize PowerR;
+
+    function imported #pragma kcg C:name PowerRR32_mathext_mathextimpl #end
+      PowerRR32(i : float32; p : float32)
+      returns (o : float32)
+      specialize PowerRR;
+
+    function imported #pragma kcg C:name SinhR32_mathext_mathextimpl #end
+      SinhR32(i : float32) returns (o : float32) specialize SinhR;
+
+    function imported #pragma kcg C:name SinR32_mathext_mathextimpl #end SinR32(
+        i : float32)
+      returns (o : float32)
+      specialize SinR;
+
+    function imported #pragma kcg C:name SqrtR32_mathext_mathextimpl #end
+      SqrtR32(i : float32) returns (o : float32) specialize SqrtR;
+
+    function imported #pragma kcg C:name TanhR32_mathext_mathextimpl #end
+      TanhR32(i : float32) returns (o : float32) specialize TanhR;
+
+    function imported #pragma kcg C:name TanR32_mathext_mathextimpl #end TanR32(
+        i : float32)
+      returns (o : float32)
+      specialize TanR;
+
+    function imported #pragma kcg C:name TenPowR32_mathext_mathextimpl #end
+      TenPowR32(i : float32) returns (o : float32) specialize TenPowR;
+
+    function imported #pragma kcg C:name AcoshR64_mathext_mathextimpl #end
+      AcoshR64(i : float64) returns (o : float64) specialize AcoshR;
+
+    function imported #pragma kcg C:name AcosR64_mathext_mathextimpl #end
+      AcosR64(i : float64) returns (o : float64) specialize AcosR;
+
+    function imported #pragma kcg C:name AsinhR64_mathext_mathextimpl #end
+      AsinhR64(i : float64) returns (o : float64) specialize AsinhR;
+
+    function imported #pragma kcg C:name AsinR64_mathext_mathextimpl #end
+      AsinR64(i : float64) returns (o : float64) specialize AsinR;
+
+    function imported #pragma kcg C:name Atan2R64_mathext_mathextimpl #end
+      Atan2R64(y : float64; x : float64)
+      returns (o : float64)
+      specialize Atan2R;
+
+    function imported #pragma kcg C:name AtanhR64_mathext_mathextimpl #end
+      AtanhR64(i : float64) returns (o : float64) specialize AtanhR;
+
+    function imported #pragma kcg C:name AtanR64_mathext_mathextimpl #end
+      AtanR64(i : float64) returns (o : float64) specialize AtanR;
+
+    function imported #pragma kcg C:name CoshR64_mathext_mathextimpl #end
+      CoshR64(i : float64) returns (o : float64) specialize CoshR;
+
+    function imported #pragma kcg C:name CosR64_mathext_mathextimpl #end CosR64(
+        i : float64)
+      returns (o : float64)
+      specialize CosR;
+
+    function imported #pragma kcg C:name ExpR64_mathext_mathextimpl #end ExpR64(
+        i : float64)
+      returns (o : float64)
+      specialize ExpR;
+
+    function imported #pragma kcg C:name LnR64_mathext_mathextimpl #end LnR64(
+        i : float64)
+      returns (o : float64)
+      specialize LnR;
+
+    function imported #pragma kcg C:name LogR64_mathext_mathextimpl #end LogR64(
+        i : float64)
+      returns (o : float64)
+      specialize LogR;
+
+    function imported #pragma kcg C:name PowerR64_mathext_mathextimpl #end
+      PowerR64(i : float64; p : int32) returns (o : float64) specialize PowerR;
+
+    function imported #pragma kcg C:name PowerRR64_mathext_mathextimpl #end
+      PowerRR64(i : float64; p : float64)
+      returns (o : float64)
+      specialize PowerRR;
+
+    function imported #pragma kcg C:name SinhR64_mathext_mathextimpl #end
+      SinhR64(i : float64) returns (o : float64) specialize SinhR;
+
+    function imported #pragma kcg C:name SinR64_mathext_mathextimpl #end SinR64(
+        i : float64)
+      returns (o : float64)
+      specialize SinR;
+
+    function imported #pragma kcg C:name SqrtR64_mathext_mathextimpl #end
+      SqrtR64(i : float64) returns (o : float64) specialize SqrtR;
+
+    function imported #pragma kcg C:name TanhR64_mathext_mathextimpl #end
+      TanhR64(i : float64) returns (o : float64) specialize TanhR;
+
+    function imported #pragma kcg C:name TanR64_mathext_mathextimpl #end TanR64(
+        i : float64)
+      returns (o : float64)
+      specialize TanR;
+
+    function imported #pragma kcg C:name TenPowR64_mathext_mathextimpl #end
+      TenPowR64(i : float64) returns (o : float64) specialize TenPowR;
+
+    function imported #pragma kcg C:name PowerI_mathext #end PowerI32(
+        i : int32;
+        p : int32)
+      returns (o : int32)
+      specialize PowerI;
+
+  end;
+
+  function imported AcosR(Input1 : 'T) returns (Output1 : 'T) where 'T float;
+
+  function imported AcoshR(Input1 : 'T) returns (Output1 : 'T) where 'T float;
+
+  function imported AsinR(Input1 : 'T) returns (Output1 : 'T) where 'T float;
+
+  function imported AsinhR(Input1 : 'T) returns (Output1 : 'T) where 'T float;
+
+  function imported Atan2R(Input1 : 'T; Input2 : 'T)
+    returns (Output1 : 'T)
+    where 'T float;
+
+  function imported AtanR(Input1 : 'T) returns (Output1 : 'T) where 'T float;
+
+  function imported AtanhR(Input1 : 'T) returns (Output1 : 'T) where 'T float;
+
+  function imported CosR(Input1 : 'T) returns (Output1 : 'T) where 'T float;
+
+  function imported CoshR(Input1 : 'T) returns (Output1 : 'T) where 'T float;
+
+  function imported ExpR(Input1 : 'T) returns (Output1 : 'T) where 'T float;
+
+  function imported LnR(Input1 : 'T) returns (Output1 : 'T) where 'T float;
+
+  function imported LogR(Input1 : 'T) returns (Output1 : 'T) where 'T float;
+
+  function imported PowerRR(P_Input : 'T; Power : 'T)
+    returns (P_Output : 'T)
+    where 'T float;
+
+  function imported SinR(Input1 : 'T) returns (Output1 : 'T) where 'T float;
+
+  function imported SinhR(Input1 : 'T) returns (Output1 : 'T) where 'T float;
+
+  function imported SqrtR(Input1 : 'T) returns (Output1 : 'T) where 'T float;
+
+  function imported TanR(Input1 : 'T) returns (Output1 : 'T) where 'T float;
+
+  function imported TanhR(Input1 : 'T) returns (Output1 : 'T) where 'T float;
+
+  function imported TenPowR(Input1 : 'T) returns (Output1 : 'T) where 'T float;
+
+  function Square(Square_In : 'T) returns (Square_Out : 'T) where 'T numeric
+  var
+    _L1 : 'T;
+    _L2 : 'T;
+  let
+    _L1= Square_In;
+    _L2= _L1 #1 * _L1;
+    Square_Out= _L2;
+  tel
+
+  function Inv(Inv_In : 'T) returns (Inv_Out : 'T) where 'T float
+  var
+    _L1 : 'T;
+    _L2 : 'T;
+    _L3 : 'T;
+  let
+    _L1= Inv_In;
+    _L2= (1.0 #4 : 'T);
+    _L3= _L2 #1 / _L1;
+    Inv_Out= _L3;
+  tel
+
+  function HypotR(HypotR_I1 : 'T; HypotR_I2 : 'T)
+    returns (HypotR_O : 'T)
+    where 'T float
+  var
+    _L1 : 'T;
+    _L2 : 'T;
+    _L3 : 'T;
+    _L4 : 'T;
+    _L5 : 'T;
+    _L6 : 'T;
+  let
+    _L1= HypotR_I2;
+    _L2= HypotR_I1;
+    _L3= _L2 #1 * _L2;
+    _L4= _L1 #2 * _L1;
+    _L5= _L3 #3 + _L4;
+    _L6= #4 SqrtR(_L5);
+    HypotR_O= _L6;
+  tel
+
+  function imported #pragma kcg C:name PowerI_mathext #end PowerI(
+      P_Input : 'T;
+      Power : 'T)
+    returns (P_Output : 'T)
+    where 'T integer;
+
+  function imported PowerR(P_Input : 'T; Power : int32)
+    returns (P_Output : 'T)
+    where 'T float;
+
+  function #pragma kcg expand #end SinCosR(Input1 : 'T)
+    returns (Output1 : 'T; Output2 : 'T)
+    where 'T float
+  var
+    _L1 : 'T;
+    _L2 : 'T;
+    _L3 : 'T;
+  let
+    _L1= Input1;
+    _L2= #1 SinR(_L1);
+    _L3= #1 CosR(_L1);
+    Output1= _L2;
+    Output2= _L3;
+  tel
+
+  function #pragma kcg expand #end SphericalToCartesian(
+      r : 'T;
+      theta : 'T;
+      phi : 'T)
+    returns (x : 'T; y : 'T; z : 'T)
+    where 'T float
+  var
+    _L1 : 'T;
+    _L2 : 'T;
+    _L3 : 'T;
+    _L4 : 'T;
+    _L5 : 'T;
+    _L6 : 'T;
+    _L7 : 'T;
+    _L8 : 'T;
+    _L9 : 'T;
+    _L10 : 'T;
+    _L18 : 'T;
+  let
+    _L1= r;
+    _L2= theta;
+    _L3= phi;
+    x= _L9;
+    y= _L10;
+    _L4= #1 CosR(_L3);
+    _L5= #1 SinR(_L3);
+    _L6= #2 CosR(_L2);
+    _L7= #2 SinR(_L2);
+    _L8= _L1 #1 * _L5;
+    _L9= _L8 #2 * _L6;
+    _L10= _L8 #3 * _L7;
+    _L18= _L1 #4 * _L4;
+    z= _L18;
+  tel
+
+  function #pragma kcg expand #end RadiansToDegrees(Radians : 'T)
+    returns (Degrees : 'T)
+    where 'T float
+  var
+    pi : 'T;
+    _L1 : 'T;
+    _L2 : 'T;
+    _L3 : 'T;
+    _L4 : 'T;
+    _L5 : 'T;
+    _L6 : 'T;
+  let
+    _L1= Radians;
+    Degrees= _L4;
+    pi= _L2;
+    _L2= (3.1415926535897 #1 : 'T);
+    _L3= _L5 #1 / _L6;
+    _L4= _L1 #1 * _L3;
+    _L5= (180.0 #2 : 'T);
+    _L6= pi;
+  tel
+
+  function #pragma kcg expand #end PolarToCartesian(r : 'T; theta : 'T)
+    returns (x : 'T; y : 'T)
+    where 'T float
+  var
+    _L1 : 'T;
+    _L2 : 'T;
+    _L3 : 'T;
+    _L4 : 'T;
+    _L5 : 'T;
+    _L6 : 'T;
+  let
+    _L1= #1 CosR(_L6);
+    _L2= #1 SinR(_L6);
+    _L3= _L1 #1 * _L5;
+    _L4= _L5 #2 * _L2;
+    _L5= r;
+    _L6= theta;
+    x= _L3;
+    y= _L4;
+  tel
+
+  function #pragma kcg expand #end FahrenheitToCelsius(Fahrenheit : 'T)
+    returns (Celsius : 'T)
+    where 'T float
+  var
+    _L1 : 'T;
+    _L2 : 'T;
+    _L3 : 'T;
+    _L4 : 'T;
+    _L5 : 'T;
+  let
+    _L1= Fahrenheit;
+    Celsius= _L2;
+    _L2= _L3 #1 * _L4;
+    _L3= _L1 #1 - _L5;
+    _L4= (5.0 #3 / 9.0 #1 : 'T);
+    _L5= (32.0 #2 : 'T);
+  tel
+
+  function #pragma kcg expand #end DegreesToRadians(Degrees : 'T)
+    returns (Radians : 'T)
+    where 'T float
+  var
+    pi : 'T;
+    _L1 : 'T;
+    _L2 : 'T;
+    _L3 : 'T;
+    _L4 : 'T;
+    _L5 : 'T;
+    _L6 : 'T;
+  let
+    _L1= Degrees;
+    Radians= _L4;
+    pi= _L2;
+    _L2= (3.1415926535897 #1 : 'T);
+    _L3= _L6 #1 / _L5;
+    _L4= _L1 #1 * _L3;
+    _L5= (180.0 #2 : 'T);
+    _L6= pi;
+  tel
+
+  function #pragma kcg expand #end CelsiusToFahrenheit(Celsius : 'T)
+    returns (Fahrenheit : 'T)
+    where 'T float
+  var
+    _L1 : 'T;
+    _L2 : 'T;
+    _L3 : 'T;
+    _L4 : 'T;
+    _L5 : 'T;
+  let
+    _L1= Celsius;
+    Fahrenheit= _L3;
+    _L2= _L1 #1 * _L4;
+    _L3= _L2 #1 + _L5;
+    _L4= (9.0 #2 / 5.0 #1 : 'T);
+    _L5= (32.0 #2 : 'T);
+  tel
+
+  function #pragma kcg expand #end CartesianToSpherical(x : 'T; y : 'T; z : 'T)
+    returns (r : 'T; theta : 'T; phi : 'T)
+    where 'T float
+  var
+    _L1 : 'T;
+    _L2 : 'T;
+    _L3 : 'T;
+    _L6 : 'T;
+    _L7 : 'T;
+    _L8 : 'T;
+    _L9 : 'T;
+  let
+    _L1= #1 Atan2R(_L8, _L7);
+    _L2= #1 HypotR(_L7, _L8);
+    _L3= #2 HypotR(_L2, _L9);
+    _L6= #2 Atan2R(_L2, _L9);
+    _L7= x;
+    _L8= y;
+    _L9= z;
+    r= _L3;
+    theta= _L1;
+    phi= _L6;
+  tel
+
+  function #pragma kcg expand #end CartesianToPolar(x : 'T; y : 'T)
+    returns (r : 'T; theta : 'T)
+    where 'T float
+  var
+    _L1 : 'T;
+    _L2 : 'T;
+    _L3 : 'T;
+    _L4 : 'T;
+  let
+    _L1= #1 Atan2R(_L4, _L3);
+    _L2= #1 HypotR(_L3, _L4);
+    _L3= x;
+    _L4= y;
+    r= _L2;
+    theta= _L1;
+  tel
+
+end;
+
+
+/* xscade source: C:/Program Files/ANSYS Inc/v182/SCADE/SCADE/libraries/SC65/libpwlinear/pwlinear.xscade */
+package pwlinear
+  function #pragma kcg expand #end LimiterUnSymmetrical(
+      LUS_Input : 'T;
+      LowLimit : 'T;
+      HighLimit : 'T)
+    returns (LUS_Output : 'T)
+    where 'T numeric
+  var
+    _L1 : bool;
+    _L11 : 'T;
+    _L13 : 'T;
+    _L15 : 'T;
+    _L2 : bool;
+    _L3 : 'T;
+    _L9 : 'T;
+  let
+    _L1= _L3 #1 >= _L15;
+    _L2= _L3 #2 <= _L13;
+    _L3= LUS_Input;
+    _L9= #3 if _L1 then (_L15) else (_L11);
+    _L11= #6 if _L2 then (_L13) else (_L3);
+    _L13= LowLimit;
+    _L15= HighLimit;
+    LUS_Output= _L9;
+    assume A1 : LowLimit #3 <= HighLimit;
+  tel
+
+  function #pragma kcg expand #end PreLoadUnSymmetrical(
+      PLUS_Input : 'T;
+      NegOffset : 'T;
+      PosOffset : 'T;
+      Slope : 'T)
+    returns (PLUS_Output : 'T)
+    where 'T numeric
+  var
+    _L1 : 'T;
+    _L12 : 'T;
+    _L14 : 'T;
+    _L15 : 'T;
+    _L4 : bool;
+    _L5 : 'T;
+    _L7 : 'T;
+    _L9 : 'T;
+    _L17 : 'T;
+  let
+    _L1= PLUS_Input;
+    PLUS_Output= _L7;
+    _L4= _L1 #1 < _L17;
+    _L5= #2 if _L4 then (_L12) else (_L15);
+    _L7= _L9 #5 + _L5;
+    _L9= _L1 #6 * _L14;
+    _L12= NegOffset;
+    _L14= Slope;
+    _L15= PosOffset;
+    _L17= (0 #3 : 'T);
+  tel
+
+  node ClockCounter(Reset : bool) returns (Count : int32)
+  var
+    _L1 : int32;
+    _L2 : int32;
+    _L6 : int32;
+    _L7 : int32;
+    _L8 : int32;
+    _L11 : int32;
+    _L13 : bool;
+    _L16 : int32;
+  let
+    _L2= #1 if _L13 then (_L16) else (_L7);
+    Count= _L1;
+    _L6= #4 pre (_L1);
+    _L7= _L8 #5 + _L6;
+    _L8= 1;
+    _L1= (_L11) #6 -> (_L2);
+    _L11= 0;
+    _L13= Reset;
+    _L16= 0;
+  tel
+
+  function Quantizer(Q_Input : 'T; Interval : 'T)
+    returns (Q_Output : 'T)
+    where 'T float
+  var
+    _L8 : 'T;
+    _L11 : 'T;
+    _L12 : 'T;
+    _L13 : 'T;
+    _L142 : 'T;
+    _L140 : bool;
+    _L139 : 'T;
+    _L138 : 'T;
+    _L137 : 'T;
+    _L136 : 'T;
+    _L135 : 'T;
+    _L134 : 'T;
+    _L133 : int32;
+    _L130 : 'T;
+    _L129 : bool;
+    _L128 : 'T;
+    _L127 : 'T;
+    _L126 : 'T;
+    _L125 : bool;
+    _L124 : 'T;
+  let
+    _L8= Q_Input;
+    Q_Output= _L13;
+    _L11= Interval;
+    _L12= _L8 #1 / _L11;
+    _L13= _L136 #2 * _L11;
+    _L142= _L12 #3 - _L124;
+    _L140= _L142 #4 <= _L137;
+    _L139= _L124 #5 - _L126;
+    _L138= (1.0 #7 : 'T);
+    _L137= (- 0.5 #4 : 'T);
+    _L136= #6 if _L125 then (_L134) else (_L127);
+    _L135= _L124 #9 + _L138;
+    _L134= #10 if _L140 then (_L139) else (_L124);
+    _L133= (_L12 #8 : int32);
+    _L130= (0.0 #3 : 'T);
+    _L129= _L142 #14 >= _L128;
+    _L128= (0.5 #6 : 'T);
+    _L127= #15 if _L129 then (_L135) else (_L124);
+    _L126= (1.0 #5 : 'T);
+    _L125= _L142 #18 < _L130;
+    _L124= (_L133 #9 : 'T);
+    assume A1 : Interval #1 <> 0.0;
+  tel
+
+  node RateLimiter(Input : 'T; Rising : 'T; Falling : 'T; deltaT : 'T)
+    returns (Output : 'T last = Input)
+    where 'T float
+  var
+    _L1 : 'T;
+    _L6 : 'T;
+    _L7 : 'T;
+    _L8 : bool;
+    _L9 : 'T;
+    _L10 : 'T;
+    _L12 : bool;
+    _L13 : 'T;
+    _L14 : 'T;
+    _L38 : 'T;
+    _L40 : 'T;
+    _L41 : 'T;
+    _L42 : 'T;
+    _L48 : 'T;
+    _L49 : 'T;
+    _L50 : 'T;
+    _L52 : 'T;
+    _L53 : 'T;
+    _L54 : 'T;
+    _L55 : 'T;
+  let
+    _L1= Input;
+    Output= _L9;
+    _L6= Rising;
+    _L7= Falling;
+    _L8= _L38 #1 < _L7;
+    _L9= #2 if _L8 then (_L10) else (_L13);
+    _L12= _L38 #5 > _L6;
+    _L13= #6 if _L12 then (_L14) else (_L1);
+    _L10= _L53 #9 + _L41;
+    _L14= _L52 #10 + _L42;
+    _L38= _L49 #11 / _L54;
+    _L40= deltaT;
+    _L41= _L7 #12 * _L55;
+    _L42= _L6 #13 * _L40;
+    assume A1 : Falling #1 <= Rising;
+    _L48= last 'Output;
+    _L49= _L50 #16 - _L48;
+    _L50= Input;
+    _L52= last 'Output;
+    _L53= last 'Output;
+    _L54= deltaT;
+    _L55= deltaT;
+  tel
+
+  node Counter(Incr : 'T; Reset : bool) returns (Count : 'T) where 'T numeric
+  var
+    _L2 : 'T;
+    _L3 : bool;
+    _L4 : 'T;
+    _L9 : 'T;
+    _L18 : 'T;
+    _L47 : 'T;
+  let
+    _L2= Incr;
+    _L3= Reset;
+    Count= _L4;
+    _L4= #1 if _L3 then (_L47) else (_L18);
+    _L9= _L4 #4 + _L2;
+    _L18= #5 fby(_L9; 1; _L47);
+    _L47= (0 #1 : 'T);
+  tel
+
+  node FallingHysteresis(LL : 'T; FH_Input : 'T; UL : 'T; Init : bool)
+    returns (FH_Output : bool)
+    where 'T numeric
+  var
+    _L10 : bool;
+    _L9 : bool;
+    _L6 : bool;
+    _L5 : bool;
+    _L4 : bool;
+    _L3 : 'T;
+    _L2 : 'T;
+    _L1 : 'T;
+    _L16 : bool;
+    _L17 : bool;
+  let
+    _L10= _L2 #1 < _L3;
+    _L9= _L2 #2 <= _L1;
+    _L6= #3 pre (_L17);
+    _L5= (_L4) #4 -> (_L6);
+    _L4= Init;
+    FH_Output= _L17;
+    _L3= LL;
+    _L2= FH_Input;
+    _L1= UL;
+    _L16= _L9 #7 and _L5;
+    _L17= _L10 #8 or _L16;
+    assume A1 : LL #3 <= UL;
+  tel
+
+  node RisingHysteresis(UL : 'T; A : 'T; LL : 'T; Init : bool)
+    returns (S : bool)
+    where 'T numeric
+  var
+    _L6 : 'T;
+    _L7 : 'T;
+    _L8 : 'T;
+    _L9 : bool;
+    _L10 : bool;
+    _L11 : bool;
+    _L15 : bool;
+    _L16 : bool;
+    _L22 : bool;
+    _L24 : bool;
+  let
+    _L6= UL;
+    _L7= A;
+    _L8= LL;
+    S= _L24;
+    _L9= Init;
+    _L10= (_L9) #1 -> (_L11);
+    _L11= #4 pre (_L24);
+    _L15= _L7 #5 > _L6;
+    _L16= _L7 #6 >= _L8;
+    _L22= _L16 #7 and _L10;
+    _L24= _L15 #8 or _L22;
+    assume A1 : UL #7 >= LL;
+  tel
+
+  function #pragma kcg expand #end LimiterSymmetrical(
+      LS_Input : 'T;
+      BandOrigin : 'T;
+      Tolerance : 'T)
+    returns (LS_Output : 'T)
+    where 'T numeric
+  var
+    Upper_limit : 'T;
+    Lower_limit : 'T;
+    _L1 : bool;
+    _L10 : 'T;
+    _L2 : bool;
+    _L5 : 'T;
+    _L7 : 'T;
+    _L8 : 'T;
+    _L9 : 'T;
+  let
+    _L1= _L8 #1 >= Upper_limit;
+    _L2= _L8 #2 <= Lower_limit;
+    Lower_limit= _L9 #3 - _L10;
+    Upper_limit= _L10 #4 + _L9;
+    _L5= #5 if _L1 then (Upper_limit) else (_L7);
+    _L7= #8 if _L2 then (Lower_limit) else (_L8);
+    _L8= LS_Input;
+    LS_Output= _L5;
+    _L9= BandOrigin;
+    _L10= Tolerance;
+  tel
+
+  function PreLoadSymmetrical(PLS_Input : 'T; Offset : 'T; Slope : 'T)
+    returns (PLS_Output : 'T)
+    where 'T numeric
+  var
+    _L1 : bool;
+    _L10 : 'T;
+    _L2 : 'T;
+    _L4 : 'T;
+    _L5 : 'T;
+    _L6 : 'T;
+    _L8 : 'T;
+    _L9 : 'T;
+    _L12 : 'T;
+  let
+    _L1= _L6 #1 > _L12;
+    _L2= #2 if _L1 then (_L10) else (_L5);
+    _L4= _L8 #5 + _L2;
+    _L5= #6 - _L10;
+    _L6= PLS_Input;
+    _L8= _L6 #7 * _L9;
+    _L9= Slope;
+    _L10= Offset;
+    PLS_Output= _L4;
+    _L12= (0 #3 : 'T);
+  tel
+
+  function DeadBandUnSymmetrical(DBUS_Input : 'T; LowTol : 'T; HiTol : 'T)
+    returns (DBUS_Output : 'T)
+    where 'T numeric
+  var
+    _L10 : 'T;
+    _L8 : 'T;
+    _L7 : 'T;
+    _L5 : 'T;
+    _L3 : bool;
+    _L2 : bool;
+    _L1 : 'T;
+    _L11 : 'T;
+    _L13 : 'T;
+    _L15 : 'T;
+  let
+    _L10= DBUS_Input;
+    _L8= (0 #3 : 'T);
+    _L7= HiTol;
+    DBUS_Output= _L1;
+    _L5= #1 if _L3 then (_L13) else (_L8);
+    _L3= _L10 #4 >= _L7;
+    _L2= _L11 #5 >= _L10;
+    _L1= #6 if _L2 then (_L15) else (_L5);
+    _L11= LowTol;
+    _L13= _L10 #9 - _L7;
+    _L15= _L10 #10 - _L11;
+    assume A1 : LowTol #1 <= HiTol;
+  tel
+
+  function DeadBandSymmetrical(DBS_Input : 'T; Tolerance : 'T)
+    returns (DBS_Output : 'T)
+    where 'T numeric
+  var
+    _L26 : 'T;
+    _L25 : bool;
+    _L22 : 'T;
+    _L20 : 'T;
+    _L19 : 'T;
+    _L18 : bool;
+    _L17 : 'T;
+    _L30 : 'T;
+    _L31 : 'T;
+    _L34 : 'T;
+  let
+    _L17= #1 if _L25 then (_L20) else (_L26);
+    _L18= _L34 #4 >= _L30;
+    _L19= _L34 #5 - _L30;
+    _L20= _L30 #6 + _L34;
+    _L22= (0 #3 : 'T);
+    _L25= _L31 #7 >= _L34;
+    _L26= #8 if _L18 then (_L19) else (_L22);
+    _L30= Tolerance;
+    _L31= #11 - _L30;
+    DBS_Output= _L17;
+    _L34= DBS_Input;
+  tel
+
+  node MinReset(Input : 'T; Reset : bool; Init : 'T)
+    returns (Output : 'T)
+    where 'T numeric
+  var
+    _L24 : 'T;
+    _L23 : 'T;
+    _L22 : 'T;
+    _L21 : 'T;
+    _L20 : bool;
+    _L19 : 'T;
+  let
+    _L20= Reset;
+    _L21= Input;
+    _L22= #1 if _L20 then (_L24) else (_L23);
+    Output= _L22;
+    _L23= #1 math::Min(_L21, _L19);
+    _L24= Init;
+    _L19= #1 fby(_L22; 1; Init);
+  tel
+
+  node MaxReset(Input : 'T; Reset : bool; Init : 'T)
+    returns (Output : 'T)
+    where 'T numeric
+  var
+    _L1 : 'T;
+    _L5 : 'T;
+    _L6 : 'T;
+    _L8 : bool;
+    _L12 : 'T;
+    _L15 : 'T;
+  let
+    _L1= Input;
+    Output= _L6;
+    _L5= #1 math::Max(_L1, _L12);
+    _L6= #1 if _L8 then (_L15) else (_L5);
+    _L8= Reset;
+    _L12= #1 fby(_L6; 1; Init);
+    _L15= Init;
+  tel
+
+  node CheckSlope(Input : 'T; Max : 'T) returns (Output : bool) where 'T numeric
+  var
+    _L3 : bool;
+    _L4 : 'T;
+    _L5 : 'T;
+    _L6 : 'T;
+    _L7 : 'T;
+    _L8 : bool;
+    _L9 : 'T;
+  let
+    _L3= (true) #1 -> (_L8);
+    _L4= #1 math::Abs(_L5);
+    _L5= _L7 #1 - _L6;
+    _L6= #1 pre (_L7);
+    _L7= Input;
+    _L8= _L4 #1 < _L9;
+    _L9= Max;
+    Output= _L3;
+  tel
+
+end;
+
+
+/* xscade source: C:/Program Files/ANSYS Inc/v182/SCADE/SCADE/libraries/SC65/libpwlinear/lut.xscade */
+package lut
+  function Interp1D<<Xs>>(IdxX : { k : int32, f : 'T }; Y : 'T^Xs)
+    returns (OutY : 'T)
+    where 'T float
+  var
+    Idx : int32;
+    _L23 : 'T;
+    _L29 : int32;
+    _L28 : int32;
+    _L27 : int32;
+    _L26 : int32;
+    _L25 : 'T;
+    _L21 : 'T^Xs;
+    _L20 : 'T;
+    _L16 : 'T;
+    _L15 : 'T;
+    _L30 : int32;
+    _L31 : 'T;
+  let
+    _L23= (_L21#7 . [_L28] default (0.0 #1 : 'T));
+    _L29= 1;
+    _L28= _L29 #6 + _L27;
+    _L27= Idx;
+    _L26= Idx;
+    _L25= (_L21#5 . [_L26] default (0.0 #2 : 'T));
+    _L21= Y;
+    _L20= _L23 #4 - _L25;
+    Idx= _L30;
+    _L16= _L15 #3 + _L25;
+    OutY= _L16;
+    _L15= _L31 #2 * _L20;
+    assume A1 : 0 #1 <= Idx #1 and Idx #1 < Xs #5 - 1;
+    _L30= IdxX#1.k;
+    _L31= IdxX#2.f;
+  tel
+
+  function Interp2DFloor<<Xs, Ys>>(
+      IdxX : { k : int32, f : 'T };
+      IdxY : { k : int32, f : 'T };
+      Z : 'T^Ys^Xs)
+    returns (OutZ : 'T)
+    where 'T float
+  var
+    i : int32;
+    j : int32;
+    _L11 : 'T;
+    _L16 : 'T;
+    _L21 : 'T;
+    _L18 : 'T;
+    _L45 : 'T;
+    _L47 : 'T;
+    _L48 : 'T;
+    _L49 : 'T;
+    _L50 : 'T;
+    _L53 : bool;
+    _L54 : 'T;
+    _L56 : 'T;
+    _L55 : bool;
+    _L57 : int32;
+    _L58 : int32;
+  let
+    i= _L57;
+    j= _L58;
+    _L11= (Z#2 . [i #1 + 1][j] default (0.0 #4 : 'T));
+    _L16= (Z#1 . [i][j] default (0.0 #3 : 'T));
+    _L18= (Z#4 . [i #3 + 1][j #4 + 1] default (0.0 #6 : 'T));
+    _L21= (Z#3 . [i][j #2 + 1] default (0.0 #5 : 'T));
+    OutZ= _L48;
+    _L45= IdxX#1.f;
+    _L47= IdxY#2.f;
+    _L48= #11 if _L53 then (_L49) else (_L50);
+    _L49= #14 if _L55 then (_L16) else (_L11);
+    _L50= #17 if _L55 then (_L21) else (_L18);
+    _L54= (1.0 #2 : 'T);
+    _L56= (1.0 #1 : 'T);
+    _L53= _L47 #20 < _L54;
+    _L55= _L45 #21 < _L56;
+    assume A2 : 0 #2 <= j #2 and j #23 < Ys #2 - 1;
+    assume A1 : 0 #1 <= i #1 and i #22 < Xs #1 - 1;
+    _L57= IdxX#3.k;
+    _L58= IdxY#5.k;
+  tel
+
+  function PreLutDirect(
+      InX : 'T;
+      Orig : 'T;
+      Step : 'T;
+      NbElem : int32;
+      Extrapol : bool)
+    returns (OutIndex : { k : int32, f : 'T })
+    where 'T float
+  var
+    bLow : bool;
+    bHigh : bool;
+    F0 : 'T;
+    N : int32;
+    _L1 : 'T;
+    _L17 : bool;
+    _L45 : bool;
+    _L49 : int32;
+    _L56 : bool;
+    _L71 : int32;
+    _L75 : { k : int32, f : 'T };
+    _L87 : int32;
+    _L88 : 'T;
+    _L89 : bool;
+    _L93 : int32;
+    _L92 : 'T;
+    _L94 : { k : int32, f : 'T };
+    _L98 : { k : int32, f : 'T };
+    _L100 : { k : int32, f : 'T };
+    _L103 : 'T;
+    _L162 : { k : int32, f : 'T };
+    _L163 : { k : int32, f : 'T };
+    _L165 : 'T;
+    _L164 : 'T;
+    _L166 : 'T;
+    _L167 : 'T;
+    _L169 : 'T;
+    _L171 : int32;
+    _L173 : int32;
+    _L174 : bool;
+    _L175 : 'T;
+    _L176 : 'T;
+    _L177 : 'T;
+    _L182 : { k : int32, f : 'T };
+    _L180 : 'T;
+    _L178 : 'T;
+    _L181 : int32;
+    _L184 : int32;
+    _L185 : int32;
+    _L186 : 'T;
+    _L187 : 'T;
+    _L172 : int32;
+    _L188 : { k : int32, f : 'T };
+    _L191 : { k : int32, f : 'T };
+  let
+    _L1= InX;
+    bLow= _L17;
+    _L45= bLow;
+    _L49= (0 #28 : int32);
+    _L56= bHigh;
+    _L71= NbElem #1 - 2;
+    _L75= #5{ k:_L71, f:_L177 };
+    _L87= (0 #29 : int32);
+    _L88= (0.0 #30 : 'T);
+    _L89= Extrapol;
+    _L92= (1.0 #32 : 'T);
+    _L93= NbElem #31 - (2 #33 : int32);
+    OutIndex= _L98;
+    _L94= #6{ k:_L93, f:_L92 };
+    _L98= #11 if _L45 then (_L163) else (_L100);
+    _L100= #14 if _L56 then (_L162) else (_L182);
+    _L17= _L1 #17 <= _L103;
+    _L103= Orig;
+    _L162= #18 if _L89 then (_L75) else (_L94);
+    _L163= #21 if _L89 then (_L188) else (_L191);
+    F0= _L167;
+    _L164= InX;
+    _L165= Orig;
+    _L166= _L164 #24 - _L165;
+    _L167= _L166 #25 / _L169;
+    _L169= Step;
+    _L171= (_L167 #26 : int32);
+    N= _L171;
+    _L173= NbElem;
+    bHigh= _L174;
+    _L175= F0;
+    _L176= F0;
+    _L182= #7{ k:_L181, f:_L178 };
+    _L180= F0;
+    _L178= _L180 #29 - _L186;
+    _L181= N;
+    _L184= N;
+    _L177= _L176 #30 - _L187;
+    _L185= NbElem #2 - 2;
+    _L186= (_L184 #31 : 'T);
+    _L187= (_L185 #27 : 'T);
+    _L174= _L172 #34 > _L173;
+    _L172= N;
+    _L188= #1{ k:_L49, f:_L175 };
+    _L191= #4{ k:_L87, f:_L88 };
+  tel
+
+  function Lut1DCeil<<Xs>>(InX : 'T; X : 'T^Xs; Y : 'T^Xs)
+    returns (OutY : 'T)
+    where 'T float
+  var
+    i : int32;
+    _L191 : 'T^Xs;
+    _L190 : 'T^Xs;
+    _L189 : 'T;
+    _L186 : int32;
+    _L192 : 'T;
+    _L193 : 'T^Xs;
+    _L194 : 'T^Xs;
+    _L198 : int32;
+    _L197 : int32;
+    _L199 : int32;
+    _L200 : int32;
+  let
+    OutY= _L192;
+    _L186= 0;
+    i= ( foldi #1 SearchIdxCeil <<Xs>>)(_L186, _L191, _L194);
+    _L189= InX;
+    _L190= X;
+    _L191= (_L189)#7^Xs;
+    _L192= (_L193#3 . [_L199] default (0.0 #1 : 'T));
+    _L193= Y;
+    _L194= #1 reverse _L190;
+    _L197= _L198 #4 - i;
+    _L198= (Xs #2 : int32);
+    _L199= _L197 #5 - _L200;
+    _L200= 1;
+  tel
+
+  function Lut1DNearest<<Xs>>(InX : 'T; X : 'T^Xs; Y : 'T^Xs)
+    returns (OutY : 'T)
+    where 'T float
+  var
+    i : int32;
+    _L189 : 'T^(Xs - 2 - 0 + 1);
+    _L188 : 'T^(Xs - 1 - 1 + 1);
+    _L187 : 'T;
+    _L185 : int32;
+    _L184 : 'T^(Xs - 1);
+    _L191 : 'T^Xs;
+    _L190 : 'T;
+  let
+    _L184= (_L187)#6^(Xs - 1);
+    _L185= 0;
+    i= ( foldi #1 SearchNearest <<Xs - 1>>)(_L185, _L184, _L189, _L188);
+    _L187= InX;
+    _L188= X #1 [1 .. Xs - 1];
+    _L189= X #2 [0 .. Xs - 2];
+    OutY= _L190;
+    _L190= (_L191#1 . [i] default (0.0 #1 : 'T));
+    _L191= Y;
+  tel
+
+  function Lut2DFloor<<Xs, Ys>>(
+      InX : 'T;
+      InY : 'T;
+      X : 'T^Xs;
+      Y : 'T^Ys;
+      Z : 'T^Ys^Xs)
+    returns (OutZ : 'T)
+    where 'T float
+  var
+    i : int32;
+    j : int32;
+    _L2 : 'T;
+    _L6 : 'T;
+    _L11 : int32;
+    _L12 : int32;
+    _L14 : 'T^Xs;
+    _L15 : int32;
+    _L19 : int32;
+    _L18 : 'T^Ys;
+    _L20 : 'T;
+    _L22 : 'T^Xs;
+    _L23 : 'T^Ys;
+  let
+    _L2= InX;
+    _L6= InY;
+    OutZ= _L20;
+    _L12= 0;
+    _L18= Y;
+    _L19= 0;
+    i= _L11;
+    j= _L15;
+    _L20= (Z#1 . [i][j] default (0.0 #1 : 'T));
+    _L22= (_L2)#4^Xs;
+    _L23= (_L6)#5^Ys;
+    _L11= ( foldi #6 SearchIdxFloor <<Xs>>)(_L12, _L22, _L14);
+    _L15= ( foldi #8 SearchIdxFloor <<Ys>>)(_L19, _L23, _L18);
+    _L14= X;
+  tel
+
+  function private #pragma kcg expand #end SearchIdxFloor(
+      i : int32;
+      Acc : int32;
+      InX : 'T;
+      Xi : 'T)
+    returns (Out : int32)
+    where 'T numeric
+  var
+    _L8 : int32;
+    _L40 : 'T;
+    _L77 : bool;
+    _L84 : int32;
+    _L74 : 'T;
+    _L86 : int32;
+  let
+    _L8= Acc;
+    _L40= InX;
+    Out= _L84;
+    _L84= #1 if _L77 then (_L8) else (_L86);
+    _L74= Xi;
+    _L86= i;
+    _L77= _L40 #1 < _L74;
+  tel
+
+  function Lut2DCeil<<Xs, Ys>>(
+      InX : 'T;
+      InY : 'T;
+      X : 'T^Xs;
+      Y : 'T^Ys;
+      Z : 'T^Ys^Xs)
+    returns (OutZ : 'T)
+    where 'T float
+  var
+    i : int32;
+    j : int32;
+    _L2 : 'T;
+    _L6 : 'T;
+    _L11 : int32;
+    _L13 : int32;
+    _L14 : 'T^Xs;
+    _L15 : int32;
+    _L18 : 'T^Ys;
+    _L17 : int32;
+    _L20 : 'T;
+    _L22 : 'T^Xs;
+    _L23 : 'T^Ys;
+    _L24 : 'T^Xs;
+    _L27 : 'T^Ys;
+  let
+    _L2= InX;
+    _L6= InY;
+    OutZ= _L20;
+    _L13= 0;
+    _L14= X;
+    _L17= 0;
+    _L18= Y;
+    i= _L11;
+    j= _L15;
+    _L20= (Z#2 . [Xs #6 - i #5 - 1][Ys #8 - j #7 - 1] default (0.0 #1 : 'T));
+    _L22= (_L2)#6^Xs;
+    _L23= (_L6)#7^Ys;
+    _L11= ( foldi #8 SearchIdxCeil <<Xs>>)(_L13, _L22, _L24);
+    _L15= ( foldi #10 SearchIdxCeil <<Ys>>)(_L17, _L23, _L27);
+    _L24= #1 reverse _L14;
+    _L27= #3 reverse _L18;
+  tel
+
+  function private #pragma kcg expand #end SearchIdxCeil(
+      i : int32;
+      Acc : int32;
+      InX : 'T;
+      Xi : 'T)
+    returns (Out : int32)
+    where 'T numeric
+  var
+    _L8 : int32;
+    _L40 : 'T;
+    _L77 : bool;
+    _L84 : int32;
+    _L74 : 'T;
+    _L86 : int32;
+  let
+    _L8= Acc;
+    _L40= InX;
+    Out= _L84;
+    _L84= #1 if _L77 then (_L8) else (_L86);
+    _L74= Xi;
+    _L86= i;
+    _L77= _L40 #1 > _L74;
+  tel
+
+  function private SearchNearest(
+      i : int32;
+      Acc : int32;
+      InX : 'T;
+      Xi1 : 'T;
+      Xi2 : 'T)
+    returns (Out : int32)
+    where 'T numeric
+  var
+    _L8 : int32;
+    _L40 : 'T;
+    _L74 : 'T;
+    _L77 : bool;
+    _L84 : int32;
+    _L85 : 'T;
+    _L87 : 'T;
+    _L91 : 'T;
+    _L98 : int32;
+    _L99 : 'T;
+    _L100 : 'T;
+    _L101 : bool;
+    _L102 : int32;
+    _L103 : int32;
+    _L104 : int32;
+  let
+    _L8= Acc;
+    _L40= InX;
+    _L74= Xi1;
+    Out= _L84;
+    _L84= #1 if _L77 then (_L8) else (_L98);
+    _L85= Xi2;
+    _L87= Xi1;
+    _L91= InX;
+    _L98= #4 if _L101 then (_L102) else (_L103);
+    _L100= _L91 #7 - _L87;
+    _L99= _L85 #8 - _L91;
+    _L101= _L99 #1 > _L100;
+    _L77= _L40 #10 < _L74;
+    _L102= i;
+    _L103= _L102 #11 + _L104;
+    _L104= 1;
+  tel
+
+  function Lut2DNearest<<Xs, Ys>>(
+      InX : 'T;
+      InY : 'T;
+      X : 'T^Xs;
+      Y : 'T^Ys;
+      Z : 'T^Ys^Xs)
+    returns (OutZ : 'T)
+    where 'T float
+  var
+    i : int32;
+    j : int32;
+    _L2 : 'T;
+    _L6 : 'T;
+    _L11 : int32;
+    _L13 : int32;
+    _L14 : 'T^(Xs - 2 - 0 + 1);
+    _L15 : int32;
+    _L18 : 'T^(Ys - 1 - 1 + 1);
+    _L17 : int32;
+    _L20 : 'T;
+    _L21 : 'T^(Xs - 1 - 1 + 1);
+    _L26 : 'T^(Ys - 2 - 0 + 1);
+    _L27 : 'T^(Xs - 1);
+    _L28 : 'T^(Ys - 1);
+  let
+    _L2= InX;
+    _L6= InY;
+    OutZ= _L20;
+    _L13= 0;
+    _L14= X #1 [0 .. Xs - 2];
+    _L17= 0;
+    _L18= Y #4 [1 .. Ys - 1];
+    i= _L11;
+    j= _L15;
+    _L20= (Z#1 . [i][j] default (0.0 #1 : 'T));
+    _L21= X #2 [1 .. Xs - 1];
+    _L26= Y #3 [0 .. Ys - 2];
+    _L27= (_L2)#10^(Xs - 1);
+    _L28= (_L6)#12^(Ys - 1);
+    _L11= ( foldi #14 SearchNearest <<Xs - 1>>)(_L13, _L27, _L14, _L21);
+    _L15= ( foldi #17 SearchNearest <<Ys - 1>>)(_L17, _L28, _L26, _L18);
+  tel
+
+  function Interp1DFloor<<Xs>>(IdxX : { k : int32, f : 'T }; Y : 'T^Xs)
+    returns (OutY : 'T)
+    where 'T float
+  var
+    Idx : int32;
+    _L21 : 'T^Xs;
+    _L23 : 'T;
+    _L25 : 'T;
+    _L26 : int32;
+    _L27 : int32;
+    _L28 : int32;
+    _L29 : int32;
+    _L30 : 'T;
+    _L32 : bool;
+    _L33 : 'T;
+    _L34 : int32;
+    _L35 : 'T;
+  let
+    OutY= _L30;
+    Idx= _L34;
+    _L21= Y;
+    _L25= (_L21#2 . [_L28] default (0.0 #3 : 'T));
+    _L26= Idx;
+    _L27= Idx;
+    _L28= _L29 #3 + _L27;
+    _L29= 1;
+    _L23= (_L21#4 . [_L26] default (0.0 #2 : 'T));
+    _L30= #5 if _L32 then (_L23) else (_L25);
+    _L32= _L35 #8 < _L33;
+    _L33= (1.0 #1 : 'T);
+    assume A1 : 0 #1 <= Idx #1 and Idx #9 < Xs #1 - 1;
+    _L34= IdxX#1.k;
+    _L35= IdxX#2.f;
+  tel
+
+  function Interp2D<<Xs, Ys>>(
+      IdxX : { k : int32, f : 'T };
+      IdxY : { k : int32, f : 'T };
+      Z : 'T^Ys^Xs)
+    returns (OutZ : 'T)
+    where 'T float
+  var
+    i : int32;
+    j : int32;
+    _L11 : 'T;
+    _L12 : 'T;
+    _L13 : 'T;
+    _L14 : 'T;
+    _L16 : 'T;
+    _L21 : 'T;
+    _L18 : 'T;
+    _L41 : 'T;
+    _L40 : 'T;
+    _L39 : 'T;
+    _L44 : 'T;
+    _L43 : 'T;
+    _L42 : 'T;
+    _L45 : int32;
+    _L46 : int32;
+    _L47 : 'T;
+    _L48 : 'T;
+  let
+    i= _L45;
+    j= _L46;
+    _L11= (Z#4 . [i][j] default (0.0 #4 : 'T));
+    _L12= _L14 #4 + _L11;
+    _L14= _L47 #5 * _L13;
+    _L16= (Z#3 . [i #22 + 1][j] default (0.0 #3 : 'T));
+    _L18= (Z#2 . [i][j #21 + 1] default (0.0 #2 : 'T));
+    _L21= (Z#1 . [i #19 + 1][j #20 + 1] default (0.0 #1 : 'T));
+    OutZ= _L43;
+    _L13= _L16 #13 - _L11;
+    _L39= _L40 #14 + _L18;
+    _L40= _L47 #15 * _L41;
+    _L41= _L21 #16 - _L18;
+    _L42= _L39 #17 - _L12;
+    _L43= _L44 #18 + _L12;
+    _L44= _L48 #19 * _L42;
+    assume A1 : 0 #2 <= i #2 and i #2 < Xs #19 - 1;
+    assume A2 : 0 #4 <= j #4 and j #4 < Ys #21 - 1;
+    _L45= IdxX#1.k;
+    _L46= IdxY#5.k;
+    _L47= IdxX#3.f;
+    _L48= IdxY#4.f;
+  tel
+
+  function #pragma kcg expand #end SearchIdx(
+      i : int32;
+      AccIn : int32;
+      InX : 'T;
+      X : 'T)
+    returns (AccOut : int32)
+    where 'T numeric
+  var
+    _L1 : 'T;
+    _L2 : bool;
+    _L7 : int32;
+    _L8 : 'T;
+    _L9 : int32;
+    _L10 : int32;
+  let
+    _L1= InX;
+    _L2= _L1 #1 >= _L8;
+    _L7= i;
+    AccOut= _L9;
+    _L8= X;
+    _L9= #1 if _L2 then (_L7) else (_L10);
+    _L10= AccIn;
+  tel
+
+  function #pragma kcg expand #end Proj<<N>>(
+      Idx : int32;
+      Input1 : 'T^N;
+      DefVal : 'T)
+    returns (Output1 : 'T; Output2 : 'T)
+  var
+    _L1 : 'T^N;
+    _L2 : int32;
+    _L6 : 'T;
+    _L5 : 'T;
+    _L4 : int32;
+    _L3 : int32;
+  let
+    _L1= Input1;
+    _L2= Idx;
+    _L3= _L2 #1 + _L4;
+    _L4= 1;
+    _L5= (_L1#1 . [_L2] default DefVal);
+    _L6= (_L1#2 . [_L3] default DefVal);
+    Output1= _L5;
+    Output2= _L6;
+  tel
+
+  function #pragma kcg expand #end PreLutNoSat<<Xs>>(InX : 'T; X : 'T^Xs)
+    returns (F : 'T; Idx : int32)
+    where 'T float
+  var
+    idx : int32;
+    X2 : 'T;
+    X1 : 'T;
+    _L33 : int32;
+    _L39 : 'T^(Xs - 2 - 0 + 1);
+    _L40 : 'T^(Xs - 1);
+    _L42 : 'T;
+    _L41 : 'T;
+  let
+    idx= ( foldi #1 SearchIdx <<Xs - 1>>)(_L33, _L40, _L39);
+    Idx= idx;
+    _L33= 0;
+    _L39= X #1 [0 .. Xs - 2];
+    _L40= (InX)#1^(Xs - 1);
+    X1= _L41;
+    X2= _L42;
+    _L41= (X#3 . [Idx] default (0.0 #1 : 'T));
+    _L42= (X#4 . [Idx #2 + 1] default (0.0 #2 : 'T));
+    activate IfBlock2 if X1 #1 = X2
+      then var
+        _L4 : 'T;
+      let
+        F= _L4;
+        _L4= (0.0 #3 : 'T);
+      tel
+      else var
+        _L4 : 'T;
+      let
+        _L4= (InX #6 - X1) #1 / (X2 #7 - X1);
+        F= _L4;
+      tel
+    returns ..;
+    assume A1 : ( fold #2 $and$ <<Xs - 1>>)(true, ( map
+        #2 $<=$
+        <<Xs - 1>>)(X #4 [0 .. Xs - 2], X #5 [1 .. Xs - 1]));
+  tel
+
+  function Lut1DNoSat<<Xs>>(InX : 'T; X : 'T^Xs; Y : 'T^Xs)
+    returns (OutY : 'T)
+    where 'T float
+  var
+    Idx : int32;
+    _L16 : 'T;
+    _L24 : 'T;
+    _L25 : 'T;
+    _L26 : 'T^Xs;
+    _L27 : 'T^Xs;
+    _L28 : 'T;
+    _L29 : 'T;
+  let
+    _L25, Idx= (#1 PreLutNoSat <<Xs>>)(_L16, _L27);
+    _L16= InX;
+    _L24= #1 InterpolateLinear(_L25, _L29, _L28);
+    OutY= _L24;
+    _L26= Y;
+    _L29, _L28= (#1 Proj <<Xs>>)(Idx, _L26, (0.0 #1 : 'T));
+    _L27= X;
+  tel
+
+  function Limiter<<Xs>>(Val : 'T; Range : 'T^Xs)
+    returns (LimitedVal : 'T)
+    where 'T numeric
+  var
+    _L1 : 'T;
+    _L2 : 'T;
+    _L3 : 'T;
+    _L4 : bool;
+    _L5 : 'T;
+    _L6 : 'T;
+    _L7 : bool;
+  let
+    _L1= Val;
+    _L2= Range #1[0];
+    _L3= Range #2[Xs #1 - 1];
+    _L4= _L1 #1 < _L2;
+    _L5= #1 if _L4 then (_L2) else (_L6);
+    _L6= #2 if _L7 then (_L3) else (_L1);
+    _L7= _L1 #1 > _L3;
+    LimitedVal= _L5;
+  tel
+
+  function #pragma kcg expand #end InterpolateLinear(F : 'T; Y1 : 'T; Y2 : 'T)
+    returns (Y : 'T)
+    where 'T numeric
+  var
+    _L9 : 'T;
+    _L8 : 'T;
+    _L6 : 'T;
+    _L11 : 'T;
+    _L12 : 'T;
+    _L13 : 'T;
+  let
+    _L6= _L12 #1 - _L13;
+    Y= _L9;
+    _L8= _L11 #1 * _L6;
+    _L9= _L8 #1 + _L13;
+    _L11= F;
+    _L12= Y2;
+    _L13= Y1;
+  tel
+
+  function Lut1DFloor<<Xs>>(InX : 'T; X : 'T^Xs; Y : 'T^Xs)
+    returns (OutY : 'T)
+    where 'T float
+  var
+    i : int32;
+    _L188 : 'T^Xs;
+    _L187 : 'T^Xs;
+    _L186 : 'T^Xs;
+    _L185 : 'T;
+    _L184 : 'T;
+    _L182 : int32;
+  let
+    _L182= 0;
+    i= ( foldi #1 SearchIdxFloor <<Xs>>)(_L182, _L186, _L188);
+    _L184= InX;
+    _L185= (_L187#1 . [i] default (0.0 #1 : 'T));
+    _L186= (_L184)#6^Xs;
+    _L187= Y;
+    _L188= X;
+    OutY= _L185;
+  tel
+
+  function Lut3DNearest<<Xs, Ys, Zs>>(
+      InX : 'T;
+      InY : 'T;
+      InZ : 'T;
+      X : 'T^Xs;
+      Y : 'T^Ys;
+      Z : 'T^Zs;
+      W : 'T^Zs^Ys^Xs)
+    returns (OutW : 'T)
+    where 'T float
+  var
+    i : int32;
+    j : int32;
+    k : int32;
+    _L2 : 'T;
+    _L6 : 'T;
+    _L11 : int32;
+    _L13 : int32;
+    _L14 : 'T^(Xs - 2 - 0 + 1);
+    _L15 : int32;
+    _L18 : 'T^(Ys - 1 - 1 + 1);
+    _L17 : int32;
+    _L20 : 'T;
+    _L21 : 'T^(Xs - 1 - 1 + 1);
+    _L26 : 'T^(Ys - 2 - 0 + 1);
+    _L27 : 'T^(Xs - 1);
+    _L28 : 'T^(Ys - 1);
+    _L34 : int32;
+    _L33 : 'T^(Zs - 1 - 1 + 1);
+    _L32 : 'T^(Zs - 1);
+    _L31 : int32;
+    _L30 : 'T^(Zs - 2 - 0 + 1);
+    _L29 : 'T;
+  let
+    _L2= InX;
+    _L6= InY;
+    OutW= _L20;
+    _L13= 0;
+    _L14= X #1 [0 .. Xs - 2];
+    _L17= 0;
+    _L18= Y #2 [1 .. Ys - 1];
+    i= _L11;
+    j= _L15;
+    _L20= (W#6 . [i][j][k] default (0.0 #1 : 'T));
+    _L21= X #3 [1 .. Xs - 1];
+    _L26= Y #4 [0 .. Ys - 2];
+    _L27= (_L2)#1^(Xs - 1);
+    _L28= (_L6)#2^(Ys - 1);
+    _L11= ( foldi #1 SearchNearest <<Xs - 1>>)(_L13, _L27, _L14, _L21);
+    _L15= ( foldi #2 SearchNearest <<Ys - 1>>)(_L17, _L28, _L26, _L18);
+    _L29= InZ;
+    _L30= Z #7 [0 .. Zs - 2];
+    _L31= ( foldi #3 SearchNearest <<Zs - 1>>)(_L34, _L32, _L30, _L33);
+    _L32= (_L29)#3^(Zs - 1);
+    _L33= Z #8 [1 .. Zs - 1];
+    _L34= 0;
+    k= _L31;
+  tel
+
+  function Lut2DNoSat<<Xs, Ys>>(
+      InX : 'T;
+      InY : 'T;
+      X : 'T^Xs;
+      Y : 'T^Ys;
+      Z : 'T^Ys^Xs)
+    returns (OutZ : 'T)
+    where 'T float
+  var
+    rateY : 'T;
+    rateX : 'T;
+    idxY : int32;
+    idxX : int32;
+    _L22 : 'T;
+    _L52 : 'T;
+    _L79 : 'T;
+    _L82 : 'T;
+    _L83 : int32;
+    _L84 : 'T;
+    _L87 : 'T;
+    _L93 : int32;
+    _L94 : 'T;
+    _L95 : 'T;
+    _L96 : 'T;
+    _L97 : 'T;
+    _L98 : 'T;
+    _L99 : 'T;
+    _L101 : 'T;
+    _L100 : 'T;
+  let
+    _L94, _L93= (#1 PreLutNoSat <<Xs>>)(_L52, X);
+    _L22= #3 InterpolateLinear(_L95, _L79, _L87);
+    OutZ= _L22;
+    _L52= InX;
+    _L79= #1 InterpolateLinear(_L96, _L98, _L99);
+    _L82, _L83= (#2 PreLutNoSat <<Ys>>)(_L84, Y);
+    _L84= InY;
+    _L87= #2 InterpolateLinear(_L97, _L101, _L100);
+    rateY= _L82;
+    rateX= _L94;
+    idxX= _L93;
+    idxY= _L83;
+    _L95= rateX;
+    _L96= rateY;
+    _L97= rateY;
+    _L98= (Z#10 . [idxX][idxY] default (0.0 #3 : 'T));
+    _L99= (Z#11 . [idxX][idxY #9 + 1] default (0.0 #4 : 'T));
+    _L100= (Z#9 . [idxX #7 + 1][idxY #8 + 1] default (0.0 #2 : 'T));
+    _L101= (Z#8 . [idxX #6 + 1][idxY] default (0.0 #1 : 'T));
+  tel
+
+  function #pragma kcg expand #end Lut2D<<Xs, Ys>>(
+      InX : 'T;
+      InY : 'T;
+      X : 'T^Xs;
+      Y : 'T^Ys;
+      Z : 'T^Ys^Xs;
+      Extrapol : bool)
+    returns (OutZ : 'T)
+    where 'T float
+  var
+    Xsat : 'T;
+    Ysat : 'T;
+    _L52 : 'T;
+    _L53 : 'T;
+    _L54 : 'T;
+  let
+    activate IfBlock1 if Extrapol
+      then var
+        _L2 : 'T;
+        _L3 : 'T;
+      let
+        Xsat= _L2;
+        _L2= InX;
+        _L3= InY;
+        Ysat= _L3;
+      tel
+      else var
+        _L1 : 'T;
+        _L2 : 'T;
+        _L3 : 'T;
+        _L4 : 'T;
+      let
+        Xsat= _L2;
+        _L1= InX;
+        _L2= #1 Limiter2(_L1, X #1[0], X #2[Xs #1 - 1]);
+        _L3= #2 Limiter2(_L4, Y #3[0], Y #4[Ys #2 - 1]);
+        _L4= InY;
+        Ysat= _L3;
+      tel
+    returns ..;
+    _L52= (#1 Lut2DNoSat <<Xs, Ys>>)(_L53, _L54, X, Y, Z);
+    _L53= Xsat;
+    _L54= Ysat;
+    OutZ= _L52;
+  tel
+
+  function #pragma kcg expand #end Lut1D<<Xs>>(
+      InX : 'T;
+      X : 'T^Xs;
+      Y : 'T^Xs;
+      Extrapol : bool)
+    returns (OutY : 'T)
+    where 'T float
+  var
+    Xsat : 'T;
+    _L16 : 'T;
+    _L18 : 'T;
+  let
+    activate IfBlock1 if Extrapol
+      then var
+        _L2 : 'T;
+      let
+        Xsat= _L2;
+        _L2= InX;
+      tel
+      else var
+        _L1 : 'T;
+        _L2 : 'T;
+      let
+        Xsat= _L2;
+        _L1= InX;
+        _L2= #1 Limiter2(_L1, X #1[0], X #2[Xs #1 - 1]);
+      tel
+    returns ..;
+    _L16= (#1 Lut1DNoSat <<Xs>>)(_L18, X, Y);
+    _L18= Xsat;
+    OutY= _L16;
+  tel
+
+  function Lut3DNoSat<<Xs, Ys, Zs>>(
+      InX : 'T;
+      InY : 'T;
+      InZ : 'T;
+      X : 'T^Xs;
+      Y : 'T^Ys;
+      Z : 'T^Zs;
+      W : 'T^Zs^Ys^Xs)
+    returns (OutW : 'T)
+    where 'T float
+  var
+    rateY : 'T;
+    idxY : int32;
+    rateZ : 'T;
+    idxZ : int32;
+    rateX : 'T;
+    idxX : int32;
+    _L190 : 'T;
+    _L189 : 'T;
+    _L188 : 'T;
+    _L187 : 'T;
+    _L186 : 'T;
+    _L185 : 'T;
+    _L184 : 'T;
+    _L183 : 'T;
+    _L182 : 'T;
+    _L181 : 'T;
+    _L180 : 'T;
+    _L179 : 'T;
+    _L178 : 'T;
+    _L177 : 'T;
+    _L175 : 'T;
+    _L176 : int32;
+    _L174 : 'T;
+    _L172 : 'T;
+    _L173 : int32;
+    _L171 : 'T;
+    _L170 : 'T;
+    _L169 : 'T;
+    _L168 : 'T;
+    _L167 : 'T;
+    _L166 : 'T;
+    _L164 : 'T;
+    _L165 : int32;
+    _L163 : 'T;
+    _L162 : 'T;
+  let
+    _L162= InY;
+    rateZ= _L172;
+    _L163= #14 InterpolateLinear(_L166, _L180, _L170);
+    _L164, _L165= (#6 PreLutNoSat <<Xs>>)(_L184, X);
+    _L166= rateY;
+    _L167=
+      (W#16 . [idxX #22 + 1][idxY #23 + 1][idxZ #24 + 1] default (0.0 #8 : 'T));
+    _L168= #13 InterpolateLinear(_L187, _L185, _L171);
+    _L169= (W#14 . [idxX #18 + 1][idxY][idxZ #19 + 1] default (0.0 #6 : 'T));
+    _L170= #12 InterpolateLinear(_L181, _L190, _L167);
+    idxX= _L165;
+    _L171= (W#10 . [idxX][idxY][idxZ #13 + 1] default (0.0 #2 : 'T));
+    _L172, _L173= (#5 PreLutNoSat <<Zs>>)(_L177, Z);
+    _L174= #11 InterpolateLinear(_L187, _L189, _L188);
+    idxY= _L176;
+    _L175, _L176= (#4 PreLutNoSat <<Ys>>)(_L162, Y);
+    _L177= InZ;
+    rateX= _L164;
+    _L178= #10 InterpolateLinear(_L182, _L186, _L163);
+    _L179= rateY;
+    _L180= #9 InterpolateLinear(_L181, _L183, _L169);
+    _L181= rateZ;
+    _L182= rateX;
+    _L183= (W#13 . [idxX #17 + 1][idxY][idxZ] default (0.0 #5 : 'T));
+    _L184= InX;
+    rateY= _L175;
+    idxZ= _L173;
+    _L185= (W#9 . [idxX][idxY][idxZ] default (0.0 #1 : 'T));
+    _L186= #8 InterpolateLinear(_L179, _L168, _L174);
+    OutW= _L178;
+    _L187= rateZ;
+    _L188= (W#12 . [idxX][idxY #15 + 1][idxZ #16 + 1] default (0.0 #4 : 'T));
+    _L189= (W#11 . [idxX][idxY #14 + 1][idxZ] default (0.0 #3 : 'T));
+    _L190= (W#15 . [idxX #20 + 1][idxY #21 + 1][idxZ] default (0.0 #7 : 'T));
+  tel
+
+  function #pragma kcg expand #end Lut3D<<Xs, Ys, Zs>>(
+      InX : 'T;
+      InY : 'T;
+      InZ : 'T;
+      X : 'T^Xs;
+      Y : 'T^Ys;
+      Z : 'T^Zs;
+      W : 'T^Zs^Ys^Xs;
+      Extrapol : bool)
+    returns (OutW : 'T)
+    where 'T float
+  var
+    In1Sat : 'T;
+    In3Sat : 'T;
+    In2Sat : 'T;
+    _L89 : 'T;
+    _L90 : 'T;
+    _L91 : 'T;
+    _L92 : 'T;
+  let
+    activate IfBlock1 if Extrapol
+      then var
+        _L1 : 'T;
+        _L2 : 'T;
+        _L3 : 'T;
+      let
+        _L1= InX;
+        _L2= InY;
+        _L3= InZ;
+        In1Sat= _L1;
+        In2Sat= _L2;
+        In3Sat= _L3;
+      tel
+      else var
+        _L1 : 'T;
+        _L2 : 'T;
+        _L3 : 'T;
+        _L4 : 'T;
+        _L5 : 'T;
+        _L6 : 'T;
+      let
+        _L1= InX;
+        _L2= InY;
+        _L3= InZ;
+        In1Sat= _L4;
+        In2Sat= _L5;
+        In3Sat= _L6;
+        _L4= #1 Limiter2(_L1, X #1[0], X #2[Xs #1 - 1]);
+        _L5= #2 Limiter2(_L2, Y #3[0], Y #4[Ys #2 - 1]);
+        _L6= #3 Limiter2(_L3, Z #5[0], Z #6[Zs #3 - 1]);
+      tel
+    returns ..;
+    _L89= (#1 Lut3DNoSat <<Xs, Ys, Zs>>)(_L90, _L91, _L92, X, Y, Z, W);
+    _L90= In1Sat;
+    _L91= In2Sat;
+    _L92= In3Sat;
+    OutW= _L89;
+  tel
+
+  function #pragma kcg expand #end PreLut<<Xs>>(
+      InX : 'T;
+      X : 'T^Xs;
+      Extrapol : bool)
+    returns (Out : { k : int32, f : 'T })
+    where 'T float
+  var
+    Xsat : 'T;
+    _L44 : int32;
+    _L43 : 'T;
+    _L45 : 'T;
+    _L52 : { k : int32, f : 'T };
+  let
+    activate IfBlock1 if Extrapol
+      then var
+        _L7 : 'T;
+      let
+        Xsat= _L7;
+        _L7= InX;
+      tel
+      else var
+        _L5 : 'T;
+        _L6 : 'T;
+      let
+        _L5= InX;
+        Xsat= _L6;
+        _L6= #1 Limiter2(_L5, X #1[0], X #2[Xs #1 - 1]);
+      tel
+    returns ..;
+    _L43, _L44= (#1 PreLutNoSat <<Xs>>)(_L45, X);
+    _L45= Xsat;
+    Out= _L52;
+    _L52= #2{ k:_L44, f:_L43 };
+  tel
+
+  function private Limiter2(Val : 'T; Low : 'T; High : 'T)
+    returns (LimitedVal : 'T)
+    where 'T numeric
+  var
+    _L1 : 'T;
+    _L2 : 'T;
+    _L3 : 'T;
+    _L4 : bool;
+    _L5 : 'T;
+    _L6 : 'T;
+    _L7 : bool;
+  let
+    _L1= Val;
+    _L2= Low;
+    _L3= High;
+    _L4= _L1 #1 < _L2;
+    _L5= #1 if _L4 then (_L2) else (_L6);
+    _L6= #2 if _L7 then (_L3) else (_L1);
+    _L7= _L1 #1 > _L3;
+    LimitedVal= _L5;
+  tel
+
+end;
+
+
+/* xscade source: C:/Program Files/ANSYS Inc/v182/SCADE/SCADE/libraries/SC65/libverif/libverif.xscade */
+package verif
+  node AlwaysAfterFirstCond(Input1 : bool; Cond : bool) returns (Output1 : bool)
+  var
+    _L1 : bool;
+    _L2 : bool;
+    _L3 : bool;
+    _L4 : bool;
+  let
+    _L1= Cond;
+    _L2= Input1;
+    Output1= _L4;
+    _L3= #1 HasNeverBeenTrue(_L1);
+    _L4= _L3 #2 or _L2;
+  tel
+
+  node #pragma kcg expand #end HasNeverBeenTrue(Input1 : bool)
+    returns (Output1 : bool)
+  var
+    _L1 : bool;
+    _L2 : bool;
+    _L3 : bool;
+    _L4 : bool;
+    _L5 : bool;
+  let
+    _L1= Input1;
+    Output1= _L2;
+    _L2= (_L4) #1 -> (_L5);
+    _L3= #4 pre (_L2);
+    _L4= #5 not _L1;
+    _L5= _L4 #6 and _L3;
+  tel
+
+  function #pragma kcg expand #end Implies(A : bool; B : bool)
+    returns (C : bool)
+  var
+    _L1 : bool;
+    _L2 : bool;
+    _L3 : bool;
+    _L4 : bool;
+  let
+    _L1= A;
+    _L2= B;
+    C= _L3;
+    _L3= _L4 #1 or _L2;
+    _L4= #2 not _L1;
+  tel
+
+  node AtLeastNTicks(Input1 : bool; N : int32) returns (Output1 : bool)
+  var
+    cnt : int32;
+    _L1 : bool;
+    _L2 : int32;
+    _L3 : int32;
+    _L5 : int32;
+    _L6 : int32;
+    _L7 : int32;
+    _L8 : int32;
+    _L10 : int32;
+    _L11 : int32;
+    _L22 : int32;
+    _L23 : int32;
+    _L24 : bool;
+    _L25 : bool;
+    _L32 : bool;
+    _L33 : int32;
+  let
+    _L1= Input1;
+    _L2= N;
+    Output1= _L25;
+    _L3= _L10 #1 + _L6;
+    _L5= cnt;
+    _L6= (_L8) #2 -> (_L7);
+    _L7= #5 pre (_L5);
+    _L8= 0;
+    _L10= 1;
+    _L11= #6 if _L1 then (_L3) else (_L8);
+    cnt= _L33;
+    _L22= N;
+    _L23= cnt;
+    _L24= _L23 #9 >= _L22;
+    _L25= _L24 #10 and _L1;
+    _L32= _L11 #11 < _L2;
+    _L33= #12 if _L32 then (_L11) else (_L2);
+  tel
+
+  node ImpliesWithinNTick(Input1 : bool; Input2 : bool; N : int32)
+    returns (Output1 : bool)
+  var
+    _L5 : bool;
+    _L4 : bool;
+    _L2 : bool;
+    _L1 : bool;
+  let
+    _L5= #1 Implies(_L4, _L1);
+    _L4= #2 AtLeastNTicks(_L2, N);
+    Output1= _L5;
+    _L2= Input1;
+    _L1= Input2;
+  tel
+
+  node AfterNthTick<<N>>(Input1 : bool) returns (Output1 : bool)
+  var
+    _L6 : bool;
+    _L5 : bool;
+    _L4 : bool;
+    _L3 : bool;
+    _L2 : bool;
+    _L1 : bool;
+  let
+    _L6= false;
+    _L5= true;
+    _L4= true;
+    _L3= #1 if _L2 then (_L1) else (_L4);
+    _L2= #4 fby(_L5; N; _L6);
+    Output1= _L3;
+    _L1= Input1;
+  tel
+
+end;
+
+/* $********** SCADE Suite KCG 32-bit 6.6 (build i19) ***********
+** -
+** Generation date: 2018-01-18T13:27:06
+*************************************************************$ */

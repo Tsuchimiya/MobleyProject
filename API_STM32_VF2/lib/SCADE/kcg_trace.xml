@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+  <Model commandLine="" date="">
+    <Option name="use_types" value="#off#"/>
+    <Option name="imported_root_package" value="#off#"/>
+    <Option name="root_package" value="#off#"/>
+    <Option name="xml_basename" value="kcg_xml_filter_out.scade"/>
+    <Option name="state_vector" value="#off#"/>
+    <Option name="static" value="#off#"/>
+    <Option name="separate_io_all" value="#off#"/>
+    <Option name="no_separate_io" value="#off#"/>
+    <Option name="separate_io" value="#off#"/>
+    <Option name="warn_error" value="#off#"/>
+    <Option name="short_circuit" value="#off#"/>
+    <Option name="wrap_c_ops" value="#off#"/>
+    <Option name="input_file" value="C:/Program Files/ANSYS Inc/v182/SCADE/SCADE/libraries/SC65/libverif/libverif.xscade"/>
+    <Option name="input_file" value="C:/Program Files/ANSYS Inc/v182/SCADE/SCADE/libraries/SC65/libpwlinear/lut.xscade"/>
+    <Option name="input_file" value="C:/Program Files/ANSYS Inc/v182/SCADE/SCADE/libraries/SC65/libpwlinear/pwlinear.xscade"/>
+    <Option name="input_file" value="C:/Program Files/ANSYS Inc/v182/SCADE/SCADE/libraries/SC65/libmathext/mathext.xscade"/>
+    <Option name="input_file" value="C:/Program Files/ANSYS Inc/v182/SCADE/SCADE/libraries/SC65/libmath/math.xscade"/>
+    <Option name="input_file" value="C:/Program Files/ANSYS Inc/v182/SCADE/SCADE/libraries/SC65/libmath/vect.xscade"/>
+    <Option name="input_file" value="C:/Program Files/ANSYS Inc/v182/SCADE/SCADE/libraries/SC65/liblinear/filters.xscade"/>
+    <Option name="input_file" value="C:/Program Files/ANSYS Inc/v182/SCADE/SCADE/libraries/SC65/liblinear/linear.xscade"/>
+    <Option name="input_file" value="C:/Program Files/ANSYS Inc/v182/SCADE/SCADE/libraries/SC65/libdigital/TruthTables.xscade"/>
+    <Option name="input_file" value="C:/Program Files/ANSYS Inc/v182/SCADE/SCADE/libraries/SC65/libdigital/digital.xscade"/>
+    <Option name="input_file" value="U:/5A/Prog_synchrone/GeoCar_US/GeoCar_US.xscade"/>
+    <Option name="input_file" value="U:/5A/Prog_synchrone/GeoCar_US/Operator2.xscade"/>
+    <Option name="input_file" value="U:/5A/Prog_synchrone/TD1/Operator1.xscade"/>
+    <Option name="probes" value="#off#"/>
+    <Option name="debug" value="#off#"/>
+    <Option name="no_observe" value="#off#"/>
+    <Option name="observe" value="#off#"/>
+    <Option name="user_config" value="./user_macros.h"/>
+    <Option name="input_threshold" value="#off#"/>
+    <Option name="header" value="#off#"/>
+    <Option name="significance_length" value="31"/>
+    <Option name="name_length" value="200"/>
+    <Option name="globals_prefix" value="#off#"/>
+    <Option name="keep_asserts" value="#off#"/>
+    <Option name="global_root_context" value="#off#"/>
+    <Option name="expall" value="#off#"/>
+    <Option name="noexp" value="#off#"/>
+    <Option name="exp" value="#off#"/>
+    <Option name="target_dir" value="U:/5A/Prog_synchrone/GeoCar_US/KCG"/>
+    <Option name="target" value="C"/>
+    <Option name="root" value="US_handler"/>
+    <Option name="auth" value="#off#"/>
+    <NoExpNode headerFile="checkThreshold.h" scadeName="checkThreshold" targetCycleFct="checkThreshold">
+      <Input scadeName="Sensor_value" scadeType="float64" targetName="Sensor_value" targetType="kcg_float64"/>
+      <Input scadeName="Threshold" scadeType="float64" targetName="Threshold" targetType="kcg_float64"/>
+      <Output scadeName="Alarm" scadeType="bool" targetName="Alarm" targetType="kcg_bool"/>
+    </NoExpNode>
+    <RootNode headerFile="US_handler.h" scadeName="US_handler" targetCycleFct="US_handler" targetInitFct="US_handler_reset" targetInitializationFct="US_handler_init">
+      <Input inCtx="true" scadeName="Left_Sensor" scadeType="float64" targetName="Left_Sensor" targetType="kcg_float64"/>
+      <Input inCtx="true" scadeName="Middle_Sensor" scadeType="float64" targetName="Middle_Sensor" targetType="kcg_float64"/>
+      <Input inCtx="true" scadeName="Right_Sensor" scadeType="float64" targetName="Right_Sensor" targetType="kcg_float64"/>
+      <Output inCtx="true" scadeName="Emergency_stop" scadeType="bool" targetName="Emergency_stop" targetType="kcg_bool"/>
+      <NodeInstance instName="3" refName="checkThreshold" scadeName="checkThreshold"/>
+      <NodeInstance instName="4" refName="checkThreshold" scadeName="checkThreshold"/>
+      <NodeInstance instName="5" refName="checkThreshold" scadeName="checkThreshold"/>
+      <Automaton scadeName="Emergency_stop_SM" targetStatesType="SSM_ST_Emergency_stop_SM" targetTransitionsType="SSM_TR_Emergency_stop_SM">
+        <State scadeName="IDLE" targetName="SSM_st_IDLE_Emergency_stop_SM">
+          <Fork priority="1">
+            <Condition/>
+            <Transition kind="strong" scadeDest="WaitForConfirmation" targetName="SSM_TR_IDLE_WaitForConfirmation_1_IDLE_Emergency_stop_SM"/>
+          </Fork>
+        </State>
+        <State scadeName="Stop" targetName="SSM_st_Stop_Emergency_stop_SM">
+          <Fork priority="1">
+            <Condition/>
+            <Transition kind="strong" scadeDest="IDLE" targetName="SSM_TR_Stop_IDLE_1_Stop_Emergency_stop_SM"/>
+          </Fork>
+        </State>
+        <State scadeName="WaitForConfirmation" targetName="SSM_st_WaitForConfirmation_Emergency_stop_SM">
+          <Fork priority="1">
+            <Condition/>
+            <Transition kind="strong" scadeDest="IDLE" targetName="SSM_TR_WaitForConfirmation_IDLE_1_WaitForConfirmation_Emergency_stop_SM"/>
+          </Fork>
+          <Fork priority="2">
+            <Condition/>
+            <Action>
+              <Times instName="3">
+                <Init inCtx="true" targetName="init" targetType="kcg_bool"/>
+                <Memory inCtx="true" targetName="v3_times_3_size" targetType="kcg_size"/>
+              </Times>
+            </Action>
+            <Transition kind="strong" scadeDest="Stop" targetName="SSM_TR_WaitForConfirmation_Stop_2_WaitForConfirmation_Emergency_stop_SM"/>
+          </Fork>
+        </State>
+        <NextState inCtx="true" mem="true" targetName="Emergency_stop_SM_state_nxt"/>
+        <ResetActiveState inCtx="true" mem="true" targetName="Emergency_stop_SM_reset_act"/>
+      </Automaton>
+      <Init inCtx="true" targetName="init" targetType="kcg_bool"/>
+      <Memory inCtx="true" targetName="v3_times_3_size" targetType="kcg_size"/>
+      <OutCtxType targetName="outC_US_handler"/>
+      <InCtxType targetName="inC_US_handler"/>
+    </RootNode>
+    <Constant macroDef="true" scadeName="NbCyclesConfirmation" scadeType="int16" targetName="NbCyclesConfirmation" targetType="kcg_int16"/>
+    <Package scadeName="digital"/>
+    <Package scadeName="truthtables">
+      <EnumType scadeName="TruthTableValues" targetName="TruthTableValues_truthtables">
+        <EnumVal scadeName="T" targetName="T_truthtables"/>
+        <EnumVal scadeName="F" targetName="F_truthtables"/>
+        <EnumVal scadeName="X" targetName="X_truthtables"/>
+      </EnumType>
+    </Package>
+    <Package scadeName="linear"/>
+    <Package scadeName="filters"/>
+    <Package scadeName="vect"/>
+    <Package scadeName="math"/>
+    <Package scadeName="mathext">
+      <Package scadeName="mathextimpl"/>
+    </Package>
+    <Package scadeName="pwlinear"/>
+    <Package scadeName="lut"/>
+    <Package scadeName="verif"/>
+    <PredefType scadeName="int8" targetName="kcg_int8"/>
+    <PredefType scadeName="int16" targetName="kcg_int16"/>
+    <PredefType scadeName="int32" targetName="kcg_int32"/>
+    <PredefType scadeName="int64" targetName="kcg_int64"/>
+    <PredefType scadeName="uint8" targetName="kcg_uint8"/>
+    <PredefType scadeName="uint16" targetName="kcg_uint16"/>
+    <PredefType scadeName="uint32" targetName="kcg_uint32"/>
+    <PredefType scadeName="uint64" targetName="kcg_uint64"/>
+    <PredefType scadeName="size" targetName="kcg_size"/>
+    <PredefType scadeName="float32" targetName="kcg_float32"/>
+    <PredefType scadeName="float64" targetName="kcg_float64"/>
+    <PredefType scadeName="bool" targetName="kcg_bool"/>
+    <PredefType scadeName="char" targetName="kcg_char"/>
+  </Model>
