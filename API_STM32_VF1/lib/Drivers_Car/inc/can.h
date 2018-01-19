@@ -40,7 +40,7 @@
 #define ID_MOTOR_PROP								0x003
 #define ID_MOTOR_DIR								0x001
 #define ID_MOTOR_ENABLE							0x002
-#define ID_BATTERY									0x07
+#define ID_BATTERY									0x007
 
 
 #include "stm32f10x.h"

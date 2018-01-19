@@ -75,7 +75,6 @@ void SysTick_Callback(void) {
 					pDataITF_STM->motor_current_R=ADC_QuickGet(MOTORS_ADC, REAR_MOTOR_R_CURRENT_RANK);
 					pDataITF_STM->motor_current_F=ADC_QuickGet(MOTORS_ADC, FRONT_MOTOR_CURRENT_RANK);
 					CAN_Send_Current();
-					CAN_Send_Rear_US();
 					pDataITF_STM->battery_level =  Battery_get();
 					pDataITF_STM->steering_stop_sensor_L = Direction_get();
 				}
