@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+  <Model commandLine="" date="">
+    <Option name="use_types" value="#off#"/>
+    <Option name="imported_root_package" value="#off#"/>
+    <Option name="root_package" value="#off#"/>
+    <Option name="xml_basename" value="kcg_xml_filter_out.scade"/>
+    <Option name="state_vector" value="#off#"/>
+    <Option name="static" value="#off#"/>
+    <Option name="separate_io_all" value="#off#"/>
+    <Option name="no_separate_io" value="#off#"/>
+    <Option name="separate_io" value="#off#"/>
+    <Option name="warn_error" value="#off#"/>
+    <Option name="short_circuit" value="#off#"/>
+    <Option name="wrap_c_ops" value="#off#"/>
+    <Option name="input_file" value="U:/5A/Prog_synchrone/GeoCar_US/Simulation/scade_model_without_unused.scade"/>
+    <Option name="probes" value="#on#"/>
+    <Option name="no_observe" value="#off#"/>
+    <Option name="observe" value="#off#"/>
+    <Option name="debug" value="#on#"/>
+    <Option name="user_config" value="./user_macros.h"/>
+    <Option name="input_threshold" value="#off#"/>
+    <Option name="header" value="#off#"/>
+    <Option name="significance_length" value="31"/>
+    <Option name="name_length" value="200"/>
+    <Option name="globals_prefix" value="#off#"/>
+    <Option name="keep_asserts" value="#off#"/>
+    <Option name="global_root_context" value="#off#"/>
+    <Option name="expall" value="#off#"/>
+    <Option name="noexp" value="#off#"/>
+    <Option name="exp" value="#off#"/>
+    <Option name="target_dir" value="U:/5A/Prog_synchrone/GeoCar_US/Simulation"/>
+    <Option name="target" value="C"/>
+    <Option name="root" value="US_handler"/>
+    <Option name="auth" value="#off#"/>
+    <Constant macroDef="true" scadeName="NbCyclesConfirmation" scadeType="int16" targetName="NbCyclesConfirmation" targetType="kcg_int16"/>
+    <RootNode headerFile="US_handler.h" scadeName="US_handler" targetCycleFct="US_handler" targetInitFct="US_handler_reset" targetInitializationFct="US_handler_init">
+      <Input inCtx="true" scadeName="US_FL" scadeType="float64" targetName="US_FL" targetType="kcg_float64"/>
+      <Input inCtx="true" scadeName="US_FM" scadeType="float64" targetName="US_FM" targetType="kcg_float64"/>
+      <Input inCtx="true" scadeName="US_FR" scadeType="float64" targetName="US_FR" targetType="kcg_float64"/>
+      <Output inCtx="true" scadeName="Emergency_stop" scadeType="bool" targetName="Emergency_stop" targetType="kcg_bool"/>
+      <Local inCtx="true" scadeName="Obstacle_L" scadeType="bool" targetName="Obstacle_L" targetType="kcg_bool"/>
+      <Local inCtx="true" scadeName="Obstacle_M" scadeType="bool" targetName="Obstacle_M" targetType="kcg_bool"/>
+      <Local inCtx="true" scadeName="Obstacle_R" scadeType="bool" targetName="Obstacle_R" targetType="kcg_bool"/>
+      <Local inCtx="true" scadeName="_L1" scadeType="bool" targetName="_L1" targetType="kcg_bool"/>
+      <Local inCtx="true" scadeName="_L2" scadeType="bool" targetName="_L2" targetType="kcg_bool"/>
+      <Local inCtx="true" scadeName="_L3" scadeType="bool" targetName="_L3" targetType="kcg_bool"/>
+      <Local inCtx="true" scadeName="_L4" scadeType="float64" targetName="_L4" targetType="kcg_float64"/>
+      <Local inCtx="true" scadeName="_L5" scadeType="float64" targetName="_L5" targetType="kcg_float64"/>
+      <Local inCtx="true" scadeName="_L6" scadeType="float64" targetName="_L6" targetType="kcg_float64"/>
+      <Local inCtx="true" scadeName="_L7" scadeType="float64" targetName="_L7" targetType="kcg_float64"/>
+      <Local inCtx="true" scadeName="_L8" scadeType="float64" targetName="_L8" targetType="kcg_float64"/>
+      <Local inCtx="true" scadeName="_L9" scadeType="float64" targetName="_L9" targetType="kcg_float64"/>
+      <Local inCtx="true" scadeName="_L14" scadeType="bool" targetName="_L14" targetType="kcg_bool"/>
+      <Local inCtx="true" scadeName="_L15" scadeType="bool" targetName="_L15" targetType="kcg_bool"/>
+      <Local inCtx="true" scadeName="_L16" scadeType="bool" targetName="_L16" targetType="kcg_bool"/>
+      <NodeInstance instName="3" refName="checkThreshold" scadeName="checkThreshold">
+        <OutCtxVar targetName="Context_checkThreshold_3"/>
+      </NodeInstance>
+      <NodeInstance instName="4" refName="checkThreshold" scadeName="checkThreshold">
+        <OutCtxVar targetName="Context_checkThreshold_4"/>
+      </NodeInstance>
+      <NodeInstance instName="5" refName="checkThreshold" scadeName="checkThreshold">
+        <OutCtxVar targetName="Context_checkThreshold_5"/>
+      </NodeInstance>
+      <Automaton scadeName="Emergency_stop_SM" targetStatesType="SSM_ST_Emergency_stop_SM" targetTransitionsType="SSM_TR_Emergency_stop_SM">
+        <State scadeName="IDLE" targetName="SSM_st_IDLE_Emergency_stop_SM">
+          <Local clockVal="SSM_st_IDLE_Emergency_stop_SM" clockVar="Emergency_stop_SM_state_act" inCtx="true" scadeName="_L1" scadeType="bool" targetName="_L1_IDLE_Emergency_stop_SM" targetType="kcg_bool"/>
+          <Fork priority="1">
+            <Condition/>
+            <Transition kind="strong" scadeDest="WaitForConfirmation" targetName="SSM_TR_IDLE_WaitForConfirmation_1_IDLE_Emergency_stop_SM"/>
+          </Fork>
+        </State>
+        <State scadeName="Stop" targetName="SSM_st_Stop_Emergency_stop_SM">
+          <Local clockVal="SSM_st_Stop_Emergency_stop_SM" clockVar="Emergency_stop_SM_state_act" inCtx="true" scadeName="_L1" scadeType="bool" targetName="_L1_Stop_Emergency_stop_SM" targetType="kcg_bool"/>
+          <Fork priority="1">
+            <Condition/>
+            <Transition kind="strong" scadeDest="IDLE" targetName="SSM_TR_Stop_IDLE_1_Stop_Emergency_stop_SM"/>
+          </Fork>
+        </State>
+        <State scadeName="WaitForConfirmation" targetName="SSM_st_WaitForConfirmation_Emergency_stop_SM">
+          <Local clockVal="SSM_st_WaitForConfirmation_Emergency_stop_SM" clockVar="Emergency_stop_SM_state_act" inCtx="true" scadeName="_L2" scadeType="bool" targetName="_L2_WaitForConfirmation_Emergency_stop_SM" targetType="kcg_bool"/>
+          <Fork priority="1">
+            <Condition/>
+            <Transition kind="strong" scadeDest="IDLE" targetName="SSM_TR_WaitForConfirmation_IDLE_1_WaitForConfirmation_Emergency_stop_SM"/>
+          </Fork>
+          <Fork priority="2">
+            <Condition/>
+            <Action>
+              <Times instName="3">
+                <Init inCtx="true" targetName="init" targetType="kcg_bool"/>
+                <Memory inCtx="true" targetName="v3_times_3_size" targetType="kcg_size"/>
+              </Times>
+            </Action>
+            <Transition kind="strong" scadeDest="Stop" targetName="SSM_TR_WaitForConfirmation_Stop_2_WaitForConfirmation_Emergency_stop_SM"/>
+          </Fork>
+        </State>
+        <ActiveState inCtx="true" targetName="Emergency_stop_SM_state_act"/>
+        <SelectedState inCtx="true" targetName="Emergency_stop_SM_state_sel"/>
+        <NextState inCtx="true" mem="true" targetName="Emergency_stop_SM_state_nxt"/>
+        <ResetActiveState inCtx="true" mem="true" targetName="Emergency_stop_SM_reset_act"/>
+        <ResetNextState inCtx="true" mem="true" targetName="Emergency_stop_SM_reset_nxt"/>
+        <StrongTransition inCtx="true" targetName="Emergency_stop_SM_fired_strong"/>
+        <WeakTransition inCtx="true" targetName="Emergency_stop_SM_fired"/>
+      </Automaton>
+      <Init inCtx="true" targetName="init" targetType="kcg_bool"/>
+      <Memory inCtx="true" targetName="v3_times_3_size" targetType="kcg_size"/>
+      <Clock inCtx="true" targetName="Emergency_stop_SM_state_sel" targetType="SSM_ST_Emergency_stop_SM"/>
+      <Clock inCtx="true" targetName="Emergency_stop_SM_state_act" targetType="SSM_ST_Emergency_stop_SM"/>
+      <OutCtxType targetName="outC_US_handler"/>
+      <InCtxType targetName="inC_US_handler"/>
+    </RootNode>
+    <NoExpNode headerFile="checkThreshold.h" scadeName="checkThreshold" targetCycleFct="checkThreshold" targetInitFct="checkThreshold_reset" targetInitializationFct="checkThreshold_init">
+      <Input scadeName="Sensor_value" scadeType="float64" targetName="Sensor_value" targetType="kcg_float64"/>
+      <Input scadeName="Threshold" scadeType="float64" targetName="Threshold" targetType="kcg_float64"/>
+      <Output inCtx="true" scadeName="Alarm" scadeType="bool" targetName="Alarm" targetType="kcg_bool"/>
+      <Local inCtx="true" scadeName="_L1" scadeType="bool" targetName="_L1" targetType="kcg_bool"/>
+      <Local inCtx="true" scadeName="_L2" scadeType="float64" targetName="_L2" targetType="kcg_float64"/>
+      <Local inCtx="true" scadeName="_L3" scadeType="float64" targetName="_L3" targetType="kcg_float64"/>
+      <OutCtxType targetName="outC_checkThreshold"/>
+    </NoExpNode>
+    <PredefType scadeName="int8" targetName="kcg_int8"/>
+    <PredefType scadeName="int16" targetName="kcg_int16"/>
+    <PredefType scadeName="int32" targetName="kcg_int32"/>
+    <PredefType scadeName="int64" targetName="kcg_int64"/>
+    <PredefType scadeName="uint8" targetName="kcg_uint8"/>
+    <PredefType scadeName="uint16" targetName="kcg_uint16"/>
+    <PredefType scadeName="uint32" targetName="kcg_uint32"/>
+    <PredefType scadeName="uint64" targetName="kcg_uint64"/>
+    <PredefType scadeName="size" targetName="kcg_size"/>
+    <PredefType scadeName="float32" targetName="kcg_float32"/>
+    <PredefType scadeName="float64" targetName="kcg_float64"/>
+    <PredefType scadeName="bool" targetName="kcg_bool"/>
+    <PredefType scadeName="char" targetName="kcg_char"/>
+  </Model>

@@ -1,0 +1,366 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--$********** SCADE Suite KCG 32-bit 6.6 (build i19) ***********
+** Command: kcg66.exe -config U:/5A/Prog_synchrone/GeoCar_US/Simulation/config.txt
+** Generation date: 2018-01-18T09:58:59
+*************************************************************$-->
+<mapping>
+  <config>
+    <option name="use_types" value="#off#"/>
+    <option name="imported_root_package" value="#off#"/>
+    <option name="root_package" value="#off#"/>
+    <option name="xml_basename" value="kcg_xml_filter_out.scade"/>
+    <option name="state_vector" value="#off#"/>
+    <option name="static" value="#off#"/>
+    <option name="separate_io_all" value="#off#"/>
+    <option name="no_separate_io" value="#off#"/>
+    <option name="separate_io" value="#off#"/>
+    <option name="warn_error" value="#off#"/>
+    <option name="short_circuit" value="#off#"/>
+    <option name="wrap_c_ops" value="#off#"/>
+    <option name="input_file" value="U:/5A/Prog_synchrone/GeoCar_US/Simulation/scade_model_without_unused.scade"/>
+    <option name="probes" value="#on#"/>
+    <option name="no_observe" value="#off#"/>
+    <option name="observe" value="#off#"/>
+    <option name="debug" value="#on#"/>
+    <option name="user_config" value="./user_macros.h"/>
+    <option name="input_threshold" value="#off#"/>
+    <option name="header" value="#off#"/>
+    <option name="significance_length" value="31"/>
+    <option name="name_length" value="200"/>
+    <option name="globals_prefix" value="#off#"/>
+    <option name="keep_asserts" value="#off#"/>
+    <option name="global_root_context" value="#off#"/>
+    <option name="expall" value="#off#"/>
+    <option name="noexp" value="#off#"/>
+    <option name="exp" value="#off#"/>
+    <option name="target_dir" value="U:/5A/Prog_synchrone/GeoCar_US/Simulation"/>
+    <option name="target" value="C"/>
+    <option name="root" value="US_handler"/>
+    <option name="auth" value="#off#"/>
+  </config>
+  <model>
+    <predefType id="1" name="bool"/>
+    <predefType id="2" name="char"/>
+    <predefType id="3" name="int8"/>
+    <predefType id="4" name="int16"/>
+    <predefType id="5" name="int32"/>
+    <predefType id="6" name="int64"/>
+    <predefType id="7" name="uint8"/>
+    <predefType id="8" name="uint16"/>
+    <predefType id="9" name="uint32"/>
+    <predefType id="10" name="uint64"/>
+    <predefType id="11" name="float32"/>
+    <predefType id="12" name="float64"/>
+    <predefType id="13" name="size"/>
+    <constant id="14" name="NbCyclesConfirmation" imported="false" type="4"/>
+    <operator id="15" name="US_handler" imported="false" root="true" expanded="false">
+      <input id="16" name="US_FL" clock="false" type="12"/>
+      <input id="17" name="US_FM" clock="false" type="12"/>
+      <input id="18" name="US_FR" clock="false" type="12"/>
+      <output id="19" name="Emergency_stop" clock="false" type="1"/>
+      <local id="20" name="Obstacle_L" clock="false" type="1"/>
+      <local id="21" name="Obstacle_M" clock="false" type="1"/>
+      <local id="22" name="Obstacle_R" clock="false" type="1"/>
+      <local id="23" name="_L1" clock="false" type="1"/>
+      <local id="24" name="_L2" clock="false" type="1"/>
+      <local id="25" name="_L3" clock="false" type="1"/>
+      <local id="26" name="_L4" clock="false" type="12"/>
+      <local id="27" name="_L5" clock="false" type="12"/>
+      <local id="28" name="_L6" clock="false" type="12"/>
+      <local id="29" name="_L7" clock="false" type="12"/>
+      <local id="30" name="_L8" clock="false" type="12"/>
+      <local id="31" name="_L9" clock="false" type="12"/>
+      <local id="32" name="_L14" clock="false" type="1"/>
+      <local id="33" name="_L15" clock="false" type="1"/>
+      <local id="34" name="_L16" clock="false" type="1"/>
+      <instance id="35" name="3" op="54" expanded="false"/>
+      <instance id="36" name="4" op="54" expanded="false"/>
+      <instance id="37" name="5" op="54" expanded="false"/>
+      <automaton id="38" name="Emergency_stop_SM">
+        <state id="39" name="IDLE" initial="true" final="false" default="false">
+          <local id="40" name="_L1" clock="false" type="1"/>
+          <fork id="41" name="1" kind="strong">
+            <transition id="42" dest="47"/>
+          </fork>
+        </state>
+        <state id="43" name="Stop" initial="false" final="false" default="false">
+          <local id="44" name="_L1" clock="false" type="1"/>
+          <fork id="45" name="1" kind="strong">
+            <transition id="46" dest="39"/>
+          </fork>
+        </state>
+        <state id="47" name="WaitForConfirmation" initial="false" final="false" default="false">
+          <local id="48" name="_L2" clock="false" type="1"/>
+          <fork id="49" name="1" kind="strong">
+            <transition id="50" dest="39"/>
+          </fork>
+          <fork id="51" name="2" kind="strong">
+            <times id="52" name="3"/>
+            <transition id="53" dest="43"/>
+          </fork>
+        </state>
+      </automaton>
+    </operator>
+    <operator id="54" name="checkThreshold" imported="false" root="false" expanded="false">
+      <input id="55" name="Sensor_value" clock="false" type="12"/>
+      <input id="56" name="Threshold" clock="false" type="12"/>
+      <output id="57" name="Alarm" clock="false" type="1"/>
+      <local id="58" name="_L1" clock="false" type="1"/>
+      <local id="59" name="_L2" clock="false" type="12"/>
+      <local id="60" name="_L3" clock="false" type="12"/>
+    </operator>
+  </model>
+  <generated>
+    <c>
+      <file id="61" name="US_handler.h">
+        <function id="62" name="US_handler_init">
+          <parameter id="63" name="outC" type="69" pointer="true"/>
+        </function>
+        <function id="64" name="US_handler_reset">
+          <parameter id="65" name="outC" type="69" pointer="true"/>
+        </function>
+        <function id="66" name="US_handler">
+          <parameter id="67" name="inC" type="105" pointer="true"/>
+          <parameter id="68" name="outC" type="69" pointer="true"/>
+        </function>
+        <struct id="69" name="outC_US_handler">
+          <field id="70" name="Emergency_stop" type="168" pointer="false"/>
+          <field id="71" name="init" type="168" pointer="false"/>
+          <field id="72" name="v3_times_3_size" type="165" pointer="false"/>
+          <field id="73" name="Emergency_stop_SM_state_nxt" type="124" pointer="false"/>
+          <field id="74" name="Emergency_stop_SM_reset_act" type="168" pointer="false"/>
+          <field id="75" name="Emergency_stop_SM_reset_nxt" type="168" pointer="false"/>
+          <field id="76" name="Context_checkThreshold_3" type="118" pointer="false"/>
+          <field id="77" name="Context_checkThreshold_4" type="118" pointer="false"/>
+          <field id="78" name="Context_checkThreshold_5" type="118" pointer="false"/>
+          <field id="79" name="Emergency_stop_SM_state_sel" type="124" pointer="false"/>
+          <field id="80" name="Emergency_stop_SM_state_act" type="124" pointer="false"/>
+          <field id="81" name="o_times_3_size" type="168" pointer="false"/>
+          <field id="82" name="c_times_3_size" type="168" pointer="false"/>
+          <field id="83" name="n_times_3_size" type="165" pointer="false"/>
+          <field id="84" name="v4_times_3_size" type="165" pointer="false"/>
+          <field id="85" name="_L1_IDLE_Emergency_stop_SM" type="168" pointer="false"/>
+          <field id="86" name="_L1_Stop_Emergency_stop_SM" type="168" pointer="false"/>
+          <field id="87" name="_L2_WaitForConfirmation_Emergency_stop_SM" type="168" pointer="false"/>
+          <field id="88" name="Emergency_stop_SM_fired_strong" type="128" pointer="false"/>
+          <field id="89" name="Emergency_stop_SM_fired" type="128" pointer="false"/>
+          <field id="90" name="Obstacle_L" type="168" pointer="false"/>
+          <field id="91" name="Obstacle_M" type="168" pointer="false"/>
+          <field id="92" name="Obstacle_R" type="168" pointer="false"/>
+          <field id="93" name="_L1" type="168" pointer="false"/>
+          <field id="94" name="_L2" type="168" pointer="false"/>
+          <field id="95" name="_L3" type="168" pointer="false"/>
+          <field id="96" name="_L4" type="166" pointer="false"/>
+          <field id="97" name="_L5" type="166" pointer="false"/>
+          <field id="98" name="_L6" type="166" pointer="false"/>
+          <field id="99" name="_L7" type="166" pointer="false"/>
+          <field id="100" name="_L8" type="166" pointer="false"/>
+          <field id="101" name="_L9" type="166" pointer="false"/>
+          <field id="102" name="_L14" type="168" pointer="false"/>
+          <field id="103" name="_L15" type="168" pointer="false"/>
+          <field id="104" name="_L16" type="168" pointer="false"/>
+        </struct>
+        <struct id="105" name="inC_US_handler">
+          <field id="106" name="US_FL" type="166" pointer="false"/>
+          <field id="107" name="US_FM" type="166" pointer="false"/>
+          <field id="108" name="US_FR" type="166" pointer="false"/>
+        </struct>
+      </file>
+      <file id="109" name="checkThreshold.h">
+        <function id="110" name="checkThreshold_init">
+          <parameter id="111" name="outC" type="118" pointer="true"/>
+        </function>
+        <function id="112" name="checkThreshold_reset">
+          <parameter id="113" name="outC" type="118" pointer="true"/>
+        </function>
+        <function id="114" name="checkThreshold">
+          <parameter id="115" name="Sensor_value" type="166" pointer="false"/>
+          <parameter id="116" name="Threshold" type="166" pointer="false"/>
+          <parameter id="117" name="outC" type="118" pointer="true"/>
+        </function>
+        <struct id="118" name="outC_checkThreshold">
+          <field id="119" name="Alarm" type="168" pointer="false"/>
+          <field id="120" name="_L1" type="168" pointer="false"/>
+          <field id="121" name="_L2" type="166" pointer="false"/>
+          <field id="122" name="_L3" type="166" pointer="false"/>
+        </struct>
+      </file>
+      <file id="123" name="kcg_types.h">
+        <enum id="124" name="SSM_ST_Emergency_stop_SM" tagName="kcg_tag_SSM_ST_Emergency_stop_SM">
+          <value id="125" name="SSM_st_IDLE_Emergency_stop_SM"/>
+          <value id="126" name="SSM_st_Stop_Emergency_stop_SM"/>
+          <value id="127" name="SSM_st_WaitForConfirmation_Emergency_stop_SM"/>
+        </enum>
+        <enum id="128" name="SSM_TR_Emergency_stop_SM" tagName="kcg_tag_SSM_TR_Emergency_stop_SM">
+          <value id="129" name="SSM_TR_no_trans_Emergency_stop_SM"/>
+          <value id="130" name="SSM_TR_IDLE_WaitForConfirmation_1_IDLE_Emergency_stop_SM"/>
+          <value id="131" name="SSM_TR_Stop_IDLE_1_Stop_Emergency_stop_SM"/>
+          <value id="132" name="SSM_TR_WaitForConfirmation_IDLE_1_WaitForConfirmation_Emergency_stop_SM"/>
+          <value id="133" name="SSM_TR_WaitForConfirmation_Stop_2_WaitForConfirmation_Emergency_stop_SM"/>
+        </enum>
+        <macro id="134" name="kcg_assign_array"/>
+        <macro id="135" name="kcg_assign_struct"/>
+        <macro id="136" name="kcg_lnot_uint8"/>
+        <macro id="137" name="kcg_lnot_uint16"/>
+        <macro id="138" name="kcg_lnot_uint32"/>
+        <macro id="139" name="kcg_lnot_uint64"/>
+        <macro id="140" name="kcg_lsl_uint8"/>
+        <macro id="141" name="kcg_lsl_uint16"/>
+        <macro id="142" name="kcg_lsl_uint32"/>
+        <macro id="143" name="kcg_lsl_uint64"/>
+        <macro id="144" name="kcg_true"/>
+        <macro id="145" name="kcg_false"/>
+        <macro id="146" name="kcg_lit_int8"/>
+        <macro id="147" name="kcg_lit_int16"/>
+        <macro id="148" name="kcg_lit_int32"/>
+        <macro id="149" name="kcg_lit_int64"/>
+        <macro id="150" name="kcg_lit_uint8"/>
+        <macro id="151" name="kcg_lit_uint16"/>
+        <macro id="152" name="kcg_lit_uint32"/>
+        <macro id="153" name="kcg_lit_uint64"/>
+        <macro id="154" name="kcg_lit_size"/>
+        <macro id="155" name="kcg_lit_float64"/>
+        <macro id="156" name="kcg_lit_float32"/>
+        <predefType id="157" name="kcg_int8"/>
+        <predefType id="158" name="kcg_int16"/>
+        <predefType id="159" name="kcg_int32"/>
+        <predefType id="160" name="kcg_int64"/>
+        <predefType id="161" name="kcg_uint8"/>
+        <predefType id="162" name="kcg_uint16"/>
+        <predefType id="163" name="kcg_uint32"/>
+        <predefType id="164" name="kcg_uint64"/>
+        <predefType id="165" name="kcg_size"/>
+        <predefType id="166" name="kcg_float64"/>
+        <predefType id="167" name="kcg_float32"/>
+        <predefType id="168" name="kcg_bool"/>
+        <predefType id="169" name="kcg_char"/>
+        <macro id="170" name="KCG_MAPW_CPY"/>
+      </file>
+      <file id="171" name="kcg_consts.h">
+        <macro id="172" name="NbCyclesConfirmation" type="158"/>
+      </file>
+      <file id="173" name="kcg_sensors.h"/>
+    </c>
+    <map srcId="166" dstId="155" role="wrapped-lit"/>
+    <map srcId="167" dstId="156" role="wrapped-lit"/>
+    <map srcId="165" dstId="154" role="wrapped-lit"/>
+    <map srcId="164" dstId="153" role="wrapped-lit"/>
+    <map srcId="164" dstId="139" role="wrapped-lnot"/>
+    <map srcId="164" dstId="143" role="wrapped-lsl"/>
+    <map srcId="163" dstId="152" role="wrapped-lit"/>
+    <map srcId="163" dstId="138" role="wrapped-lnot"/>
+    <map srcId="163" dstId="142" role="wrapped-lsl"/>
+    <map srcId="162" dstId="151" role="wrapped-lit"/>
+    <map srcId="162" dstId="137" role="wrapped-lnot"/>
+    <map srcId="162" dstId="141" role="wrapped-lsl"/>
+    <map srcId="161" dstId="150" role="wrapped-lit"/>
+    <map srcId="161" dstId="136" role="wrapped-lnot"/>
+    <map srcId="161" dstId="140" role="wrapped-lsl"/>
+    <map srcId="160" dstId="149" role="wrapped-lit"/>
+    <map srcId="159" dstId="148" role="wrapped-lit"/>
+    <map srcId="158" dstId="147" role="wrapped-lit"/>
+    <map srcId="157" dstId="146" role="wrapped-lit"/>
+    <map srcId="87" dstId="80" role="clock"/>
+    <map srcId="87" dstId="127" role="clock-value"/>
+    <map srcId="86" dstId="80" role="clock"/>
+    <map srcId="86" dstId="126" role="clock-value"/>
+    <map srcId="85" dstId="80" role="clock"/>
+    <map srcId="85" dstId="125" role="clock-value"/>
+    <map srcId="84" dstId="79" role="clock"/>
+    <map srcId="84" dstId="127" role="clock-value"/>
+    <map srcId="83" dstId="79" role="clock"/>
+    <map srcId="83" dstId="127" role="clock-value"/>
+    <map srcId="82" dstId="79" role="clock"/>
+    <map srcId="82" dstId="127" role="clock-value"/>
+    <map srcId="81" dstId="79" role="clock"/>
+    <map srcId="81" dstId="127" role="clock-value"/>
+    <map srcId="72" dstId="79" role="clock"/>
+    <map srcId="72" dstId="127" role="clock-value"/>
+  </generated>
+  <map modelId="42" generatedId="130"/>
+  <map modelId="46" generatedId="131"/>
+  <map modelId="38" generatedId="129" role="autom-no-trans-enum"/>
+  <map modelId="53" generatedId="133"/>
+  <map modelId="50" generatedId="132"/>
+  <map modelId="43" generatedId="126"/>
+  <map modelId="39" generatedId="125"/>
+  <map modelId="47" generatedId="127"/>
+  <map modelId="15" generatedId="63" role="context-parameter"/>
+  <map modelId="15" generatedId="62" role="init-method"/>
+  <map modelId="15" generatedId="65" role="context-parameter"/>
+  <map modelId="15" generatedId="64" role="reset-method"/>
+  <map modelId="15" generatedId="67" role="input-struct-parameter"/>
+  <map modelId="18" generatedId="108"/>
+  <map modelId="17" generatedId="107"/>
+  <map modelId="16" generatedId="106"/>
+  <map modelId="15" generatedId="105" role="input-struct-type"/>
+  <map modelId="15" generatedId="68" role="context-parameter"/>
+  <map modelId="34" generatedId="104"/>
+  <map modelId="33" generatedId="103"/>
+  <map modelId="32" generatedId="102"/>
+  <map modelId="31" generatedId="101"/>
+  <map modelId="30" generatedId="100"/>
+  <map modelId="29" generatedId="99"/>
+  <map modelId="28" generatedId="98"/>
+  <map modelId="27" generatedId="97"/>
+  <map modelId="26" generatedId="96"/>
+  <map modelId="25" generatedId="95"/>
+  <map modelId="24" generatedId="94"/>
+  <map modelId="23" generatedId="93"/>
+  <map modelId="22" generatedId="92"/>
+  <map modelId="21" generatedId="91"/>
+  <map modelId="20" generatedId="90"/>
+  <map modelId="38" generatedId="89" role="autom-weak-transition"/>
+  <map modelId="38" generatedId="88" role="autom-strong-transition"/>
+  <map modelId="48" generatedId="87"/>
+  <map modelId="44" generatedId="86"/>
+  <map modelId="40" generatedId="85"/>
+  <map modelId="38" generatedId="80" role="autom-active-state"/>
+  <map modelId="38" generatedId="79" role="autom-selected-state"/>
+  <map modelId="37" generatedId="78"/>
+  <map modelId="36" generatedId="77"/>
+  <map modelId="35" generatedId="76"/>
+  <map modelId="38" generatedId="75" role="autom-next-reset"/>
+  <map modelId="38" generatedId="74" role="autom-active-reset"/>
+  <map modelId="38" generatedId="73" role="autom-next-state"/>
+  <map modelId="52" generatedId="72" role="memory"/>
+  <map modelId="52" generatedId="71" role="init"/>
+  <map modelId="19" generatedId="70"/>
+  <map modelId="15" generatedId="69" role="context-type"/>
+  <map modelId="15" generatedId="61" role="interface-file"/>
+  <map modelId="15" generatedId="66" role="cycle-method"/>
+  <map modelId="54" generatedId="111" role="context-parameter"/>
+  <map modelId="54" generatedId="110" role="init-method"/>
+  <map modelId="54" generatedId="113" role="context-parameter"/>
+  <map modelId="54" generatedId="112" role="reset-method"/>
+  <map modelId="56" generatedId="116"/>
+  <map modelId="55" generatedId="115"/>
+  <map modelId="54" generatedId="117" role="context-parameter"/>
+  <map modelId="60" generatedId="122"/>
+  <map modelId="59" generatedId="121"/>
+  <map modelId="58" generatedId="120"/>
+  <map modelId="57" generatedId="119"/>
+  <map modelId="54" generatedId="118" role="context-type"/>
+  <map modelId="54" generatedId="109" role="interface-file"/>
+  <map modelId="54" generatedId="114" role="cycle-method"/>
+  <map modelId="14" generatedId="172"/>
+  <map modelId="38" generatedId="128" role="autom-transitions-type"/>
+  <map modelId="38" generatedId="124" role="autom-states-type"/>
+  <map modelId="2" generatedId="169"/>
+  <map modelId="1" generatedId="168"/>
+  <map modelId="12" generatedId="166"/>
+  <map modelId="11" generatedId="167"/>
+  <map modelId="13" generatedId="165"/>
+  <map modelId="10" generatedId="164"/>
+  <map modelId="9" generatedId="163"/>
+  <map modelId="8" generatedId="162"/>
+  <map modelId="7" generatedId="161"/>
+  <map modelId="6" generatedId="160"/>
+  <map modelId="5" generatedId="159"/>
+  <map modelId="4" generatedId="158"/>
+  <map modelId="3" generatedId="157"/>
+</mapping>
+<!--$********** SCADE Suite KCG 32-bit 6.6 (build i19) ***********
+** mapping.xml
+** Generation date: 2018-01-18T09:58:59
+*************************************************************$-->

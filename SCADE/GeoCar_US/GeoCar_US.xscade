@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<File xmlns="http://www.esterel-technologies.com/ns/scade/6" xmlns:ed="http://www.esterel-technologies.com/ns/scade/pragmas/editor/5" xmlns:kcg="http://www.esterel-technologies.com/ns/scade/pragmas/codegen/3">
+	<declarations>
+		<Constant name="NbCyclesConfirmation">
+			<type>
+				<NamedType>
+					<type>
+						<TypeRef name="int16"/>
+					</type>
+				</NamedType>
+			</type>
+			<value>
+				<ConstValue value="50"/>
+			</value>
+			<pragmas>
+				<ed:Constant oid="!ed/e271/3472/1714/5a5f86eb3a93"/>
+			</pragmas>
+		</Constant>
+	</declarations>
+</File>

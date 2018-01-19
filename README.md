@@ -67,7 +67,11 @@ Contient les drivers.
 
 Contient le reste du code.
 
-### III- convention.txt
+### III- SCADE
+
+Contient le projet SCADE de surveillance des capteurs ultrason, et le code C généré (sous KCG). Créé avec SCADE Suite v19.2.
+
+### IIII- convention.txt
 
 Convention de codage adoptée.
 

@@ -1,0 +1,66 @@
+$**************  SCADETOC Version 18.2 (build i9) **************
+** Generation date: 2018-01-18T09:58:58
+** Command: scade -code "U:\5A\Prog_synchrone\GeoCar_US\GeoCar_US.etp" -root US_handler -conf Simulation -build
+*************************************************************$
+*** Generated Files Information (GENFIL): KCG- Generated files
+  at file U:\5A\Prog_synchrone\GeoCar_US\Simulation\mapping.xml, line 0, character 0
+ ~mapping.xml
+  at file U:\5A\Prog_synchrone\GeoCar_US\Simulation\kcg_metrics.txt, line 0, character 0
+ ~kcg_metrics.txt
+  at file U:\5A\Prog_synchrone\GeoCar_US\Simulation\US_handler.c, line 0, character 0
+ ~US_handler.c
+  at file U:\5A\Prog_synchrone\GeoCar_US\Simulation\checkThreshold.c, line 0, character 0
+ ~checkThreshold.c
+  at file U:\5A\Prog_synchrone\GeoCar_US\Simulation\US_handler.h, line 0, character 0
+ ~US_handler.h
+  at file U:\5A\Prog_synchrone\GeoCar_US\Simulation\checkThreshold.h, line 0, character 0
+ ~checkThreshold.h
+  at file U:\5A\Prog_synchrone\GeoCar_US\Simulation\kcg_types.h, line 0, character 0
+ ~kcg_types.h
+  at file U:\5A\Prog_synchrone\GeoCar_US\Simulation\kcg_consts.h, line 0, character 0
+ ~kcg_consts.h
+  at file U:\5A\Prog_synchrone\GeoCar_US\Simulation\kcg_sensors.h, line 0, character 0
+ ~kcg_sensors.h
+  at file U:\5A\Prog_synchrone\GeoCar_US\Simulation\kcg_types.c, line 0, character 0
+ ~kcg_types.c
+  at file U:\5A\Prog_synchrone\GeoCar_US\Simulation\kcg_consts.c, line 0, character 0
+ ~kcg_consts.c
+  at file U:\5A\Prog_synchrone\GeoCar_US\Simulation\config.txt, line 0, character 0
+ ~config.txt
+*** Generated Files Information (GENFIL): Code Generator Generated files
+  at file U:\5A\Prog_synchrone\GeoCar_US\Simulation\user_macros.h, line 0, character 0
+ ~user_macros.h
+  at file U:\5A\Prog_synchrone\GeoCar_US\Simulation\kcg_imported_types.h, line 0, character 0
+ ~kcg_imported_types.h
+  at file U:\5A\Prog_synchrone\GeoCar_US\Simulation\sc2c.log, line 0, character 0
+ ~sc2c.log
+  at file U:\5A\Prog_synchrone\GeoCar_US\Simulation\sc2c_integration_files.txt, line 0, character 0
+ ~sc2c_integration_files.txt
+*** Generated Files Information (GENFIL): Type Utils Generated files
+  at file U:\5A\Prog_synchrone\GeoCar_US\Simulation\GeoCar_US_type.h, line 0, character 0
+ ~GeoCar_US_type.h
+  at file U:\5A\Prog_synchrone\GeoCar_US\Simulation\GeoCar_US_type.c, line 0, character 0
+ ~GeoCar_US_type.c
+*** Generated Files Information (GENFIL): Mapping Utils Generated files
+  at file U:\5A\Prog_synchrone\GeoCar_US\Simulation\GeoCar_US_mapping.h, line 0, character 0
+ ~GeoCar_US_mapping.h
+  at file U:\5A\Prog_synchrone\GeoCar_US\Simulation\GeoCar_US_mapping.c, line 0, character 0
+ ~GeoCar_US_mapping.c
+*** Generated Files Information (GENFIL): Simulator Generated files
+  at file U:\5A\Prog_synchrone\GeoCar_US\Simulation\GeoCar_US_interface.h, line 0, character 0
+ ~GeoCar_US_interface.h
+  at file U:\5A\Prog_synchrone\GeoCar_US\Simulation\GeoCar_US_interface.c, line 0, character 0
+ ~GeoCar_US_interface.c
+  at file U:\5A\Prog_synchrone\GeoCar_US\Simulation\GeoCar_US_dll.c, line 0, character 0
+ ~GeoCar_US_dll.c
+*** Generated Files Information (GENFIL): Build Generated files
+  at file U:\5A\Prog_synchrone\GeoCar_US\Simulation\Makefile_win64, line 0, character 0
+ ~Makefile_win64
+  at file U:\5A\Prog_synchrone\GeoCar_US\Simulation\US_handler.dll, line 0, character 0
+ ~US_handler.dll
+  at file U:\5A\Prog_synchrone\GeoCar_US\Simulation\US_handler.exe, line 0, character 0
+ ~US_handler.exe
+$**************  SCADETOC Version 18.2 (build i9) **************
+** Generation date: 2018-01-18T09:59:09
+** sc2c.log
+*************************************************************$
